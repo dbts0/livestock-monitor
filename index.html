@@ -1,0 +1,3031 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Livestock Population Monitor | Abu Dhabi Animal Shops</title>
+  <style>
+    * { box-sizing: border-box; font-family: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Tahoma', sans-serif; }
+    body { background: #f0f4e8; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+    .container { max-width: 1400px; width: 100%; background: white; border-radius: 32px; box-shadow: 0 12px 30px rgba(0,0,0,0.1); overflow: hidden; position: relative; }
+    .header { background: #2d6a4f; color: white; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+    .header-text h1 { margin: 0 0 4px 0; font-weight: 600; font-size: 1.5rem; }
+    .header-text p { margin: 0; opacity: 0.9; font-size: 0.85rem; }
+    .stats-badge { background: rgba(255,255,255,0.2); border-radius: 40px; padding: 3px 10px; display: inline-block; font-size: 0.7rem; margin-top: 6px; }
+    .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .manage-providers-btn { background: #f0f4e8; color: #2d6a4f; border: none; padding: 8px 16px; border-radius: 40px; font-weight: 700; font-size: 0.8rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.15); transition: 0.2s; display: flex; align-items: center; gap: 6px; }
+    .manage-providers-btn:hover { background: white; transform: translateY(-1px); }
+    .form-card { padding: 20px 24px 24px 24px; }
+    .compact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 14px; margin-bottom: 16px; }
+    .compact-grid .field-item { display: flex; flex-direction: column; gap: 3px; }
+    .compact-grid .field-item label { font-size: 0.7rem; font-weight: 700; color: #2d6a4f; letter-spacing: 0.2px; }
+    .compact-grid .field-item input, .compact-grid .field-item select { padding: 7px 10px; border: 1px solid #c8e0d0; border-radius: 12px; font-size: 0.8rem; background: #fefef7; transition: 0.2s; width: 100%; }
+    .compact-grid .field-item input:focus, .compact-grid .field-item select:focus { border-color: #2d6a4f; outline: none; box-shadow: 0 0 0 2px rgba(45,106,79,0.15); background: white; }
+    .vehicle-plate-group { display: flex; gap: 5px; }
+    .vehicle-plate-group .plate-number { flex: 1.5; min-width: 0; }
+    .vehicle-plate-group .plate-emirate { flex: 1.2; min-width: 0; }
+    .driver-name-group { display: flex; gap: 5px; align-items: stretch; }
+    .driver-name-group input { flex: 1; min-width: 0; }
+    .driver-name-group select { flex: 0 0 80px; padding: 7px; font-size: 0.75rem; border-radius: 12px; border: 1px solid #2d6a4f; background: #e8f3ec; color: #2d6a4f; font-weight: 700; cursor: pointer; }
+    .datetime-group { display: flex; gap: 5px; align-items: stretch; }
+    .datetime-group input { flex: 1; min-width: 0; }
+    .datetime-group .now-btn { flex: 0 0 auto; padding: 0 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; background: #e8f3ec; color: #2d6a4f; border: 1px solid #c8e0d0; cursor: pointer; transition: 0.15s; white-space: nowrap; }
+    .datetime-group .now-btn:hover { background: #d8ecdf; transform: translateY(-1px); }
+    .compact-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 14px; margin-bottom: 16px; }
+    .compact-grid-2 .field-item { display: flex; flex-direction: column; gap: 3px; }
+    .compact-grid-2 .field-item label { font-size: 0.7rem; font-weight: 700; color: #2d6a4f; letter-spacing: 0.2px; }
+    .compact-grid-2 .field-item input, .compact-grid-2 .field-item select { padding: 7px 10px; border: 1px solid #c8e0d0; border-radius: 12px; font-size: 0.8rem; background: #fefef7; transition: 0.2s; width: 100%; }
+    .compact-grid-2 .field-item input:focus, .compact-grid-2 .field-item select:focus { border-color: #2d6a4f; outline: none; box-shadow: 0 0 0 2px rgba(45,106,79,0.15); background: white; }
+    .cert-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 10px 14px; margin-bottom: 16px; }
+    .form-row { margin-bottom: 16px; display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; }
+    .form-row label { width: 130px; font-weight: 600; color: #2d6a4f; padding-top: 8px; font-size: 0.8rem; }
+    .field-group { flex: 1; min-width: 250px; }
+    textarea { width: 100%; padding: 8px 12px; border: 1px solid #c8e0d0; border-radius: 16px; font-size: 0.85rem; background: #fefef7; transition: 0.2s; resize: vertical; }
+    textarea:focus { border-color: #2d6a4f; outline: none; box-shadow: 0 0 0 2px rgba(45,106,79,0.15); background: white; }
+    .inline-hint { font-size: 0.65rem; color: #6b8f7c; margin-top: 2px; }
+    .cert-alert { margin-top: 6px; padding: 8px 12px; border-radius: 10px; font-size: 0.72rem; display: none; }
+    .cert-alert.show { display: block; }
+    .cert-alert.info { background: #e8f3ec; color: #2d6a4f; border: 1px solid #b8dcc5; }
+    .cert-alert.warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+    .cert-alert.danger { background: #fdecea; color: #a53125; border: 1px solid #f5c2c2; }
+    .manual-input { margin-top: 4px; display: none; }
+    .manual-input.show { display: block; }
+    .submit-btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; margin-bottom: 12px; }
+    .submit-btn { border: none; padding: 14px 20px; border-radius: 40px; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 3px 8px rgba(0,0,0,0.12); }
+    .submit-btn.accept { background: #2d6a4f; color: white; }
+    .submit-btn.accept:hover { background: #1f543d; transform: translateY(-2px); box-shadow: 0 5px 14px rgba(45,106,79,0.35); }
+    .submit-btn.reject { background: #c0392b; color: white; }
+    .submit-btn.reject:hover { background: #a53125; transform: translateY(-2px); box-shadow: 0 5px 14px rgba(192,57,43,0.35); }
+    .secondary-btn-group { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center; margin-top: 8px; }
+    button.secondary { border: 1px solid #c8e0d0; padding: 9px 18px; border-radius: 40px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.2s; background: #eef3ef; color: #2d6a4f; }
+    button.secondary:hover { background: #e2ece4; }
+    .species-table-wrapper { width: 100%; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background: white; }
+    .species-table-header { background: #c8102e; color: white; padding: 7px 12px; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.3px; }
+    .species-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .species-table th { background: #f0f0f0; color: #222; font-weight: 700; padding: 8px 10px; text-align: center; border: 1px solid #ddd; font-size: 0.78rem; }
+    .species-table td { padding: 6px 8px; border: 1px solid #ddd; vertical-align: middle; background: white; }
+    .species-table select, .species-table input[type="number"] { width: 100%; padding: 7px 9px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.82rem; background: white; color: #333; }
+    .species-table select:focus, .species-table input:focus { border-color: #c8102e; box-shadow: 0 0 0 2px rgba(200,16,46,0.15); outline: none; }
+    .required-star { color: #c8102e; font-weight: 700; margin-left: 3px; }
+    .add-row-cell { text-align: center; width: 50px; }
+    .add-row-btn { background: #4caf50; color: white; border: none; width: 28px; height: 28px; border-radius: 50%; font-size: 1rem; cursor: pointer; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; padding: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.15); transition: 0.15s; }
+    .add-row-btn:hover { background: #3d8b40; transform: scale(1.08); }
+    .remove-row-btn { background: #e74c3c; color: white; border: none; width: 24px; height: 24px; border-radius: 50%; font-size: 0.8rem; cursor: pointer; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+    .remove-row-btn:hover { background: #c0392b; }
+    .total-row td { background: #fafafa; font-weight: 700; color: #222; padding: 8px 10px; font-size: 0.82rem; }
+    .total-row .total-label { text-align: right; padding-right: 14px; }
+    .total-row .total-input { width: 120px; padding: 7px 9px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.82rem; background: #f0f0f0; color: #c8102e; font-weight: 700; text-align: center; }
+    .records-section { margin-top: 24px; padding-top: 20px; border-top: 2px dashed #c8e0d0; }
+    .records-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .records-panel { border-radius: 16px; overflow: hidden; border: 1px solid #d8e8dc; display: flex; flex-direction: column; }
+    .records-panel.accepted { border-color: #b8dcc5; }
+    .records-panel.rejected { border-color: #f0c0bb; }
+    .records-panel.washed { border-color: #b8cbe0; }
+    .records-panel-header { padding: 10px 14px; color: white; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .records-panel.accepted .records-panel-header { background: #2d6a4f; }
+    .records-panel.rejected .records-panel-header { background: #c0392b; }
+    .records-panel.washed .records-panel-header { background: #1f4e79; }
+    .records-panel-title { font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; }
+    .records-panel-count { background: rgba(255,255,255,0.25); padding: 2px 10px; border-radius: 40px; font-size: 0.7rem; font-weight: 600; }
+    .records-panel-total { padding: 12px 14px; border-bottom: 1px solid #e8f3ec; }
+    .records-panel.accepted .records-panel-total { background: linear-gradient(180deg, #eaf6ee 0%, #f4faf6 100%); }
+    .records-panel.rejected .records-panel-total { background: linear-gradient(180deg, #fdecea 0%, #fef5f4 100%); border-bottom-color: #f8d7da; }
+    .records-panel.washed .records-panel-total { background: linear-gradient(180deg, #e8f0f8 0%, #f2f7fc 100%); border-bottom-color: #d0e0f0; }
+    .total-header-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+    .total-label-text { font-size: 0.72rem; font-weight: 700; color: #2d6a4f; text-transform: uppercase; letter-spacing: 0.4px; }
+    .records-panel.rejected .total-label-text { color: #a53125; }
+    .records-panel.washed .total-label-text { color: #1f4e79; }
+    .total-grand-value { font-size: 1.3rem; font-weight: 800; color: #2d6a4f; background: white; padding: 4px 16px; border-radius: 40px; border: 2px solid #b8dcc5; min-width: 70px; text-align: center; box-shadow: 0 2px 6px rgba(45,106,79,0.15); }
+    .records-panel.rejected .total-grand-value { color: #a53125; border-color: #f0c0bb; box-shadow: 0 2px 6px rgba(192,57,43,0.15); }
+    .records-panel.washed .total-grand-value { color: #1f4e79; border-color: #b8cbe0; box-shadow: 0 2px 6px rgba(31,78,121,0.15); }
+    .species-breakdown { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 6px; }
+    .species-chip { display: flex; justify-content: space-between; align-items: center; gap: 6px; padding: 5px 10px; background: white; border-radius: 10px; border: 1px solid #d8e8dc; font-size: 0.72rem; }
+    .species-chip .chip-name { font-weight: 600; color: #2d6a4f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .species-chip .chip-count { font-weight: 800; color: #1f543d; background: #eaf6ee; padding: 1px 8px; border-radius: 20px; font-size: 0.72rem; min-width: 30px; text-align: center; }
+    .species-breakdown-empty { font-size: 0.7rem; color: #888; font-style: italic; padding: 4px 0; }
+    .records-panel-filters { display: flex; gap: 6px; padding: 8px 10px; flex-wrap: wrap; background: #fafdfb; border-bottom: 1px solid #e8f3ec; align-items: center; }
+    .records-panel-filters select, .records-panel-filters input { width: auto; min-width: 0; padding: 4px 8px; font-size: 0.7rem; border-radius: 10px; border: 1px solid #c8e0d0; background: white; flex: 1; }
+    .records-panel-actions { display: flex; gap: 6px; padding: 8px 10px; background: #fafdfb; border-bottom: 1px solid #e8f3ec; flex-wrap: wrap; }
+    .records-panel-actions button { padding: 5px 10px; font-size: 0.7rem; border-radius: 40px; flex: 1; min-width: 90px; }
+    .records-panel-actions button.export-selected { background: #1f543d; color: white; border-color: #1f543d; font-weight: 700; }
+    .records-panel-actions button.export-selected:disabled, .records-panel-actions button.pdf-btn:disabled { background: #ccc; border-color: #ccc; color: #888; cursor: not-allowed; opacity: 0.6; }
+    .records-panel-actions button.pdf-btn { background: #c8102e; color: white; border-color: #c8102e; font-weight: 700; }
+    .records-panel-actions button.wash-btn { background: #1f4e79; color: white; border-color: #1f4e79; font-weight: 700; }
+    .records-panel-actions button.wash-btn:disabled { background: #ccc; border-color: #ccc; color: #888; cursor: not-allowed; opacity: 0.6; }
+    .records-panel-table-wrapper { overflow-x: auto; overflow-y: auto; max-height: 360px; background: white; flex: 1; }
+    .records-panel table { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+    .records-panel th, .records-panel td { padding: 6px 5px; text-align: left; border-bottom: 1px solid #eef5ef; vertical-align: top; }
+    .records-panel th { background: #e8f3ec; color: #2d6a4f; font-weight: 600; position: sticky; top: 0; font-size: 0.68rem; }
+    .records-panel.rejected th { background: #fdecea; color: #a53125; }
+    .records-panel.washed th { background: #e8f0f8; color: #1f4e79; }
+    .records-panel .empty-msg { padding: 24px; text-align: center; color: #999; font-size: 0.8rem; }
+    .select-col { width: 30px; text-align: center; padding-left: 8px !important; }
+    .select-col input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: #2d6a4f; }
+    tr.row-selected { background: #f0f8f3; }
+    .section-label { font-size: 0.7rem; font-weight: 700; color: #2d6a4f; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; padding-left: 2px; }
+    .section-divider { margin: 6px 0 14px 0; border: none; border-top: 1px dashed #c8e0d0; }
+    .footer-note { margin-top: 16px; background: #f4faf6; padding: 10px 14px; border-radius: 20px; font-size: 0.7rem; color: #3a6b58; text-align: center; }
+    .tab-bar { display: flex; gap: 6px; border-bottom: 2px solid #c8e0d0; margin-bottom: 18px; padding-bottom: 4px; flex-wrap: wrap; }
+    .tab-btn { background: none; border: none; padding: 10px 18px; font-size: 0.85rem; font-weight: 700; color: #6b8f7c; cursor: pointer; border-radius: 12px 12px 0 0; transition: 0.2s; }
+    .tab-btn:hover { background: #eaf6ee; color: #2d6a4f; }
+    .tab-btn.active { background: #2d6a4f; color: white; }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.active { display: flex; }
+    .modal-content { background: white; width: 100%; max-width: 800px; max-height: 90vh; border-radius: 24px; box-shadow: 0 12px 40px rgba(0,0,0,0.2); display: flex; flex-direction: column; overflow: hidden; }
+    .modal-content.wide { max-width: 1200px; }
+    .modal-content.narrow { max-width: 500px; }
+    .modal-header { background: #2d6a4f; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .modal-header.rejected-header { background: #c0392b; }
+    .modal-header.warning-header { background: #b07d00; }
+    .modal-header h2 { margin: 0; font-size: 1.2rem; }
+    .close-modal-btn { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; line-height: 1; padding: 0; opacity: 0.8; }
+    .close-modal-btn:hover { opacity: 1; }
+    .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+    .modal-footer { padding: 14px 20px; border-top: 1px solid #eef5ef; display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+    .modal-footer button { padding: 10px 20px; border-radius: 40px; font-weight: 700; font-size: 0.85rem; cursor: pointer; border: none; transition: 0.15s; }
+    .modal-footer button.primary { background: #2d6a4f; color: white; }
+    .modal-footer button.primary:hover { background: #1f543d; }
+    .modal-footer button.danger { background: #c0392b; color: white; }
+    .modal-footer button.danger:hover { background: #a53125; }
+    .modal-footer button.cancel { background: #eef3ef; color: #555; border: 1px solid #c8e0d0; }
+    .modal-footer button.cancel:hover { background: #e2ece4; }
+    .password-input { width: 100%; padding: 12px 16px; border: 2px solid #c8e0d0; border-radius: 12px; font-size: 1rem; text-align: center; letter-spacing: 3px; }
+    .password-input:focus { outline: none; border-color: #2d6a4f; box-shadow: 0 0 0 3px rgba(45,106,79,0.15); }
+    .password-error { color: #c0392b; font-size: 0.8rem; margin-top: 8px; text-align: center; display: none; }
+    .password-error.show { display: block; }
+    .add-vehicle-section { background: #f4faf6; border: 1px solid #c8e0d0; border-radius: 16px; padding: 16px; margin-bottom: 24px; }
+    .add-vehicle-section h3 { margin: 0 0 12px 0; font-size: 0.9rem; color: #2d6a4f; }
+    .add-vehicle-form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .add-vehicle-form .field-item { display: flex; flex-direction: column; gap: 3px; }
+    .add-vehicle-form .field-item label { font-size: 0.7rem; font-weight: 700; color: #2d6a4f; }
+    .add-vehicle-form .field-item input, .add-vehicle-form .field-item select { padding: 7px 10px; border: 1px solid #c8e0d0; border-radius: 12px; font-size: 0.8rem; background: white; }
+    .add-vehicle-form .full-width { grid-column: span 2; }
+    .add-vehicle-btn { grid-column: span 2; background: #2d6a4f; color: white; border: none; padding: 10px; border-radius: 40px; font-weight: 700; cursor: pointer; transition: 0.2s; margin-top: 4px; }
+    .add-vehicle-btn:hover { background: #1f543d; }
+    .providers-list { display: flex; flex-direction: column; gap: 12px; }
+    .provider-card { border: 1px solid #c8e0d0; border-radius: 12px; overflow: hidden; }
+    .provider-vehicle-header { background: #e8f3ec; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; }
+    .provider-vehicle-title { font-weight: 700; color: #2d6a4f; font-size: 0.85rem; }
+    .delete-vehicle-btn { background: #fde8e8; color: #c0392b; border: 1px solid #f5c2c2; padding: 4px 10px; border-radius: 40px; font-size: 0.7rem; font-weight: 700; cursor: pointer; }
+    .delete-vehicle-btn:hover { background: #fbd5d5; }
+    .provider-drivers-list { padding: 10px 14px; display: flex; flex-direction: column; gap: 8px; }
+    .provider-driver-row { display: flex; justify-content: space-between; align-items: center; background: #fafdfb; border: 1px solid #eef5ef; padding: 8px 12px; border-radius: 10px; font-size: 0.78rem; }
+    .driver-info strong { color: #2d6a4f; }
+    .driver-info span { color: #666; margin-left: 8px; font-size: 0.72rem; }
+    .delete-driver-btn { background: none; border: none; color: #c0392b; cursor: pointer; font-size: 1rem; padding: 4px; border-radius: 50%; }
+    .delete-driver-btn:hover { background: #fdecea; }
+    .add-driver-inline-form { display: flex; gap: 6px; margin-top: 6px; padding-top: 10px; border-top: 1px dashed #d8e8dc; }
+    .add-driver-inline-form input { flex: 1; min-width: 0; padding: 6px 10px; border: 1px solid #c8e0d0; border-radius: 8px; font-size: 0.75rem; }
+    .add-driver-inline-btn { background: #2d6a4f; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .add-driver-inline-btn:hover { background: #1f543d; }
+    .wash-queue-section { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 8px; }
+    .animal-ids-section { margin-top: 16px; border: 2px solid #f0c0bb; border-radius: 16px; overflow: hidden; background: #fefaf9; }
+    .animal-ids-header { background: #c0392b; color: white; padding: 10px 16px; font-weight: 700; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .animal-ids-count-badge { background: rgba(255,255,255,0.25); padding: 2px 10px; border-radius: 40px; font-size: 0.7rem; }
+    .animal-ids-body { padding: 14px 16px; }
+    .input-mode-tabs { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+    .input-mode-tab { padding: 8px 16px; border: 2px solid #f0c0bb; background: white; border-radius: 40px; font-size: 0.78rem; font-weight: 700; cursor: pointer; color: #a53125; }
+    .input-mode-tab:hover { background: #fdecea; }
+    .input-mode-tab.active { background: #c0392b; color: white; border-color: #c0392b; }
+    .input-mode-pane { display: none; }
+    .input-mode-pane.active { display: block; }
+    .individual-ids-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; max-height: 240px; overflow-y: auto; }
+    .individual-id-row { display: grid; grid-template-columns: 2fr 1.5fr 1.5fr 40px; gap: 6px; align-items: center; padding: 6px 8px; background: white; border: 1px solid #f0c0bb; border-radius: 10px; }
+    .individual-id-row input, .individual-id-row select { width: 100%; padding: 6px 9px; border: 1px solid #e0c0bb; border-radius: 8px; font-size: 0.78rem; background: white; }
+    .individual-id-row input:focus, .individual-id-row select:focus { border-color: #c0392b; outline: none; box-shadow: 0 0 0 2px rgba(192,57,43,0.12); }
+    .remove-id-btn { background: #fde8e8; color: #c0392b; border: 1px solid #f5c2c2; width: 30px; height: 30px; border-radius: 50%; font-size: 1rem; cursor: pointer; font-weight: 700; padding: 0; }
+    .remove-id-btn:hover { background: #fbd5d5; }
+    .add-id-btn { background: #c0392b; color: white; border: none; padding: 7px 16px; border-radius: 40px; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
+    .add-id-btn:hover { background: #a53125; }
+    .range-form { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
+    .range-form .range-item { display: flex; flex-direction: column; gap: 3px; }
+    .range-form .range-item label { font-size: 0.68rem; font-weight: 700; color: #a53125; }
+    .range-form .range-item input, .range-form .range-item select { padding: 7px 9px; border: 1px solid #e0c0bb; border-radius: 8px; font-size: 0.78rem; background: white; width: 100%; }
+    .range-preview { background: white; border: 1px dashed #c0392b; border-radius: 10px; padding: 10px 12px; font-size: 0.75rem; color: #a53125; margin-top: 8px; max-height: 100px; overflow-y: auto; font-family: monospace; }
+    .range-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .range-btn { background: #c0392b; color: white; border: none; padding: 8px 18px; border-radius: 40px; font-size: 0.78rem; font-weight: 700; cursor: pointer; }
+    .range-btn:hover { background: #a53125; }
+    .range-btn.secondary { background: #eef3ef; color: #2d6a4f; border: 1px solid #c8e0d0; }
+    .paste-textarea { width: 100%; padding: 10px 12px; border: 1px solid #e0c0bb; border-radius: 12px; font-size: 0.78rem; font-family: monospace; background: white; resize: vertical; min-height: 100px; }
+    .paste-hint { font-size: 0.68rem; color: #888; margin-top: 4px; }
+    .paste-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .registered-ids-summary { margin-top: 14px; background: white; border: 1px solid #f0c0bb; border-radius: 12px; padding: 10px 12px; }
+    .registered-ids-summary h4 { margin: 0 0 8px 0; font-size: 0.78rem; color: #a53125; }
+    .registered-ids-list { display: flex; flex-wrap: wrap; gap: 4px; max-height: 120px; overflow-y: auto; }
+    .id-chip { background: #fdecea; color: #842318; padding: 2px 9px; border-radius: 20px; font-size: 0.68rem; font-weight: 600; border: 1px solid #f0c0bb; display: inline-flex; align-items: center; gap: 4px; }
+    .id-chip .id-chip-close { cursor: pointer; opacity: 0.6; font-size: 0.8rem; line-height: 1; }
+    .archive-search-box { background: linear-gradient(135deg, #2d6a4f 0%, #1f543d 100%); color: white; padding: 20px 24px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(45,106,79,0.2); }
+    .archive-search-box h3 { margin: 0 0 4px 0; font-size: 1.05rem; }
+    .archive-search-box p { margin: 0 0 12px 0; font-size: 0.75rem; opacity: 0.9; }
+    .archive-search-input-group { display: flex; gap: 8px; }
+    .archive-search-input-group input { flex: 1; padding: 12px 16px; border: none; border-radius: 40px; font-size: 0.9rem; background: white; color: #333; }
+    .archive-search-input-group input:focus { outline: none; box-shadow: 0 0 0 3px rgba(255,255,255,0.3); }
+    .archive-search-btn { background: #c8102e; color: white; border: none; padding: 12px 26px; border-radius: 40px; font-size: 0.9rem; font-weight: 700; cursor: pointer; }
+    .search-result-box { background: white; border-radius: 16px; padding: 16px 20px; margin-bottom: 20px; border: 2px solid #c8e0d0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .search-result-box.has-result { border-color: #2d6a4f; }
+    .search-result-box.no-result { border-color: #ddd; background: #fafafa; }
+    .search-result-title { font-size: 0.9rem; font-weight: 700; color: #2d6a4f; margin-bottom: 10px; }
+    .search-timeline { display: flex; flex-direction: column; gap: 8px; }
+    .search-timeline-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 14px; border-radius: 12px; font-size: 0.78rem; }
+    .search-timeline-item.rejected { background: #fdecea; border-left: 4px solid #c0392b; }
+    .search-timeline-icon { font-size: 1.1rem; }
+    .search-timeline-content { flex: 1; }
+    .search-timeline-meta { font-size: 0.7rem; color: #666; margin-top: 4px; }
+    .archive-tables-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .archive-section-header { background: linear-gradient(135deg, #c0392b 0%, #a53125 100%); color: white; padding: 12px 16px; border-radius: 14px 14px 0 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .archive-section-header.blue { background: linear-gradient(135deg, #1f4e79 0%, #163a5c 100%); }
+    .archive-section-title { font-weight: 700; font-size: 0.9rem; }
+    .archive-section-count { background: rgba(255,255,255,0.25); padding: 2px 10px; border-radius: 40px; font-size: 0.7rem; }
+    .archive-section-body { background: white; border: 1px solid #f0c0bb; border-top: none; border-radius: 0 0 14px 14px; padding: 12px; }
+    .archive-table-wrapper { overflow-x: auto; overflow-y: auto; max-height: 420px; }
+    .archive-table-wrapper table { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+    .archive-table-wrapper th { background: #fdecea; color: #a53125; font-weight: 600; position: sticky; top: 0; padding: 7px 6px; text-align: left; font-size: 0.68rem; border-bottom: 1px solid #f8d7da; }
+    .archive-table-wrapper.blue th { background: #e8f0f8; color: #1f4e79; border-bottom-color: #d0e0f0; }
+    .archive-table-wrapper td { padding: 6px 5px; border-bottom: 1px solid #fef5f4; vertical-align: top; }
+    .archive-view-ids-btn { background: #1f4e79; color: white; border: none; padding: 3px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .archive-view-ids-btn:disabled { background: #ccc; cursor: not-allowed; opacity: 0.6; }
+    .no-ids-warning { color: #b07d00; font-size: 0.65rem; font-weight: 600; }
+    .archive-filter-row { display: flex; gap: 6px; padding: 8px 0; flex-wrap: wrap; }
+    .archive-filter-row select, .archive-filter-row input { padding: 5px 10px; font-size: 0.72rem; border-radius: 10px; border: 1px solid #e0c0bb; background: white; flex: 1; min-width: 0; }
+    .archive-export-row { display: flex; gap: 6px; padding: 8px 0 10px 0; flex-wrap: wrap; }
+    .archive-export-row button { padding: 5px 12px; font-size: 0.7rem; border-radius: 40px; flex: 1; min-width: 90px; }
+    .help-btn { background: #f0f4e8; color: #2d6a4f; border: none; width: 36px; height: 36px; border-radius: 50%; font-weight: 700; font-size: 1rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.15); transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+    .help-btn:hover { background: white; transform: translateY(-1px); }
+    .help-section { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #eef5ef; }
+    .help-section:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+    .help-section h3 { margin: 0 0 8px 0; color: #2d6a4f; font-size: 1rem; }
+    .help-section h4 { margin: 12px 0 6px 0; color: #555; font-size: 0.85rem; }
+    .help-section p { margin: 0 0 8px 0; font-size: 0.82rem; line-height: 1.5; color: #444; }
+    .help-section ul { margin: 0 0 8px 0; padding-left: 20px; font-size: 0.82rem; line-height: 1.6; color: #444; }
+    .help-section code { background: #eaf6ee; color: #2d6a4f; padding: 2px 6px; border-radius: 4px; font-size: 0.78rem; font-family: monospace; }
+    .import-option { display: flex; align-items: flex-start; gap: 10px; padding: 10px; border: 2px solid #c8e0d0; border-radius: 12px; cursor: pointer; margin-bottom: 10px; transition: 0.15s; }
+    .import-option:hover { background: #f4faf6; }
+    .import-option input[type="radio"] { margin-top: 3px; }
+    @media (max-width: 1100px) {
+      .archive-tables-wrapper { grid-template-columns: 1fr; }
+      .range-form { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 1000px) { .records-panels, .wash-queue-section { grid-template-columns: 1fr; } }
+    @media (max-width: 720px) {
+      .compact-grid { grid-template-columns: repeat(2, 1fr); }
+      .compact-grid-2, .cert-grid { grid-template-columns: 1fr; }
+      .submit-btn-group { grid-template-columns: 1fr; }
+      .add-vehicle-form { grid-template-columns: 1fr; }
+      .add-vehicle-form .full-width { grid-column: span 1; }
+      .add-vehicle-btn { grid-column: span 1; }
+      .individual-id-row { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) { .compact-grid { grid-template-columns: 1fr; } }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="header-text">
+      <h1>🐪 Livestock Population Monitor</h1>
+      <p>Mina · Shahama · Wathba · Baniyas | Accepted &amp; Rejected shipment tracking</p>
+      <div class="stats-badge">📍 Mina | Shahama | Wathba | Baniyas livestock shops</div>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="help-btn" id="openHelpBtn" title="Help / Guide">?</button>
+      <button type="button" class="manage-providers-btn" id="exportJsonBtn" title="Export all data to JSON file">📤 Export</button>
+      <button type="button" class="manage-providers-btn" id="importJsonBtn" title="Import data from JSON file">📥 Import</button>
+      <button type="button" class="manage-providers-btn" id="openProvidersBtn">🚛 Manage Providers</button>
+    </div>
+  </div>
+  <input type="file" id="importFileInput" accept=".json,application/json" style="display:none;">
+  <div class="form-card">
+    <div class="tab-bar">
+      <button type="button" class="tab-btn active" data-tab="entryTab">📝 Data Entry</button>
+      <button type="button" class="tab-btn" data-tab="washTab">🚿 Vehicle Wash Queue</button>
+      <button type="button" class="tab-btn" data-tab="archiveTab">🔍 Rejection Archive</button>
+    </div>
+
+    <div class="tab-pane active" id="entryTab">
+      <form id="populationForm">
+        <div class="section-label">🚛 Vehicle &amp; Driver Information</div>
+        <div class="compact-grid">
+          <div class="field-item">
+            <label>🚗 Vehicle Plate No. *</label>
+            <div class="vehicle-plate-group">
+              <input type="text" id="vehiclePlateNumber" class="plate-number" placeholder="12345" required>
+              <select id="vehicleEmirate" class="plate-emirate" required>
+                <option value="" disabled selected>— Emirate —</option>
+                <option value="Abu Dhabi">Abu Dhabi</option>
+                <option value="Dubai">Dubai</option>
+                <option value="Sharjah">Sharjah</option>
+                <option value="Ajman">Ajman</option>
+                <option value="Umm Al Quwain">Umm Al Quwain</option>
+                <option value="Ras Al Khaimah">Ras Al Khaimah</option>
+                <option value="Fujairah">Fujairah</option>
+              </select>
+            </div>
+            <div class="inline-hint" id="lookupHint"></div>
+          </div>
+          <div class="field-item">
+            <label>🧑‍✈️ Driver Name *</label>
+            <div class="driver-name-group">
+              <input type="text" id="driverName" required>
+              <select id="driverSelect" style="display:none;" title="Select approved driver"></select>
+            </div>
+          </div>
+          <div class="field-item">
+            <label>🪪 Driver ID No. *</label>
+            <input type="text" id="driverId" required>
+          </div>
+        </div>
+        <div class="compact-grid">
+          <div class="field-item">
+            <label>📞 Driver Contact No. *</label>
+            <input type="tel" id="driverContact" placeholder="+971 50 123 4567" required>
+          </div>
+          <div class="field-item">
+            <label>📅 Date &amp; Time *</label>
+            <div class="datetime-group">
+              <input type="datetime-local" id="recordDateTime" required>
+              <button type="button" class="now-btn" id="nowBtn">🔄 Now</button>
+            </div>
+            <div class="inline-hint">Auto-filled with device time — editable</div>
+          </div>
+          <div class="field-item"></div>
+        </div>
+        <hr class="section-divider">
+        <div class="section-label">🏪 Shop Information</div>
+        <div class="compact-grid-2">
+          <div class="field-item">
+            <label>🏪 Shop Group *</label>
+            <select id="shopGroup" required>
+              <option value="" disabled selected>— select livestock shop group —</option>
+              <option value="Mina livestock shops">Mina livestock shops</option>
+              <option value="Shahama livestock shops">Shahama livestock shops</option>
+              <option value="Wathba livestock shops">Wathba livestock shops</option>
+              <option value="Baniyas livestock shops">Baniyas livestock shops</option>
+            </select>
+          </div>
+          <div class="field-item">
+            <label>🏪 Individual Shop *</label>
+            <select id="shopName" required>
+              <option value="" disabled selected>— first select a group —</option>
+            </select>
+          </div>
+        </div>
+        <div class="cert-grid">
+          <div class="field-item">
+            <label id="healthCertLabel">🩺 Health Certificate No.</label>
+            <input type="text" id="healthCertNo" placeholder="Required only for non-Local breeds">
+            <div class="inline-hint" id="healthCertHint">Optional for Local breed · Required for imported breeds</div>
+          </div>
+          <div class="field-item">
+            <label>📊 Total in Certificate</label>
+            <input type="number" id="totalInCertificate" min="0" step="1" placeholder="Optional — e.g., 100">
+            <div class="inline-hint">Used to track remaining balance if same cert used for multiple shipments</div>
+          </div>
+        </div>
+        <div class="cert-alert" id="certAlert"></div>
+        <div class="compact-grid-2" style="margin-top:16px;">
+          <div class="field-item">
+            <label>🌍 Source / Certificate Origin *</label>
+            <select id="sourceCertificate" required>
+              <option value="" disabled selected>— select source —</option>
+              <option value="ADM">ADM</option>
+              <option value="AAM">AAM</option>
+              <option value="DRM">DRM</option>
+              <option value="DXB">DXB</option>
+              <option value="SHJ">SHJ</option>
+              <option value="AJM">AJM</option>
+              <option value="UAQ">UAQ</option>
+              <option value="RAK">RAK</option>
+              <option value="FUJ">FUJ</option>
+              <option value="OTHER">Other (manual entry)…</option>
+            </select>
+            <input type="text" id="sourceCertificateOther" class="manual-input" placeholder="Type custom source / certificate origin">
+          </div>
+        </div>
+        <hr class="section-divider">
+        <div class="section-label">🐏 Species &amp; Sub-breeds (Main Entries)</div>
+        <div class="species-table-wrapper">
+          <div class="species-table-header">Main entries</div>
+          <table class="species-table">
+            <thead>
+              <tr>
+                <th style="width:40%;">Animal</th>
+                <th style="width:40%;">Breed</th>
+                <th style="width:20%;">No. of animals</th>
+                <th style="width:50px;"></th>
+              </tr>
+            </thead>
+            <tbody id="speciesTableBody"></tbody>
+            <tfoot>
+              <tr class="total-row">
+                <td colspan="2" class="total-label">Total Animal Count :</td>
+                <td colspan="2"><input type="text" class="total-input" id="totalAnimalCount" value="0" readonly></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <div class="inline-hint" style="margin-top:6px;">Click the green ➕ button to add another species row. Use the red ✖ button to remove a row.</div>
+        <div class="form-row" style="margin-top:16px;">
+          <label>📝 Notes</label>
+          <div class="field-group">
+            <textarea id="notes" rows="2" placeholder="Health issues, births, quarantine, vaccination..."></textarea>
+          </div>
+        </div>
+        <div class="compact-grid-2" id="rejectionReasonBox" style="display:none;">
+          <div class="field-item" style="grid-column: span 2;">
+            <label>❌ Rejection Reason *</label>
+            <select id="rejectionReason" required>
+              <option value="" disabled selected>— select rejection reason —</option>
+              <option value="EMACIATION">EMACIATION</option>
+              <option value="FEVER">FEVER</option>
+              <option value="RESPIRATORY SYMP.">RESPIRATORY SYMP.</option>
+              <option value="ALOPECIA">ALOPECIA</option>
+              <option value="SUSPECT INFECTIOUS D.">SUSPECT INFECTIOUS D.</option>
+              <option value="TUMORS">TUMORS</option>
+              <option value="EXTERNAL PARASITES">EXTERNAL PARASITES</option>
+              <option value="DOCUMENTS ISSUE">DOCUMENTS ISSUE</option>
+              <option value="OTHER">Other (manual entry)…</option>
+            </select>
+            <input type="text" id="rejectionReasonOther" class="manual-input" placeholder="Type custom rejection reason">
+          </div>
+        </div>
+        <div class="animal-ids-section" id="animalIdsSection" style="display:none;">
+          <div class="animal-ids-header">
+            <span>🐏 Rejected Animal IDs (Optional)</span>
+            <span class="animal-ids-count-badge" id="animalIdsCountBadge">0 registered</span>
+          </div>
+          <div class="animal-ids-body">
+            <div class="inline-hint" style="margin-bottom:10px;">
+              Register the specific animal ID numbers that were rejected. Optional — skip if the rejection is only at shipment level.
+            </div>
+            <div class="input-mode-tabs">
+              <button type="button" class="input-mode-tab active" data-mode="individual">✏️ Individual</button>
+              <button type="button" class="input-mode-tab" data-mode="range">🔢 Sequential Range</button>
+              <button type="button" class="input-mode-tab" data-mode="paste">📋 Paste List</button>
+            </div>
+            <div class="input-mode-pane active" id="pane-individual">
+              <div class="individual-ids-list" id="individualIdsList"></div>
+              <button type="button" class="add-id-btn" id="addIndividualIdBtn">➕ Add Row</button>
+            </div>
+            <div class="input-mode-pane" id="pane-range">
+              <div class="range-form">
+                <div class="range-item">
+                  <label>Prefix (optional)</label>
+                  <input type="text" id="rangePrefix" placeholder="e.g., A-">
+                </div>
+                <div class="range-item">
+                  <label>From number *</label>
+                  <input type="number" id="rangeFrom" placeholder="1001" min="0">
+                </div>
+                <div class="range-item">
+                  <label>To number *</label>
+                  <input type="number" id="rangeTo" placeholder="1050" min="0">
+                </div>
+                <div class="range-item">
+                  <label>Zero padding</label>
+                  <select id="rangePadding">
+                    <option value="0">None</option>
+                    <option value="1">1 digit</option>
+                    <option value="2">2 digits</option>
+                    <option value="3">3 digits</option>
+                    <option value="4">4 digits</option>
+                    <option value="5">5 digits</option>
+                  </select>
+                </div>
+                <div class="range-item">
+                  <label>Suffix (optional)</label>
+                  <input type="text" id="rangeSuffix" placeholder="e.g., -UAE">
+                </div>
+                <div class="range-item">
+                  <label>Species *</label>
+                  <select id="rangeSpecies"></select>
+                </div>
+                <div class="range-item">
+                  <label>Sub-breed *</label>
+                  <select id="rangeSubBreed"></select>
+                </div>
+                <div class="range-item">
+                  <label>&nbsp;</label>
+                  <button type="button" class="range-btn" id="previewRangeBtn">👁️ Preview</button>
+                </div>
+              </div>
+              <div class="range-preview" id="rangePreview" style="display:none;"></div>
+              <div class="range-actions">
+                <button type="button" class="range-btn" id="addRangeBtn">➕ Add Range to List</button>
+                <button type="button" class="range-btn secondary" id="clearRangeBtn">🗑️ Clear Fields</button>
+              </div>
+            </div>
+            <div class="input-mode-pane" id="pane-paste">
+              <textarea class="paste-textarea" id="pasteTextarea" placeholder="Paste IDs here, one per line, or:&#10;A-101, Sheep, Local&#10;A-102, Sheep, Local"></textarea>
+              <div class="paste-hint">
+                Supported formats per line: <code>ID</code> · <code>ID, Species</code> · <code>ID, Species, SubBreed</code>
+              </div>
+              <div class="paste-actions">
+                <button type="button" class="range-btn" id="parsePasteBtn">👁️ Parse &amp; Preview</button>
+                <button type="button" class="range-btn secondary" id="clearPasteBtn">🗑️ Clear</button>
+              </div>
+              <div class="range-preview" id="pastePreview" style="display:none;"></div>
+            </div>
+            <div class="registered-ids-summary" id="registeredIdsSummary" style="display:none;">
+              <h4>✅ Registered IDs (<span id="registeredCount">0</span>)</h4>
+              <div class="registered-ids-list" id="registeredIdsList"></div>
+            </div>
+          </div>
+        </div>
+        <div class="submit-btn-group">
+          <button type="button" class="submit-btn accept" id="acceptBtn">✅ Accept Shipment</button>
+          <button type="button" class="submit-btn reject" id="rejectBtn">❌ Reject Shipment</button>
+        </div>
+        <div class="secondary-btn-group">
+          <button type="button" class="secondary" id="clearFormBtn">🗑️ Clear Form</button>
+          <button type="button" class="secondary" id="exportAllCsvBtn">📎 Export All (CSV)</button>
+          <button type="button" class="secondary" id="exportAllPdfBtn">📄 Export All (PDF)</button>
+          <button type="button" class="secondary" id="clearAllBtn">🗑️ Clear All Data</button>
+        </div>
+        <div class="inline-hint" id="autosaveStatus" style="text-align:center; margin-top:8px;"></div>
+      </form>
+      <div class="records-section">
+        <div class="records-panels">
+          <div class="records-panel accepted">
+            <div class="records-panel-header">
+              <div class="records-panel-title">✅ Accepted Shipments</div>
+              <span class="records-panel-count" id="acceptedCount">0</span>
+            </div>
+            <div class="records-panel-total">
+              <div class="total-header-row">
+                <span class="total-label-text">🐏 Total Accepted Animals</span>
+                <span class="total-grand-value" id="acceptedTotalAnimals">0</span>
+              </div>
+              <div class="species-breakdown" id="acceptedSpeciesBreakdown"></div>
+            </div>
+            <div class="records-panel-filters">
+              <select id="acceptedFilterSpecies">
+                <option value="">All Species</option>
+                <option value="Sheep">Sheep</option>
+                <option value="Goat">Goat</option>
+                <option value="Cattle">Cattle</option>
+                <option value="Camel">Camel</option>
+                <option value="Gazelle">Gazelle</option>
+              </select>
+              <select id="acceptedFilterGroup">
+                <option value="">All Groups</option>
+                <option value="Mina livestock shops">Mina</option>
+                <option value="Shahama livestock shops">Shahama</option>
+                <option value="Wathba livestock shops">Wathba</option>
+                <option value="Baniyas livestock shops">Baniyas</option>
+              </select>
+              <input type="text" id="acceptedFilterShop" placeholder="Shop...">
+            </div>
+            <div class="records-panel-actions">
+              <button type="button" class="export-selected" id="exportAcceptedSelectedCsvBtn" disabled>📎 CSV Selected (0)</button>
+              <button type="button" class="pdf-btn" id="exportAcceptedSelectedPdfBtn" disabled>📄 PDF Selected (0)</button>
+              <button type="button" class="secondary" id="exportAcceptedCsvBtn">📎 CSV All</button>
+              <button type="button" class="pdf-btn" id="exportAcceptedPdfBtn">📄 PDF All</button>
+              <button type="button" class="secondary" id="clearAcceptedBtn">🗑️ Clear</button>
+            </div>
+            <div class="records-panel-table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th class="select-col"><input type="checkbox" id="selectAllAccepted"></th>
+                    <th>Plate</th><th>Driver</th><th>Shop</th><th>Date &amp; Time</th>
+                    <th>Species / Breed</th><th>Count</th><th>HC / Source</th><th>Notes</th>
+                  </tr>
+                </thead>
+                <tbody id="acceptedTableBody">
+                  <tr><td colspan="9" class="empty-msg">No accepted shipments yet</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="records-panel rejected">
+            <div class="records-panel-header">
+              <div class="records-panel-title">❌ Rejected Shipments</div>
+              <span class="records-panel-count" id="rejectedCount">0</span>
+            </div>
+            <div class="records-panel-total">
+              <div class="total-header-row">
+                <span class="total-label-text">🐏 Total Rejected Animals</span>
+                <span class="total-grand-value" id="rejectedTotalAnimals">0</span>
+              </div>
+              <div class="species-breakdown" id="rejectedSpeciesBreakdown"></div>
+            </div>
+            <div class="records-panel-filters">
+              <select id="rejectedFilterSpecies">
+                <option value="">All Species</option>
+                <option value="Sheep">Sheep</option>
+                <option value="Goat">Goat</option>
+                <option value="Cattle">Cattle</option>
+                <option value="Camel">Camel</option>
+                <option value="Gazelle">Gazelle</option>
+              </select>
+              <select id="rejectedFilterGroup">
+                <option value="">All Groups</option>
+                <option value="Mina livestock shops">Mina</option>
+                <option value="Shahama livestock shops">Shahama</option>
+                <option value="Wathba livestock shops">Wathba</option>
+                <option value="Baniyas livestock shops">Baniyas</option>
+              </select>
+              <input type="text" id="rejectedFilterShop" placeholder="Shop...">
+            </div>
+            <div class="records-panel-actions">
+              <button type="button" class="export-selected" id="exportRejectedSelectedCsvBtn" disabled>📎 CSV Selected (0)</button>
+              <button type="button" class="pdf-btn" id="exportRejectedSelectedPdfBtn" disabled>📄 PDF Selected (0)</button>
+              <button type="button" class="secondary" id="exportRejectedCsvBtn">📎 CSV All</button>
+              <button type="button" class="pdf-btn" id="exportRejectedPdfBtn">📄 PDF All</button>
+              <button type="button" class="secondary" id="clearRejectedBtn">🗑️ Clear</button>
+            </div>
+            <div class="records-panel-table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th class="select-col"><input type="checkbox" id="selectAllRejected"></th>
+                    <th>Plate</th><th>Driver</th><th>Shop</th><th>Date &amp; Time</th>
+                    <th>Species / Breed</th><th>Count</th><th>Reason</th><th>Notes</th>
+                  </tr>
+                </thead>
+                <tbody id="rejectedTableBody">
+                  <tr><td colspan="9" class="empty-msg">No rejected shipments yet</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="footer-note">
+          🚛 Auto-fill driver details from approved providers when typing plate+emirate.<br>
+          🩺 Health Certificate No. required only for non-Local breeds. Total in Certificate helps track remaining balance.<br>
+          ❌ Rejection reason is mandatory. Animal IDs optional but recommended.<br>
+          📤 <strong>Export</strong> backup before switching devices. <strong>Import</strong> to merge multiple entry records.
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-pane" id="washTab">
+      <div class="section-label">🚿 Vehicle Wash Tracking — Accepted Shipments</div>
+      <p style="font-size:0.75rem; color:#6b8f7c; margin:0 0 14px 0;">
+        Every accepted shipment (each species line) is a separate wash event. Select the ones you want to mark as washed, then click ➡️ Move to Washed.
+      </p>
+      <div class="wash-queue-section">
+        <div class="records-panel accepted">
+          <div class="records-panel-header">
+            <div class="records-panel-title">🕐 Pending Wash</div>
+            <span class="records-panel-count" id="pendingWashCount">0</span>
+          </div>
+          <div class="records-panel-actions">
+            <button type="button" class="wash-btn" id="moveToWashedBtn" disabled>➡️ Move to Washed (0)</button>
+            <button type="button" class="secondary" id="exportPendingCsvBtn">📎 CSV</button>
+            <button type="button" class="pdf-btn" id="exportPendingPdfBtn">📄 PDF</button>
+          </div>
+          <div class="records-panel-table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th class="select-col"><input type="checkbox" id="selectAllPending"></th>
+                  <th>Plate</th><th>Driver</th><th>Shop</th><th>Date &amp; Time</th>
+                  <th>Species / Breed</th><th>Count</th><th>HC / Source</th>
+                </tr>
+              </thead>
+              <tbody id="pendingTableBody">
+                <tr><td colspan="8" class="empty-msg">No pending wash records</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="records-panel washed">
+          <div class="records-panel-header">
+            <div class="records-panel-title">✅ Washed Vehicles</div>
+            <span class="records-panel-count" id="washedCount">0</span>
+          </div>
+          <div class="records-panel-actions">
+            <button type="button" class="export-selected" id="exportWashedSelectedCsvBtn" disabled>📎 CSV Selected (0)</button>
+            <button type="button" class="pdf-btn" id="exportWashedSelectedPdfBtn" disabled>📄 PDF Selected (0)</button>
+            <button type="button" class="secondary" id="exportWashedCsvBtn">📊 Excel (CSV) All</button>
+            <button type="button" class="pdf-btn" id="exportWashedPdfBtn">📄 PDF All</button>
+            <button type="button" class="secondary" id="clearWashedBtn">🗑️ Clear</button>
+          </div>
+          <div class="records-panel-table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th class="select-col"><input type="checkbox" id="selectAllWashed" title="Select all"></th>
+                  <th>Plate</th><th>Driver</th><th>Shop</th><th>Accepted At</th>
+                  <th>Washed At</th><th>Species / Breed</th><th>Count</th><th>HC / Source</th>
+                </tr>
+              </thead>
+              <tbody id="washedTableBody">
+                <tr><td colspan="9" class="empty-msg">No washed records yet</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-pane" id="archiveTab">
+      <div class="archive-search-box">
+        <h3>🔍 Search Animal ID</h3>
+        <p>Enter a full or partial animal ID to see its full history (rejections and acceptances).</p>
+        <div class="archive-search-input-group">
+          <input type="text" id="animalSearchInput" placeholder="e.g., A-1001 or 1050 (partial search supported)">
+          <button type="button" class="archive-search-btn" id="animalSearchBtn">🔍 Search</button>
+        </div>
+      </div>
+      <div id="searchResultBox" style="display:none;"></div>
+      <div class="archive-tables-wrapper">
+        <div>
+          <div class="archive-section-header">
+            <span class="archive-section-title">❌ Rejected Shipments (Vehicles)</span>
+            <span class="archive-section-count" id="archiveRejectedShipmentsCount">0</span>
+          </div>
+          <div class="archive-section-body">
+            <div class="archive-filter-row">
+              <input type="text" id="archiveRejectedFilterPlate" placeholder="Plate...">
+              <input type="text" id="archiveRejectedFilterReason" placeholder="Reason...">
+            </div>
+            <div class="archive-export-row">
+              <button type="button" class="secondary" id="archiveExportShipmentsCsvBtn">📎 CSV</button>
+              <button type="button" class="pdf-btn" id="archiveExportShipmentsPdfBtn">📄 PDF</button>
+            </div>
+            <div class="archive-table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Plate</th><th>Driver</th><th>Count</th><th>IDs</th><th>Reason</th><th>Date</th><th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="archiveRejectedShipmentsBody">
+                  <tr><td colspan="7" class="empty-msg">No rejected shipments</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="archive-section-header blue">
+            <span class="archive-section-title">🐏 Rejected Animals (By ID)</span>
+            <span class="archive-section-count" id="archiveRejectedAnimalsCount">0</span>
+          </div>
+          <div class="archive-section-body">
+            <div class="archive-filter-row blue">
+              <input type="text" id="archiveRejectedFilterAnimalId" placeholder="ID...">
+              <select id="archiveRejectedFilterSpecies">
+                <option value="">All Species</option>
+                <option value="Sheep">Sheep</option>
+                <option value="Goat">Goat</option>
+                <option value="Cattle">Cattle</option>
+                <option value="Camel">Camel</option>
+                <option value="Gazelle">Gazelle</option>
+              </select>
+              <select id="archiveRejectedFilterSubBreed">
+                <option value="">All Breeds</option>
+              </select>
+            </div>
+            <div class="archive-export-row">
+              <button type="button" class="secondary" id="archiveExportAnimalsCsvBtn">📎 CSV</button>
+              <button type="button" class="pdf-btn" id="archiveExportAnimalsPdfBtn">📄 PDF</button>
+            </div>
+            <div class="archive-table-wrapper blue">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Animal ID</th><th>Species</th><th>Breed</th><th>Plate</th><th>Reason</th><th>Date</th>
+                  </tr>
+                </thead>
+                <tbody id="archiveRejectedAnimalsBody">
+                  <tr><td colspan="6" class="empty-msg">No rejected animal IDs registered</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="providersModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>🚛 Approved Providers</h2>
+      <button type="button" class="close-modal-btn" id="closeProvidersBtn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="add-vehicle-section">
+        <h3>➕ Add New Vehicle &amp; Driver</h3>
+        <div class="add-vehicle-form">
+          <div class="field-item">
+            <label>Vehicle Plate No. *</label>
+            <input type="text" id="newVehiclePlate" placeholder="54321">
+          </div>
+          <div class="field-item">
+            <label>Emirate *</label>
+            <select id="newVehicleEmirate">
+              <option value="" disabled selected>— select —</option>
+              <option value="Abu Dhabi">Abu Dhabi</option>
+              <option value="Dubai">Dubai</option>
+              <option value="Sharjah">Sharjah</option>
+              <option value="Ajman">Ajman</option>
+              <option value="Umm Al Quwain">Umm Al Quwain</option>
+              <option value="Ras Al Khaimah">Ras Al Khaimah</option>
+              <option value="Fujairah">Fujairah</option>
+            </select>
+          </div>
+          <div class="field-item">
+            <label>Driver Name *</label>
+            <input type="text" id="newDriverName">
+          </div>
+          <div class="field-item">
+            <label>Driver ID *</label>
+            <input type="text" id="newDriverId" placeholder="784-XXXX-XXXXXXX-X">
+          </div>
+          <div class="field-item full-width">
+            <label>Driver Contact *</label>
+            <input type="tel" id="newDriverContact" placeholder="+971 50 XXX XXXX">
+          </div>
+          <button type="button" class="add-vehicle-btn" id="addVehicleBtn">Add to Approved List</button>
+        </div>
+      </div>
+      <h3 style="color:#2d6a4f; font-size:1rem; margin-bottom:12px;">📋 Saved Providers</h3>
+      <div class="providers-list" id="providersList"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="viewIdsModal">
+  <div class="modal-content wide">
+    <div class="modal-header rejected-header">
+      <h2 id="viewIdsTitle">🐏 Shipment Rejected IDs</h2>
+      <button type="button" class="close-modal-btn" id="closeViewIdsBtn">&times;</button>
+    </div>
+    <div class="modal-body" id="viewIdsBody"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="passwordModal">
+  <div class="modal-content narrow">
+    <div class="modal-header warning-header">
+      <h2>🔐 Admin Password Required</h2>
+      <button type="button" class="close-modal-btn" id="closePasswordBtn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.85rem; color:#555; margin-top:0;">This action requires admin authorization.</p>
+      <input type="password" class="password-input" id="passwordInput" placeholder="••••••••" autocomplete="off">
+      <div class="password-error" id="passwordError">❌ Incorrect password. Try again.</div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="cancel" id="cancelPasswordBtn">Cancel</button>
+      <button type="button" class="primary" id="confirmPasswordBtn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="helpModal">
+  <div class="modal-content wide">
+    <div class="modal-header">
+      <h2>📖 User Guide</h2>
+      <button type="button" class="close-modal-btn" id="closeHelpBtn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="help-section">
+        <h3>🚀 Getting Started</h3>
+        <p>This system tracks livestock shipments entering animal shops in Abu Dhabi. It manages <strong>Accepted</strong>, <strong>Rejected</strong>, and <strong>Washed</strong> shipments, plus a detailed rejection archive searchable by animal ID.</p>
+      </div>
+      <div class="help-section">
+        <h3>📝 Data Entry Tab</h3>
+        <h4>Vehicle &amp; Driver</h4>
+        <ul>
+          <li>Enter the <strong>plate number</strong> and select the <strong>emirate</strong>. If it matches a saved provider, driver details auto-fill.</li>
+          <li>Date &amp; Time are auto-filled. Click 🔄 Now to refresh.</li>
+        </ul>
+        <h4>Health Certificate</h4>
+        <ul>
+          <li><strong>Required only for non-Local breeds</strong> (Australian, Somali, Pakistan, Iran, etc.). Local shipments can skip it.</li>
+          <li><strong>Total in Certificate</strong> is optional — if filled, the system tracks the remaining balance across shipments using the same certificate.</li>
+        </ul>
+        <h4>Species &amp; Sub-breeds</h4>
+        <ul>
+          <li>Add one row per species/breed combination. Click ➕ to add another, ✖ to remove.</li>
+        </ul>
+        <h4>Accept vs Reject</h4>
+        <ul>
+          <li><strong>Accept</strong>: shipment goes into the Wash Queue.</li>
+          <li><strong>Reject</strong>: rejection reason is required. You can optionally register individual animal IDs.</li>
+        </ul>
+      </div>
+      <div class="help-section">
+        <h3>🐏 Animal IDs (Rejected)</h3>
+        <p>Three ways to enter rejected animal IDs:</p>
+        <ul>
+          <li><strong>Individual</strong>: one row per animal.</li>
+          <li><strong>Sequential Range</strong>: enter prefix, from/to numbers, padding, suffix — generates IDs automatically.</li>
+          <li><strong>Paste List</strong>: paste from Excel or Word, one per line.</li>
+        </ul>
+        <p>Within the same shipment, duplicate IDs are <strong>blocked</strong>. Across shipments, you get a <strong>warning</strong> but can proceed.</p>
+      </div>
+      <div class="help-section">
+        <h3>🚿 Wash Queue Tab</h3>
+        <ul>
+          <li><strong>Pending</strong>: accepted shipments awaiting wash.</li>
+          <li>Select rows → click <strong>➡️ Move to Washed</strong>.</li>
+          <li>Washed vehicles are recorded with a timestamp.</li>
+        </ul>
+      </div>
+      <div class="help-section">
+        <h3>🔍 Rejection Archive</h3>
+        <ul>
+          <li><strong>Search Animal ID</strong>: full or partial — shows full history if found.</li>
+          <li>Left table: rejected shipments. Click <strong>👁️ View IDs</strong> to see the animal IDs in that shipment.</li>
+          <li>Right table: all rejected animal IDs with filters (species, breed, ID).</li>
+        </ul>
+      </div>
+      <div class="help-section">
+        <h3>💾 Data Storage &amp; Backup</h3>
+        <p>Everything saves automatically to your browser after 1 second of inactivity. If you refresh or close the tab, all data is restored when you come back.</p>
+        <p><strong>⚠️ Data is stored on this device only.</strong> Use <strong>📤 Export</strong> to save a full backup to a JSON file, or <strong>📥 Import</strong> to merge data from another device or restore a backup.</p>
+      </div>
+      <div class="help-section">
+        <h3>📤 Export / Import (JSON)</h3>
+        <ul>
+          <li><strong>📤 Export</strong>: downloads all data (accepted + rejected + washed + providers) to a single JSON file. Use this regularly as a backup.</li>
+          <li><strong>📥 Import</strong>: opens a file picker. Choose a previously exported JSON file, then pick one of three modes:
+            <ul>
+              <li><strong>Merge</strong> (default): adds new records only, skips existing ones</li>
+              <li><strong>Replace All</strong>: deletes current data first, then imports</li>
+              <li><strong>Merge &amp; Overwrite</strong>: adds new + replaces existing with imported version</li>
+            </ul>
+          </li>
+        </ul>
+        <p><strong>💡 Tip:</strong> Use Export + Import to combine records from multiple devices (each entry person exports their data, then you import all files into one master copy).</p>
+      </div>
+      <div class="help-section">
+        <h3>🔐 Admin Password</h3>
+        <p>Certain actions (deleting records) require the admin password. Contact your administrator if you need access.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="importModeModal">
+  <div class="modal-content narrow">
+    <div class="modal-header">
+      <h2>📥 Import Data</h2>
+      <button type="button" class="close-modal-btn" id="closeImportModeBtn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.85rem; color:#555; margin-top:0;">Choose how to merge the imported data with your current data.</p>
+      <div id="importFileSummary" style="background:#f4faf6; border:1px solid #c8e0d0; border-radius:12px; padding:12px; margin-bottom:14px; font-size:0.8rem; color:#2d6a4f; line-height:1.6;"></div>
+      <label class="import-option">
+        <input type="radio" name="importMode" value="merge" checked>
+        <div>
+          <strong style="font-size:0.85rem;">Merge (recommended)</strong>
+          <div style="font-size:0.72rem; color:#666; margin-top:3px;">Add new records only · Skip existing ones (by ID)</div>
+        </div>
+      </label>
+      <label class="import-option">
+        <input type="radio" name="importMode" value="replace">
+        <div>
+          <strong style="font-size:0.85rem; color:#c0392b;">Replace All</strong>
+          <div style="font-size:0.72rem; color:#c0392b; margin-top:3px;">⚠️ Delete all current data, then import · Use for fresh install</div>
+        </div>
+      </label>
+      <label class="import-option" style="margin-bottom:0;">
+        <input type="radio" name="importMode" value="overwrite">
+        <div>
+          <strong style="font-size:0.85rem;">Merge &amp; Overwrite</strong>
+          <div style="font-size:0.72rem; color:#666; margin-top:3px;">Add new records + replace existing ones with imported versions</div>
+        </div>
+      </label>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="cancel" id="cancelImportBtn">Cancel</button>
+      <button type="button" class="primary" id="confirmImportBtn">Import Now</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ======================== GLOBAL STATE ========================
+let acceptedRecords = [];
+let rejectedRecords = [];
+let washedRecords = [];
+
+let acceptedSelected = new Set();
+let rejectedSelected = new Set();
+let pendingSelected = new Set();
+let washedSelected = new Set();
+
+let animalIdIndex = {};
+let currentRejectedAnimalIds = [];
+
+// ======================== CONSTANTS ========================
+const ADMIN_PASSWORD = '2102258';
+const STORAGE_KEYS = {
+  accepted: 'livestockAccepted',
+  rejected: 'livestockRejected',
+  washed: 'livestockWashed',
+  formDraft: 'livestockFormDraft'
+};
+
+// ======================== TABS ========================
+const tabButtons = document.querySelectorAll('.tab-btn');
+const tabPanes = document.querySelectorAll('.tab-pane');
+tabButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    tabButtons.forEach(b => b.classList.remove('active'));
+    tabPanes.forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+    if (btn.dataset.tab === 'archiveTab') renderArchive();
+  });
+});
+
+// ======================== PASSWORD MODAL ========================
+const passwordModal = document.getElementById('passwordModal');
+const passwordInput = document.getElementById('passwordInput');
+const passwordError = document.getElementById('passwordError');
+let passwordCallback = null;
+
+function requirePassword(callback) {
+  passwordCallback = callback;
+  passwordInput.value = '';
+  passwordError.classList.remove('show');
+  passwordModal.classList.add('active');
+  setTimeout(() => passwordInput.focus(), 100);
+}
+function closePasswordModal() {
+  passwordModal.classList.remove('active');
+  passwordCallback = null;
+  passwordInput.value = '';
+  passwordError.classList.remove('show');
+}
+document.getElementById('closePasswordBtn').addEventListener('click', closePasswordModal);
+document.getElementById('cancelPasswordBtn').addEventListener('click', closePasswordModal);
+passwordModal.addEventListener('click', (e) => { if (e.target === passwordModal) closePasswordModal(); });
+document.getElementById('confirmPasswordBtn').addEventListener('click', () => {
+  if (passwordInput.value === ADMIN_PASSWORD) {
+    const cb = passwordCallback;
+    closePasswordModal();
+    if (cb) cb();
+  } else {
+    passwordError.classList.add('show');
+    passwordInput.value = '';
+    passwordInput.focus();
+  }
+});
+passwordInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('confirmPasswordBtn').click();
+});
+
+// ======================== HELP MODAL ========================
+const helpModal = document.getElementById('helpModal');
+document.getElementById('openHelpBtn').addEventListener('click', () => helpModal.classList.add('active'));
+document.getElementById('closeHelpBtn').addEventListener('click', () => helpModal.classList.remove('active'));
+helpModal.addEventListener('click', (e) => { if (e.target === helpModal) helpModal.classList.remove('active'); });
+
+// ======================== DATA PERSISTENCE ========================
+function saveData() {
+  try {
+    localStorage.setItem(STORAGE_KEYS.accepted, JSON.stringify(acceptedRecords));
+    localStorage.setItem(STORAGE_KEYS.rejected, JSON.stringify(rejectedRecords));
+    localStorage.setItem(STORAGE_KEYS.washed, JSON.stringify(washedRecords));
+  } catch (e) { console.error('Save error', e); }
+}
+function loadData() {
+  try {
+    acceptedRecords = JSON.parse(localStorage.getItem(STORAGE_KEYS.accepted)) || [];
+    rejectedRecords = JSON.parse(localStorage.getItem(STORAGE_KEYS.rejected)) || [];
+    washedRecords = JSON.parse(localStorage.getItem(STORAGE_KEYS.washed)) || [];
+    rebuildAnimalIdIndex();
+  } catch (e) { console.error('Load error', e); }
+}
+
+// ======================== FORM AUTOSAVE ========================
+let autosaveTimer = null;
+const autosaveStatus = document.getElementById('autosaveStatus');
+
+function collectFormDraft() {
+  const speciesRows = [];
+  speciesTableBody.querySelectorAll('tr').forEach(row => {
+    speciesRows.push({
+      species: row.querySelector('.species-select').value,
+      subBreed: row.querySelector('.subbreed-select').value,
+      count: row.querySelector('.animals-count-input').value
+    });
+  });
+  return {
+    plateNumber: plateInput.value,
+    emirate: emirateInput.value,
+    driverName: driverNameInput.value,
+    driverId: driverIdInput.value,
+    driverContact: driverContactInput.value,
+    dateTime: dateTimeInput.value,
+    group: groupSelect.value,
+    shop: shopSelect.value,
+    healthCertNo: healthCertInput.value,
+    totalInCertificate: document.getElementById('totalInCertificate').value,
+    sourceCertificate: sourceCertificateSelect.value,
+    sourceCertificateOther: sourceCertificateOther.value,
+    notes: notesInput.value,
+    speciesRows: speciesRows,
+    rejectionReason: rejectionReasonSelect.value,
+    rejectionReasonOther: rejectionReasonOther.value,
+    rejectedAnimalIds: currentRejectedAnimalIds
+  };
+}
+function saveFormDraft() {
+  try {
+    localStorage.setItem(STORAGE_KEYS.formDraft, JSON.stringify(collectFormDraft()));
+    if (autosaveStatus) {
+      autosaveStatus.textContent = '💾 Draft auto-saved · ' + new Date().toLocaleTimeString();
+      autosaveStatus.style.color = '#6b8f7c';
+    }
+  } catch (e) { console.error('Draft save error', e); }
+}
+function scheduleAutosave() {
+  clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(saveFormDraft, 1000);
+}
+function restoreFormDraft() {
+  try {
+    const draft = JSON.parse(localStorage.getItem(STORAGE_KEYS.formDraft));
+    if (!draft) return false;
+    if (draft.plateNumber) plateInput.value = draft.plateNumber;
+    if (draft.emirate) emirateInput.value = draft.emirate;
+    if (draft.driverName) driverNameInput.value = draft.driverName;
+    if (draft.driverId) driverIdInput.value = draft.driverId;
+    if (draft.driverContact) driverContactInput.value = draft.driverContact;
+    if (draft.dateTime) dateTimeInput.value = draft.dateTime;
+    if (draft.group) {
+      groupSelect.value = draft.group;
+      populateShopDropdown();
+      if (draft.shop) shopSelect.value = draft.shop;
+    }
+    if (draft.healthCertNo) healthCertInput.value = draft.healthCertNo;
+    if (draft.totalInCertificate) document.getElementById('totalInCertificate').value = draft.totalInCertificate;
+    if (draft.sourceCertificate) {
+      sourceCertificateSelect.value = draft.sourceCertificate;
+      if (draft.sourceCertificate === 'OTHER') {
+        sourceCertificateOther.value = draft.sourceCertificateOther || '';
+        sourceCertificateOther.classList.add('show');
+      }
+    }
+    if (draft.notes) notesInput.value = draft.notes;
+    if (draft.speciesRows && draft.speciesRows.length > 0) {
+      speciesTableBody.innerHTML = '';
+      speciesRowCounter = 0;
+      draft.speciesRows.forEach(sr => {
+        const tr = createSpeciesRow();
+        if (sr.species) tr.querySelector('.species-select').value = sr.species;
+        if (sr.subBreed) tr.querySelector('.subbreed-select').value = sr.subBreed;
+        if (sr.count) tr.querySelector('.animals-count-input').value = sr.count;
+      });
+      updateTotalCount();
+    }
+    if (draft.rejectionReason) {
+      rejectionReasonSelect.value = draft.rejectionReason;
+      if (draft.rejectionReason === 'OTHER') {
+        rejectionReasonOther.value = draft.rejectionReasonOther || '';
+        rejectionReasonOther.classList.add('show');
+      }
+    }
+    if (draft.rejectedAnimalIds && draft.rejectedAnimalIds.length > 0) {
+      currentRejectedAnimalIds = draft.rejectedAnimalIds;
+      renderRegisteredIds();
+    }
+    if (autosaveStatus) {
+      autosaveStatus.textContent = '📂 Draft restored from previous session';
+      autosaveStatus.style.color = '#2d6a4f';
+    }
+    return true;
+  } catch (e) { console.error('Draft restore error', e); return false; }
+}
+function clearFormDraft() {
+  try { localStorage.removeItem(STORAGE_KEYS.formDraft); } catch (e) {}
+}
+function attachAutosaveListeners() {
+  const form = document.getElementById('populationForm');
+  form.addEventListener('input', scheduleAutosave);
+  form.addEventListener('change', scheduleAutosave);
+}
+
+// ======================== PROVIDERS ========================
+let providers = JSON.parse(localStorage.getItem('approvedProviders')) || [];
+function saveProviders() { localStorage.setItem('approvedProviders', JSON.stringify(providers)); renderProvidersList(); }
+
+const providersListContainer = document.getElementById('providersList');
+const openProvidersBtn = document.getElementById('openProvidersBtn');
+const closeProvidersBtn = document.getElementById('closeProvidersBtn');
+const providersModal = document.getElementById('providersModal');
+
+openProvidersBtn.addEventListener('click', () => providersModal.classList.add('active'));
+closeProvidersBtn.addEventListener('click', () => providersModal.classList.remove('active'));
+providersModal.addEventListener('click', (e) => { if (e.target === providersModal) providersModal.classList.remove('active'); });
+
+function renderProvidersList() {
+  if (providers.length === 0) {
+    providersListContainer.innerHTML = '<p style="text-align:center; color:#888; font-size:0.85rem;">No approved providers yet. Add one above.</p>';
+    return;
+  }
+  let html = '';
+  providers.forEach((provider, index) => {
+    const driversHtml = provider.drivers.map((driver, dIdx) => `
+      <div class="provider-driver-row">
+        <div class="driver-info">
+          <strong>${escapeHtml(driver.name)}</strong>
+          <span>ID: ${escapeHtml(driver.id)}</span>
+          <span>📞 ${escapeHtml(driver.contact)}</span>
+        </div>
+        <button type="button" class="delete-driver-btn" onclick="deleteDriver(${index}, ${dIdx})" title="Remove driver">✖</button>
+      </div>
+    `).join('');
+    html += `
+      <div class="provider-card">
+        <div class="provider-vehicle-header">
+          <span class="provider-vehicle-title">🚗 ${escapeHtml(provider.plate)} - ${escapeHtml(provider.emirate)}</span>
+          <button type="button" class="delete-vehicle-btn" onclick="deleteVehicle(${index})">Delete Vehicle</button>
+        </div>
+        <div class="provider-drivers-list">
+          ${driversHtml}
+          <div class="add-driver-inline-form">
+            <input type="text" id="addDriverName-${index}" placeholder="Driver Name">
+            <input type="text" id="addDriverId-${index}" placeholder="Driver ID">
+            <input type="text" id="addDriverContact-${index}" placeholder="Contact No.">
+            <button type="button" class="add-driver-inline-btn" onclick="addDriverInline(${index})">➕ Add</button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  providersListContainer.innerHTML = html;
+}
+window.deleteVehicle = function(index) {
+  requirePassword(() => {
+    if (confirm(`Delete vehicle ${providers[index].plate} and all its drivers?`)) { providers.splice(index, 1); saveProviders(); }
+  });
+};
+window.deleteDriver = function(vehicleIndex, driverIndex) {
+  requirePassword(() => {
+    if (confirm(`Delete driver ${providers[vehicleIndex].drivers[driverIndex].name}?`)) { providers[vehicleIndex].drivers.splice(driverIndex, 1); saveProviders(); }
+  });
+};
+window.addDriverInline = function(vehicleIndex) {
+  const name = document.getElementById(`addDriverName-${vehicleIndex}`).value.trim();
+  const id = document.getElementById(`addDriverId-${vehicleIndex}`).value.trim();
+  const contact = document.getElementById(`addDriverContact-${vehicleIndex}`).value.trim();
+  if (!name || !id || !contact) { alert("Please fill all driver fields."); return; }
+  providers[vehicleIndex].drivers.push({ name, id, contact }); saveProviders();
+};
+document.getElementById('addVehicleBtn').addEventListener('click', () => {
+  const plate = document.getElementById('newVehiclePlate').value.trim().toUpperCase();
+  const emirate = document.getElementById('newVehicleEmirate').value;
+  const name = document.getElementById('newDriverName').value.trim();
+  const id = document.getElementById('newDriverId').value.trim();
+  const contact = document.getElementById('newDriverContact').value.trim();
+  if (!plate || !emirate || !name || !id || !contact) { alert("Please fill all fields."); return; }
+  let existingVehicle = providers.find(p => p.plate === plate && p.emirate === emirate);
+  if (existingVehicle) existingVehicle.drivers.push({ name, id, contact });
+  else providers.push({ plate, emirate, drivers: [{ name, id, contact }] });
+  ['newVehiclePlate','newVehicleEmirate','newDriverName','newDriverId','newDriverContact'].forEach(id => document.getElementById(id).value = '');
+  saveProviders();
+});
+
+// ======================== AUTO-FILL ========================
+const plateInput = document.getElementById('vehiclePlateNumber');
+const emirateInput = document.getElementById('vehicleEmirate');
+const driverNameInput = document.getElementById('driverName');
+const driverIdInput = document.getElementById('driverId');
+const driverContactInput = document.getElementById('driverContact');
+const driverSelect = document.getElementById('driverSelect');
+const lookupHint = document.getElementById('lookupHint');
+
+function attemptAutoFill() {
+  const plate = plateInput.value.trim().toUpperCase();
+  const emirate = emirateInput.value;
+  driverSelect.style.display = 'none';
+  driverSelect.innerHTML = '';
+  lookupHint.textContent = '';
+  if (!plate || !emirate) return;
+  const foundVehicle = providers.find(p => p.plate === plate && p.emirate === emirate);
+  if (foundVehicle && foundVehicle.drivers.length > 0) {
+    lookupHint.innerHTML = `✅ Approved vehicle found (${foundVehicle.drivers.length} driver${foundVehicle.drivers.length > 1 ? 's' : ''})`;
+    lookupHint.style.color = '#2d6a4f';
+    if (foundVehicle.drivers.length === 1) fillDriver(foundVehicle.drivers[0]);
+    else {
+      driverSelect.innerHTML = '<option value="" disabled selected>Select Driver</option>';
+      foundVehicle.drivers.forEach((drv, idx) => {
+        const opt = document.createElement('option');
+        opt.value = idx; opt.textContent = drv.name;
+        driverSelect.appendChild(opt);
+      });
+      driverSelect.style.display = 'block';
+      fillDriver(foundVehicle.drivers[0]);
+      driverSelect.value = "0";
+    }
+  } else if (foundVehicle) {
+    lookupHint.textContent = `⚠️ Vehicle found, but no drivers saved.`;
+    lookupHint.style.color = '#b07d00';
+  } else {
+    lookupHint.textContent = `ℹ️ Vehicle not in approved list. Fill manually.`;
+    lookupHint.style.color = '#888';
+  }
+}
+function fillDriver(driver) {
+  driverNameInput.value = driver.name;
+  driverIdInput.value = driver.id;
+  driverContactInput.value = driver.contact;
+}
+plateInput.addEventListener('blur', attemptAutoFill);
+emirateInput.addEventListener('change', attemptAutoFill);
+driverSelect.addEventListener('change', (e) => {
+  const plate = plateInput.value.trim().toUpperCase();
+  const emirate = emirateInput.value;
+  const foundVehicle = providers.find(p => p.plate === plate && p.emirate === emirate);
+  if (foundVehicle && e.target.value !== "") {
+    const driver = foundVehicle.drivers[parseInt(e.target.value)];
+    if (driver) fillDriver(driver);
+  }
+});
+renderProvidersList();
+
+// ======================== SHOP DB ========================
+const shopDatabase = {
+  "Mina livestock shops": Array.from({ length: 35 }, (_, i) => `Mina Livestock ${String(i+1).padStart(2,'0')}`),
+  "Shahama livestock shops": Array.from({ length: 38 }, (_, i) => `Shahama Trading ${String(i+1).padStart(2,'0')}`),
+  "Wathba livestock shops": Array.from({ length: 40 }, (_, i) => `Wathba Farm ${String(i+1).padStart(2,'0')}`),
+  "Baniyas livestock shops": [
+    "1A- CN- 1098553 AL SAHAB LIVESTOCK TRADING & SALES",
+    "2A- CN- 1099768 SAWAT LIVESTOCK & SHEEP TRADING",
+    "3A- CN- 1029547 KHADIM AL MANSOURY LIVESTOCK & FODDER SHOP",
+    "4A- CN- 1096120 AL MANASHI LIVESTOCK TRADING - L.L.C - S.P.C",
+    "5A- CN- 1096118 AL RAWABI LIVESTOCK TRADING - L.L.C - S.P.C",
+    "6A- CN- 1191003 NOOR AL UYOON LIVESTOCK - L.L.C - S.P.C",
+    "7A- CN- 1164823- 1 GREEN ISLAND LIVESTOCK & SHEEP TRADING L.L.C. - BRANCH",
+    "8A- CN- 1193301- 1 HAMA LIVESTOCK & SHEEP TRADING - L.L.C - O.P.C - BRANCH",
+    "9A- CN- 1010199 AL reef Al Akhdar Livestock",
+    "11A- CN- 1077187 AL UYOUN LIVESTOCK ESTABLISHMENT",
+    "12A- CN- 4809098 JABAL AL NOOBA FOR THE SALE OF SHEEP - SOLE PROPRIETORSHIP",
+    "13A- CN- 1007907AL MUAZIZ LIVESTOCK & SHEEP TRADING ESTABLISHMENT",
+    "14A- CN- 1021720- 1BOU ATABA LIVESTOCK ESTABLISHMENT - BRANCH 1",
+    "15A- CN- 1098782SAEED ALHAMERI CATTLES TRADING",
+    "16A- CN- 1144375AL NUBA LIVESTOCK TRADING",
+    "17A- CN- 5796050ROYAL FALCON LIVESTOCK TRADING",
+    "18A- CN- 1145129 SAMA BANIYAS LIVESTOCK TRADNIG",
+    "19A- CN- 1084381 WADI SWAT LIVESTOCK & SHEEP TRADING",
+    "20A- CN- 1009235 AL THANIYYA CATTLE AND SHEEP TRADING",
+    "1B SAMA LIWA LIVESTOCK - SOLE PROPRIETORSHIP L.L.C.",
+    "2B- CN- 1136885- 1 BEERHAA LIVESTOCK - BRANCH 2",
+    "3B- CN- 2252669 NASEEM AL SABAH LIVESTOCK",
+    "4B- CN- 2124290 AL RAMZ LIVESTOCK TRADING",
+    "5B- CN- 2280087 AL SALSABEEL LIVESTOCK TRADING",
+    "6B- CN- 2234948 AL QALAA AL KHADHRAA LIVESTOCK TRADING",
+    "7B- CN- 1837100 AL HAZM LIVESTOCK - L.L.C - S.P.C",
+    "8B- CN- 4551498 SILVER STAR MEAT TRADING L.L.C. - RESALE OUTLET- BRANCH",
+    "9B- CN- 2249364 JABAL AL HALA LIVESTOCK TRADING",
+    "10B- CN- 1167578- 3 OASIS LIVESTOCK- RESALE OUTLET- BRANCH 2",
+    "11B- CN- 11451612 EL TAWEELA LIVESTOCK TRADING - SOLE PROPRIETORSHIP",
+    "12B- CN- 2097605 AL QOMAR SHEEP SALE",
+    "13B- CN- 2280386 DAHNAN LIVESTOCK TRADING - SOLE PROPRIETORSHIP L.L.C.",
+    "14B- CN- 2103240 ALMASEELA LIVESTOCK TRADING EST",
+    "15B- CN- 2145495 AL ANSAF LIVESTOCKS EST",
+    "16B- CN- 2104780 ABR AL MADAR LIVESTOCK TRADING",
+    "17B- CN- 2111391 NAJEM SUHAIL LIVESTOCK",
+    "18B- CN- 1878207 SHAEALIH WA NAR LIVESTOCK"
+  ]
+};
+const subBreedsList = ["Local","Australian","Somali","Holland","Pakistan","Iran","Oman","Ethiopia","India"];
+const speciesList = [
+  { value: "Sheep", label: "Sheep 🐑", emoji: "🐑" },
+  { value: "Goat", label: "Goat 🐐", emoji: "🐐" },
+  { value: "Cattle", label: "Cattle 🐄", emoji: "🐄" },
+  { value: "Camel", label: "Camel 🐪", emoji: "🐪" },
+  { value: "Gazelle", label: "Gazelle 🦌", emoji: "🦌" }
+];
+
+const groupSelect = document.getElementById('shopGroup');
+const shopSelect = document.getElementById('shopName');
+function populateShopDropdown() {
+  const selectedGroup = groupSelect.value;
+  const currentShop = shopSelect.value;
+  shopSelect.innerHTML = '<option value="" disabled selected>— select shop —</option>';
+  if (!selectedGroup || !shopDatabase[selectedGroup]) return;
+  shopDatabase[selectedGroup].forEach(shop => {
+    const option = document.createElement('option');
+    option.value = shop; option.textContent = shop;
+    shopSelect.appendChild(option);
+  });
+  if (currentShop && shopDatabase[selectedGroup].includes(currentShop)) shopSelect.value = currentShop;
+}
+groupSelect.addEventListener('change', populateShopDropdown);
+
+// ======================== MANUAL INPUTS ========================
+const sourceCertificateSelect = document.getElementById('sourceCertificate');
+const sourceCertificateOther = document.getElementById('sourceCertificateOther');
+sourceCertificateSelect.addEventListener('change', () => {
+  if (sourceCertificateSelect.value === 'OTHER') { sourceCertificateOther.classList.add('show'); sourceCertificateOther.focus(); }
+  else { sourceCertificateOther.classList.remove('show'); sourceCertificateOther.value = ''; }
+  scheduleAutosave();
+});
+const rejectionReasonSelect = document.getElementById('rejectionReason');
+const rejectionReasonOther = document.getElementById('rejectionReasonOther');
+rejectionReasonSelect.addEventListener('change', () => {
+  if (rejectionReasonSelect.value === 'OTHER') { rejectionReasonOther.classList.add('show'); rejectionReasonOther.focus(); }
+  else { rejectionReasonOther.classList.remove('show'); rejectionReasonOther.value = ''; }
+  scheduleAutosave();
+});
+
+// ======================== DATE TIME ========================
+const dateTimeInput = document.getElementById('recordDateTime');
+const nowBtn = document.getElementById('nowBtn');
+function getCurrentDateTimeLocal() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}T${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+}
+function setDateTimeToNow() { dateTimeInput.value = getCurrentDateTimeLocal(); }
+nowBtn.addEventListener('click', () => {
+  setDateTimeToNow();
+  nowBtn.textContent = '✓';
+  setTimeout(() => { nowBtn.textContent = '🔄 Now'; }, 800);
+});
+function formatDateTimeDisplay(dtValue) {
+  if (!dtValue) return '';
+  const d = new Date(dtValue);
+  if (isNaN(d.getTime())) return dtValue;
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${String(d.getDate()).padStart(2,'0')} ${months[d.getMonth()]} ${d.getFullYear()}, ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+// ======================== SPECIES TABLE ========================
+const speciesTableBody = document.getElementById('speciesTableBody');
+const totalAnimalCountInput = document.getElementById('totalAnimalCount');
+const healthCertInput = document.getElementById('healthCertNo');
+const healthCertLabel = document.getElementById('healthCertLabel');
+const healthCertHint = document.getElementById('healthCertHint');
+const totalInCertificateInput = document.getElementById('totalInCertificate');
+const certAlert = document.getElementById('certAlert');
+let speciesRowCounter = 0;
+
+function createSpeciesRow() {
+  speciesRowCounter++;
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td>
+      <select class="species-select" required>
+        <option value="" disabled selected></option>
+        ${speciesList.map(s => `<option value="${s.value}">${s.label}</option>`).join('')}
+      </select><span class="required-star">*</span>
+    </td>
+    <td>
+      <select class="subbreed-select" required>
+        <option value="" disabled selected></option>
+        ${subBreedsList.map(b => `<option value="${b}">${b}</option>`).join('')}
+      </select><span class="required-star">*</span>
+    </td>
+    <td>
+      <div style="display:flex; align-items:center; gap:6px;">
+        <input type="number" class="animals-count-input" min="0" step="1" value="0" required style="flex:1;">
+        <span class="required-star">*</span>
+        <button type="button" class="add-row-btn" title="Add another row">➕</button>
+      </div>
+    </td>
+    <td class="add-row-cell">
+      <button type="button" class="remove-row-btn" title="Remove this row" style="display:none;">✖</button>
+    </td>
+  `;
+  speciesTableBody.appendChild(tr);
+  const addBtn = tr.querySelector('.add-row-btn');
+  const removeBtn = tr.querySelector('.remove-row-btn');
+  const countInput = tr.querySelector('.animals-count-input');
+  addBtn.addEventListener('click', () => { createSpeciesRow(); scheduleAutosave(); });
+  removeBtn.addEventListener('click', () => {
+    if (speciesTableBody.querySelectorAll('tr').length > 1) {
+      tr.remove(); updateRemoveRowButtons(); updateTotalCount(); updateHealthCertHint(); scheduleAutosave();
+    }
+  });
+  countInput.addEventListener('input', () => { updateTotalCount(); scheduleAutosave(); });
+  tr.querySelector('.subbreed-select').addEventListener('change', () => { updateHealthCertHint(); scheduleAutosave(); });
+  tr.querySelector('.species-select').addEventListener('change', scheduleAutosave);
+  updateRemoveRowButtons();
+  updateTotalCount();
+  updateHealthCertHint();
+  return tr;
+}
+function updateRemoveRowButtons() {
+  const rows = speciesTableBody.querySelectorAll('tr');
+  rows.forEach(row => {
+    const btn = row.querySelector('.remove-row-btn');
+    if (btn) btn.style.display = rows.length > 1 ? 'inline-flex' : 'none';
+  });
+}
+function updateTotalCount() {
+  let total = 0;
+  speciesTableBody.querySelectorAll('.animals-count-input').forEach(inp => {
+    total += parseInt(inp.value) || 0;
+  });
+  totalAnimalCountInput.value = total;
+}
+
+// ======================== HEALTH CERT CONDITIONAL ========================
+function updateHealthCertHint() {
+  const subBreeds = Array.from(speciesTableBody.querySelectorAll('.subbreed-select'))
+    .map(s => s.value)
+    .filter(v => v);
+  const hasNonLocal = subBreeds.some(b => b !== 'Local');
+  if (subBreeds.length === 0) {
+    healthCertLabel.textContent = '🩺 Health Certificate No.';
+    healthCertLabel.style.color = '#2d6a4f';
+    healthCertInput.style.borderColor = '#c8e0d0';
+    healthCertHint.textContent = 'Optional for Local breed · Required for imported breeds';
+    healthCertHint.style.color = '#6b8f7c';
+  } else if (hasNonLocal) {
+    healthCertLabel.innerHTML = '🩺 Health Certificate No. <span style="color:#c0392b;">*</span>';
+    healthCertLabel.style.color = '#c0392b';
+    healthCertInput.style.borderColor = '#c0392b';
+    healthCertHint.textContent = '⚠️ Required — shipment contains non-Local breed(s)';
+    healthCertHint.style.color = '#c0392b';
+  } else {
+    healthCertLabel.textContent = '🩺 Health Certificate No.';
+    healthCertLabel.style.color = '#2d6a4f';
+    healthCertInput.style.borderColor = '#c8e0d0';
+    healthCertHint.textContent = '✅ Optional — all breeds are Local';
+    healthCertHint.style.color = '#2d6a4f';
+  }
+}
+
+// ======================== CERTIFICATE BALANCE CHECK ========================
+function checkCertificateUsage() {
+  const certNo = healthCertInput.value.trim();
+  if (!certNo) { certAlert.classList.remove('show'); return; }
+  const usage = [];
+  acceptedRecords.forEach(r => {
+    if (r.healthCertNo === certNo) {
+      const total = r.speciesLines.reduce((s, l) => s + l.animalCount, 0);
+      usage.push({ record: r, count: total, status: 'Accepted' });
+    }
+  });
+  rejectedRecords.forEach(r => {
+    if (r.healthCertNo === certNo) {
+      const total = r.speciesLines.reduce((s, l) => s + l.animalCount, 0);
+      usage.push({ record: r, count: total, status: 'Rejected' });
+    }
+  });
+  if (usage.length === 0) { certAlert.classList.remove('show'); return; }
+  const totalUsed = usage.reduce((s, u) => s + u.count, 0);
+  const totalInCert = parseInt(totalInCertificateInput.value) || 0;
+  let alertClass = 'info';
+  let alertHtml = '';
+  if (totalInCert > 0) {
+    const remaining = totalInCert - totalUsed;
+    if (remaining <= 0) {
+      alertClass = 'danger';
+      alertHtml = `⚠️ <strong>Certificate balance exhausted!</strong><br>`;
+      alertHtml += `Total in certificate: <strong>${totalInCert}</strong> · Used: <strong>${totalUsed}</strong> · Remaining: <strong style="color:#c0392b;">${remaining}</strong><br>`;
+      alertHtml += `<span style="font-size:0.7rem;">Proceed only if you have verified this is correct.</span>`;
+    } else {
+      alertClass = 'info';
+      alertHtml = `✅ <strong>Certificate used before (${usage.length} previous shipment${usage.length > 1 ? 's' : ''})</strong><br>`;
+      alertHtml += `Total in certificate: <strong>${totalInCert}</strong> · Used so far: <strong>${totalUsed}</strong> · <strong style="color:#2d6a4f;">Remaining: ${remaining}</strong>`;
+    }
+  } else {
+    alertClass = 'warning';
+    alertHtml = `ℹ️ <strong>Certificate used before (${usage.length} previous shipment${usage.length > 1 ? 's' : ''})</strong><br>`;
+    alertHtml += `Total used so far: <strong>${totalUsed}</strong> animals<br>`;
+    alertHtml += `<span style="font-size:0.7rem;">Tip: enter "Total in Certificate" to track remaining balance.</span>`;
+  }
+  const details = usage.map(u => `• ${u.record.vehiclePlate} (${u.status}) — ${u.count} animals — ${formatDateTimeDisplay(u.record.dateTime)}`).join('<br>');
+  alertHtml += `<div style="margin-top:6px; font-size:0.7rem; line-height:1.5;">${details}</div>`;
+  certAlert.className = 'cert-alert show ' + alertClass;
+  certAlert.innerHTML = alertHtml;
+}
+healthCertInput.addEventListener('blur', checkCertificateUsage);
+totalInCertificateInput.addEventListener('input', checkCertificateUsage);
+totalInCertificateInput.addEventListener('blur', checkCertificateUsage);
+
+// ======================== ANIMAL IDs INPUT ========================
+const animalIdsSection = document.getElementById('animalIdsSection');
+const animalIdsCountBadge = document.getElementById('animalIdsCountBadge');
+const inputModeTabs = document.querySelectorAll('.input-mode-tab');
+const inputModePanes = document.querySelectorAll('.input-mode-pane');
+
+inputModeTabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    inputModeTabs.forEach(t => t.classList.remove('active'));
+    inputModePanes.forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('pane-' + tab.dataset.mode).classList.add('active');
+  });
+});
+
+const rangeSpeciesSelect = document.getElementById('rangeSpecies');
+const rangeSubBreedSelect = document.getElementById('rangeSubBreed');
+speciesList.forEach(s => {
+  const opt = document.createElement('option');
+  opt.value = s.value; opt.textContent = s.label;
+  rangeSpeciesSelect.appendChild(opt);
+});
+subBreedsList.forEach(b => {
+  const opt = document.createElement('option');
+  opt.value = b; opt.textContent = b;
+  rangeSubBreedSelect.appendChild(opt);
+});
+
+const individualIdsList = document.getElementById('individualIdsList');
+function addIndividualIdRow() {
+  const row = document.createElement('div');
+  row.className = 'individual-id-row';
+  row.innerHTML = `
+    <input type="text" class="ind-id-input" placeholder="Animal ID (e.g., A-1001)">
+    <select class="ind-species-select">
+      <option value="">Species</option>
+      ${speciesList.map(s => `<option value="${s.value}">${s.label}</option>`).join('')}
+    </select>
+    <select class="ind-subbreed-select">
+      <option value="">Sub-breed</option>
+      ${subBreedsList.map(b => `<option value="${b}">${b}</option>`).join('')}
+    </select>
+    <button type="button" class="remove-id-btn" title="Remove">✖</button>
+  `;
+  individualIdsList.appendChild(row);
+  row.querySelector('.remove-id-btn').addEventListener('click', () => row.remove());
+}
+const addIndividualIdBtn = document.getElementById('addIndividualIdBtn');
+addIndividualIdBtn.addEventListener('click', () => {
+  const rows = individualIdsList.querySelectorAll('.individual-id-row');
+  let added = 0;
+  rows.forEach(row => {
+    const idNumber = row.querySelector('.ind-id-input').value.trim();
+    const species = row.querySelector('.ind-species-select').value;
+    const subBreed = row.querySelector('.ind-subbreed-select').value;
+    if (!idNumber) return;
+    if (!species) { alert('Please select Species for ID: ' + idNumber); return; }
+    if (!subBreed) { alert('Please select Sub-breed for ID: ' + idNumber); return; }
+    if (tryAddRejectedAnimalId(idNumber, species, subBreed)) added++;
+  });
+  if (added > 0) {
+    individualIdsList.innerHTML = '';
+    addIndividualIdRow();
+    renderRegisteredIds();
+    scheduleAutosave();
+  }
+});
+addIndividualIdRow();
+
+document.getElementById('previewRangeBtn').addEventListener('click', previewRange);
+function previewRange() {
+  const ids = buildRangeIds();
+  if (!ids) return;
+  const preview = document.getElementById('rangePreview');
+  preview.style.display = 'block';
+  const shown = ids.slice(0, 30).join(', ');
+  preview.textContent = `Will generate ${ids.length} IDs: ${shown}${ids.length > 30 ? ' ... (' + (ids.length - 30) + ' more)' : ''}`;
+}
+function buildRangeIds() {
+  const prefix = document.getElementById('rangePrefix').value;
+  const suffix = document.getElementById('rangeSuffix').value;
+  const from = parseInt(document.getElementById('rangeFrom').value);
+  const to = parseInt(document.getElementById('rangeTo').value);
+  const padding = parseInt(document.getElementById('rangePadding').value);
+  const species = rangeSpeciesSelect.value;
+  const subBreed = rangeSubBreedSelect.value;
+  if (isNaN(from) || isNaN(to)) { alert('Please enter valid From and To numbers.'); return null; }
+  if (from > to) { alert('From must be ≤ To.'); return null; }
+  if (to - from + 1 > 10000) { alert('Range too large (max 10,000).'); return null; }
+  if (!species) { alert('Please select Species.'); return null; }
+  if (!subBreed) { alert('Please select Sub-breed.'); return null; }
+  const ids = [];
+  for (let n = from; n <= to; n++) {
+    const numStr = String(n).padStart(padding, '0');
+    ids.push(prefix + numStr + suffix);
+  }
+  return ids;
+}
+document.getElementById('addRangeBtn').addEventListener('click', () => {
+  const ids = buildRangeIds();
+  if (!ids) return;
+  const species = rangeSpeciesSelect.value;
+  const subBreed = rangeSubBreedSelect.value;
+  let added = 0, skipped = 0;
+  ids.forEach(id => {
+    if (currentRejectedAnimalIds.find(x => x.idNumber === id)) { skipped++; return; }
+    if (tryAddRejectedAnimalId(id, species, subBreed, true)) added++;
+  });
+  document.getElementById('rangePreview').style.display = 'none';
+  renderRegisteredIds();
+  scheduleAutosave();
+  if (skipped > 0) alert(`⚠️ ${skipped} duplicate IDs (already in this shipment) were skipped.`);
+});
+document.getElementById('clearRangeBtn').addEventListener('click', () => {
+  ['rangePrefix','rangeFrom','rangeTo','rangeSuffix'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('rangePreview').style.display = 'none';
+});
+
+document.getElementById('parsePasteBtn').addEventListener('click', parsePaste);
+function parsePaste() {
+  const text = document.getElementById('pasteTextarea').value;
+  if (!text.trim()) { alert('Please paste some IDs first.'); return; }
+  const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+  if (lines.length === 0) { alert('No valid lines found.'); return; }
+  if (lines.length > 10000) { alert('Too many lines (max 10,000).'); return; }
+  const parsed = [];
+  lines.forEach((line) => {
+    const parts = line.split(',').map(p => p.trim());
+    const idNumber = parts[0];
+    if (!idNumber) return;
+    parsed.push({ idNumber, species: parts[1] || '', subBreed: parts[2] || '' });
+  });
+  const preview = document.getElementById('pastePreview');
+  preview.style.display = 'block';
+  const shown = parsed.slice(0, 20).map(p => p.idNumber).join(', ');
+  preview.textContent = `Parsed ${parsed.length} IDs: ${shown}${parsed.length > 20 ? ' ...' : ''}`;
+  window._parsedPaste = parsed;
+  const old = document.getElementById('confirmPasteBtn');
+  if (old) old.remove();
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'range-btn';
+  btn.id = 'confirmPasteBtn';
+  btn.textContent = '✅ Confirm & Add to List';
+  btn.style.marginTop = '8px';
+  btn.addEventListener('click', () => {
+    const parsedItems = window._parsedPaste || [];
+    const firstSpeciesLine = speciesTableBody.querySelector('tr');
+    const defaultSpecies = firstSpeciesLine ? firstSpeciesLine.querySelector('.species-select').value : '';
+    const defaultSubBreed = firstSpeciesLine ? firstSpeciesLine.querySelector('.subbreed-select').value : '';
+    let added = 0, skipped = 0;
+    parsedItems.forEach(p => {
+      const species = p.species || defaultSpecies;
+      const subBreed = p.subBreed || defaultSubBreed;
+      if (!species || !subBreed) return;
+      if (currentRejectedAnimalIds.find(x => x.idNumber === p.idNumber)) { skipped++; return; }
+      if (tryAddRejectedAnimalId(p.idNumber, species, subBreed, true)) added++;
+    });
+    document.getElementById('pasteTextarea').value = '';
+    preview.style.display = 'none';
+    btn.remove();
+    renderRegisteredIds();
+    scheduleAutosave();
+    if (skipped > 0) alert(`⚠️ ${skipped} duplicate IDs (already in this shipment) were skipped.`);
+  });
+  preview.parentNode.insertBefore(btn, preview.nextSibling);
+}
+document.getElementById('clearPasteBtn').addEventListener('click', () => {
+  document.getElementById('pasteTextarea').value = '';
+  document.getElementById('pastePreview').style.display = 'none';
+  const btn = document.getElementById('confirmPasteBtn');
+  if (btn) btn.remove();
+});
+
+function tryAddRejectedAnimalId(idNumber, species, subBreed, silentMode) {
+  const id = idNumber.trim();
+  if (!id) return false;
+  if (currentRejectedAnimalIds.find(x => x.idNumber === id)) {
+    if (!silentMode) alert(`❌ ID "${id}" is already in this shipment. Duplicate blocked.`);
+    return false;
+  }
+  if (currentRejectedAnimalIds.length >= 10000) { alert('Max 10,000 IDs reached.'); return false; }
+  const priorUsage = animalIdIndex[id];
+  if (priorUsage && priorUsage.length > 0) {
+    if (silentMode) {
+      currentRejectedAnimalIds.push({ idNumber: id, species, subBreed });
+      animalIdsCountBadge.textContent = currentRejectedAnimalIds.length + ' registered';
+      return true;
+    }
+    const prior = priorUsage[0];
+    const proceed = confirm(
+      `⚠️ This ID was previously recorded:\n\n` +
+      `ID: ${id}\n` +
+      `Status: ${prior.status}\n` +
+      `Vehicle: ${prior.vehiclePlate}\n` +
+      `Date: ${formatDateTimeDisplay(prior.dateTime)}\n` +
+      `${prior.rejectionReason ? 'Reason: ' + prior.rejectionReason + '\n' : ''}` +
+      `\nDo you want to add it again?`
+    );
+    if (!proceed) return false;
+  }
+  currentRejectedAnimalIds.push({ idNumber: id, species, subBreed });
+  animalIdsCountBadge.textContent = currentRejectedAnimalIds.length + ' registered';
+  return true;
+}
+function renderRegisteredIds() {
+  const summary = document.getElementById('registeredIdsSummary');
+  const list = document.getElementById('registeredIdsList');
+  const countSpan = document.getElementById('registeredCount');
+  animalIdsCountBadge.textContent = currentRejectedAnimalIds.length + ' registered';
+  if (currentRejectedAnimalIds.length === 0) { summary.style.display = 'none'; return; }
+  summary.style.display = 'block';
+  countSpan.textContent = currentRejectedAnimalIds.length;
+  list.innerHTML = currentRejectedAnimalIds.map(x => `
+    <span class="id-chip" title="${escapeHtml(x.species)} / ${escapeHtml(x.subBreed)}">
+      ${escapeHtml(x.idNumber)} <span class="id-chip-close" onclick="removeRejectedAnimalId('${escapeHtml(x.idNumber).replace(/'/g, "\\'")}')">✖</span>
+    </span>
+  `).join('');
+}
+window.removeRejectedAnimalId = function(idNumber) {
+  currentRejectedAnimalIds = currentRejectedAnimalIds.filter(x => x.idNumber !== idNumber);
+  renderRegisteredIds();
+  scheduleAutosave();
+};
+function clearRejectedAnimalIds() {
+  currentRejectedAnimalIds = [];
+  animalIdsCountBadge.textContent = '0 registered';
+  renderRegisteredIds();
+  individualIdsList.innerHTML = '';
+  addIndividualIdRow();
+  document.getElementById('rangePreview').style.display = 'none';
+  const pp = document.getElementById('pastePreview');
+  pp.style.display = 'none';
+  const cp = document.getElementById('confirmPasteBtn');
+  if (cp) cp.remove();
+}
+
+// ======================== BUILD RECORD ========================
+const notesInput = document.getElementById('notes');
+const rejectionReasonBox = document.getElementById('rejectionReasonBox');
+
+function buildRecordFromForm(isRejection) {
+  const plateNumber = plateInput.value.trim();
+  if (!plateNumber) { alert("❌ Enter Vehicle Plate Number"); return null; }
+  const emirate = emirateInput.value;
+  if (!emirate) { alert("❌ Select Vehicle Emirate"); return null; }
+  const vehiclePlate = `${plateNumber} - ${emirate}`;
+  const driverName = driverNameInput.value.trim();
+  if (!driverName) { alert("❌ Enter Driver Name"); return null; }
+  const driverId = driverIdInput.value.trim();
+  if (!driverId) { alert("❌ Enter Driver ID No."); return null; }
+  const driverContact = driverContactInput.value.trim();
+  if (!driverContact) { alert("❌ Enter Driver Contact No."); return null; }
+  const dateTime = dateTimeInput.value;
+  if (!dateTime) { alert("❌ Select Date & Time"); return null; }
+  const group = groupSelect.value;
+  if (!group) { alert("❌ Select shop group"); return null; }
+  const individualShop = shopSelect.value;
+  if (!individualShop) { alert("❌ Select individual shop"); return null; }
+  let sourceCertificate = sourceCertificateSelect.value;
+  if (!sourceCertificate) { alert("❌ Select Source / Certificate Origin"); return null; }
+  if (sourceCertificate === 'OTHER') {
+    const custom = sourceCertificateOther.value.trim();
+    if (!custom) { alert("❌ Enter the custom source"); return null; }
+    sourceCertificate = custom;
+  }
+  let rejectionReason = "";
+  if (isRejection) {
+    rejectionReason = rejectionReasonSelect.value;
+    if (!rejectionReason) { alert("❌ Select a rejection reason"); return null; }
+    if (rejectionReason === 'OTHER') {
+      const custom = rejectionReasonOther.value.trim();
+      if (!custom) { alert("❌ Enter the custom rejection reason"); return null; }
+      rejectionReason = custom;
+    }
+  }
+  const rows = speciesTableBody.querySelectorAll('tr');
+  if (rows.length === 0) { alert("❌ Add at least one species entry"); return null; }
+  const speciesLines = [];
+  let hasError = false;
+  rows.forEach((row, idx) => {
+    const speciesSelect = row.querySelector('.species-select');
+    const subBreedSelect = row.querySelector('.subbreed-select');
+    const animalsCountInput = row.querySelector('.animals-count-input');
+    if (!speciesSelect.value) { alert(`❌ Row #${idx+1}: select Animal`); hasError = true; return; }
+    if (!subBreedSelect.value) { alert(`❌ Row #${idx+1}: select Breed`); hasError = true; return; }
+    const animalsCount = parseInt(animalsCountInput.value) || 0;
+    speciesLines.push({ species: speciesSelect.value, subBreed: subBreedSelect.value, animalCount: animalsCount });
+  });
+  if (hasError) return null;
+  const healthCertNo = healthCertInput.value.trim();
+  const needsHealthCert = speciesLines.some(line => line.subBreed && line.subBreed !== 'Local');
+  if (needsHealthCert && !healthCertNo) {
+    alert("❌ Health Certificate No. is required for non-Local breeds.\n(Only 'Local' breed shipments can skip it.)");
+    return null;
+  }
+  const totalInCertificate = parseInt(totalInCertificateInput.value) || 0;
+  let rejectedAnimals = [];
+  if (isRejection && currentRejectedAnimalIds.length > 0) {
+    rejectedAnimals = currentRejectedAnimalIds.map(x => ({ ...x }));
+  }
+  return {
+    id: Date.now() + Math.random(),
+    vehiclePlateNumber: plateNumber, vehicleEmirate: emirate, vehiclePlate: vehiclePlate,
+    driverName, driverId, driverContact,
+    dateTime, group, individualShop,
+    healthCertNo, totalInCertificate, sourceCertificate, rejectionReason,
+    notes: notesInput.value.trim() || "",
+    speciesLines,
+    rejectedAnimals
+  };
+}
+
+function resetFormAfterAdd() {
+  plateInput.value = ""; emirateInput.value = "";
+  driverNameInput.value = ""; driverIdInput.value = ""; driverContactInput.value = "";
+  driverSelect.style.display = 'none'; lookupHint.textContent = '';
+  notesInput.value = ""; healthCertInput.value = "";
+  totalInCertificateInput.value = "";
+  certAlert.classList.remove('show');
+  sourceCertificateSelect.value = ""; sourceCertificateOther.value = ""; sourceCertificateOther.classList.remove('show');
+  rejectionReasonSelect.value = ""; rejectionReasonOther.value = ""; rejectionReasonOther.classList.remove('show');
+  rejectionReasonBox.style.display = 'none';
+  animalIdsSection.style.display = 'none';
+  clearRejectedAnimalIds();
+  speciesTableBody.innerHTML = ''; speciesRowCounter = 0; createSpeciesRow();
+  setDateTimeToNow();
+  clearFormDraft();
+  updateHealthCertHint();
+  autosaveStatus.textContent = '';
+}
+
+const acceptBtn = document.getElementById('acceptBtn');
+const rejectBtn = document.getElementById('rejectBtn');
+
+function handleAccept() {
+  const record = buildRecordFromForm(false);
+  if (!record) return;
+  acceptedRecords.push(record);
+  rebuildAnimalIdIndex();
+  saveData();
+  renderAll();
+  resetFormAfterAdd();
+}
+function handleReject() {
+  rejectionReasonBox.style.display = 'block';
+  animalIdsSection.style.display = 'block';
+  const record = buildRecordFromForm(true);
+  if (!record) return;
+  if (record.rejectedAnimals.length === 0) {
+    if (!confirm('⚠️ No animal IDs registered for this rejection. Continue anyway?')) return;
+  }
+  rejectedRecords.push(record);
+  rebuildAnimalIdIndex();
+  saveData();
+  renderAll();
+  resetFormAfterAdd();
+}
+acceptBtn.addEventListener('click', () => {
+  rejectionReasonBox.style.display = 'none';
+  animalIdsSection.style.display = 'none';
+  handleAccept();
+});
+rejectBtn.addEventListener('click', handleReject);
+
+document.getElementById('clearFormBtn').addEventListener('click', () => {
+  if (confirm('⚠️ Clear the current form? (Records already saved will remain intact)')) {
+    resetFormAfterAdd();
+    setDateTimeToNow();
+  }
+});
+
+// ======================== RENDERING ========================
+const acceptedTableBody = document.getElementById('acceptedTableBody');
+const rejectedTableBody = document.getElementById('rejectedTableBody');
+const pendingTableBody = document.getElementById('pendingTableBody');
+const washedTableBody = document.getElementById('washedTableBody');
+const acceptedCountSpan = document.getElementById('acceptedCount');
+const rejectedCountSpan = document.getElementById('rejectedCount');
+const pendingWashCountSpan = document.getElementById('pendingWashCount');
+const washedCountSpan = document.getElementById('washedCount');
+const acceptedTotalAnimalsSpan = document.getElementById('acceptedTotalAnimals');
+const rejectedTotalAnimalsSpan = document.getElementById('rejectedTotalAnimals');
+const acceptedSpeciesBreakdown = document.getElementById('acceptedSpeciesBreakdown');
+const rejectedSpeciesBreakdown = document.getElementById('rejectedSpeciesBreakdown');
+const acceptedFilterSpecies = document.getElementById('acceptedFilterSpecies');
+const acceptedFilterGroup = document.getElementById('acceptedFilterGroup');
+const acceptedFilterShop = document.getElementById('acceptedFilterShop');
+const rejectedFilterSpecies = document.getElementById('rejectedFilterSpecies');
+const rejectedFilterGroup = document.getElementById('rejectedFilterGroup');
+const rejectedFilterShop = document.getElementById('rejectedFilterShop');
+const selectAllAccepted = document.getElementById('selectAllAccepted');
+const selectAllRejected = document.getElementById('selectAllRejected');
+const selectAllPending = document.getElementById('selectAllPending');
+const selectAllWashed = document.getElementById('selectAllWashed');
+const moveToWashedBtn = document.getElementById('moveToWashedBtn');
+
+function flattenRecords(records, speciesFilter, groupFilter, shopFilter) {
+  const out = [];
+  records.forEach(record => {
+    if (groupFilter && record.group !== groupFilter) return;
+    if (shopFilter && !record.individualShop.toLowerCase().includes(shopFilter)) return;
+    record.speciesLines.forEach((line, lineIdx) => {
+      if (speciesFilter && line.species !== speciesFilter) return;
+      out.push({
+        recordId: record.id, lineIndex: lineIdx,
+        selectionKey: `${record.id}|${lineIdx}`,
+        vehiclePlate: record.vehiclePlate, driverName: record.driverName, driverContact: record.driverContact,
+        group: record.group, individualShop: record.individualShop, dateTime: record.dateTime,
+        notes: record.notes, healthCertNo: record.healthCertNo || '', sourceCertificate: record.sourceCertificate || '',
+        rejectionReason: record.rejectionReason || '',
+        rejectedAnimalsCount: (record.rejectedAnimals || []).length,
+        species: line.species, subBreed: line.subBreed, animalCount: line.animalCount
+      });
+    });
+  });
+  return out;
+}
+function computeSpeciesBreakdown(filteredRows) {
+  const totals = {};
+  speciesList.forEach(s => { totals[s.value] = 0; });
+  let grandTotal = 0;
+  filteredRows.forEach(r => {
+    if (totals[r.species] === undefined) totals[r.species] = 0;
+    totals[r.species] += r.animalCount || 0;
+    grandTotal += r.animalCount || 0;
+  });
+  return { totals, grandTotal };
+}
+function renderSpeciesBreakdown(container, totals, hideZero = true) {
+  let html = ''; let hasAny = false;
+  speciesList.forEach(s => {
+    const count = totals[s.value] || 0;
+    if (count === 0 && hideZero) return;
+    hasAny = true;
+    html += `<div class="species-chip"><span class="chip-name">${s.emoji} ${s.value}</span><span class="chip-count">${count.toLocaleString()}</span></div>`;
+  });
+  container.innerHTML = hasAny ? html : '<div class="species-breakdown-empty">No animals in current view</div>';
+}
+function renderAccepted() {
+  const filtered = flattenRecords(acceptedRecords, acceptedFilterSpecies.value, acceptedFilterGroup.value, acceptedFilterShop.value.trim().toLowerCase());
+  if (filtered.length === 0) {
+    acceptedTableBody.innerHTML = '<tr><td colspan="9" class="empty-msg">📭 No accepted shipments match filters</td></tr>';
+  } else {
+    let html = '';
+    for (const r of filtered) {
+      const isChecked = acceptedSelected.has(r.selectionKey);
+      html += `<tr class="${isChecked ? 'row-selected' : ''}">
+        <td class="select-col"><input type="checkbox" class="row-checkbox accepted-checkbox" data-key="${escapeHtml(r.selectionKey)}" ${isChecked ? 'checked' : ''}></td>
+        <td>${escapeHtml(r.vehiclePlate)}</td>
+        <td>${escapeHtml(r.driverName)}<br><span style="color:#888; font-size:0.65rem;">${escapeHtml(r.driverContact)}</span></td>
+        <td>${escapeHtml(r.individualShop)}<br><span style="color:#888; font-size:0.65rem;">${escapeHtml(r.group.replace(' livestock shops',''))}</span></td>
+        <td>${escapeHtml(formatDateTimeDisplay(r.dateTime))}</td>
+        <td><strong>${escapeHtml(r.species)}</strong><br><span style="color:#888; font-size:0.65rem;">${escapeHtml(r.subBreed)}</span></td>
+        <td style="font-weight:700; color:#2d6a4f;">${r.animalCount}</td>
+        <td><span style="font-size:0.65rem; color:#555;">🩺 ${escapeHtml(r.healthCertNo)}</span><br><span style="font-size:0.65rem; color:#888;">🌍 ${escapeHtml(r.sourceCertificate)}</span></td>
+        <td style="max-width:100px; overflow:hidden; text-overflow:ellipsis;" title="${escapeHtml(r.notes)}">${escapeHtml(r.notes.substring(0, 20))}${r.notes.length > 20 ? '…' : ''}</td>
+      </tr>`;
+    }
+    acceptedTableBody.innerHTML = html;
+  }
+  const { totals, grandTotal } = computeSpeciesBreakdown(filtered);
+  acceptedTotalAnimalsSpan.textContent = grandTotal.toLocaleString();
+  renderSpeciesBreakdown(acceptedSpeciesBreakdown, totals, true);
+  const totalLines = acceptedRecords.reduce((sum, r) => sum + r.speciesLines.length, 0);
+  acceptedCountSpan.innerText = `${acceptedRecords.length} record${acceptedRecords.length !== 1 ? 's' : ''} · ${totalLines} line${totalLines !== 1 ? 's' : ''}`;
+  updateAcceptedSelectionUI();
+}
+function renderRejected() {
+  const filtered = flattenRecords(rejectedRecords, rejectedFilterSpecies.value, rejectedFilterGroup.value, rejectedFilterShop.value.trim().toLowerCase());
+  if (filtered.length === 0) {
+    rejectedTableBody.innerHTML = '<tr><td colspan="9" class="empty-msg">📭 No rejected shipments match filters</td></tr>';
+  } else {
+    let html = '';
+    for (const r of filtered) {
+      const isChecked = rejectedSelected.has(r.selectionKey);
+      const idsBadge = r.rejectedAnimalsCount > 0
+        ? `<span style="background:#eaf6ee; color:#2d6a4f; padding:1px 7px; border-radius:20px; font-size:0.62rem; font-weight:700;">${r.rejectedAnimalsCount} IDs</span>`
+        : `<span class="no-ids-warning" style="font-size:0.62rem;">no IDs</span>`;
+      html += `<tr class="${isChecked ? 'row-selected' : ''}">
+        <td class="select-col"><input type="checkbox" class="row-checkbox rejected-checkbox" data-key="${escapeHtml(r.selectionKey)}" ${isChecked ? 'checked' : ''}></td>
+        <td>${escapeHtml(r.vehiclePlate)}</td>
+        <td>${escapeHtml(r.driverName)}<br><span style="color:#888; font-size:0.65rem;">${escapeHtml(r.driverContact)}</span></td>
+        <td>${escapeHtml(r.individualShop)}<br><span style="color:#888; font-size:0.65rem;">${escapeHtml(r.group.replace(' livestock shops',''))}</span></td>
+        <td>${escapeHtml(formatDateTimeDisplay(r.dateTime))}</td>
+        <td><strong>${escapeHtml(r.species)}</strong><br><span style="color:#888; font-size:0.65rem;">${escapeHtml(r.subBreed)}</span></td>
+        <td style="font-weight:700; color:#c0392b;">${r.animalCount}</td>
+        <td style="max-width:100px; overflow:hidden; text-overflow:ellipsis;" title="${escapeHtml(r.rejectionReason)}"><span style="font-size:0.65rem; color:#c0392b; font-weight:700;">${escapeHtml(r.rejectionReason.substring(0,20))}${r.rejectionReason.length > 20 ? '…' : ''}</span><br>${idsBadge}</td>
+        <td style="max-width:100px; overflow:hidden; text-overflow:ellipsis;" title="${escapeHtml(r.notes)}">${escapeHtml(r.notes.substring(0, 20))}${r.notes.length > 20 ? '…' : ''}</td>
+      </tr>`;
+    }
+    rejectedTableBody.innerHTML = html;
+  }
+  const { totals, grandTotal } = computeSpeciesBreakdown(filtered);
+  rejectedTotalAnimalsSpan.textContent = grandTotal.toLocaleString();
+  renderSpeciesBreakdown(rejectedSpeciesBreakdown, totals, true);
+  const totalLines = rejectedRecords.reduce((sum, r) => sum + r.speciesLines.length, 0);
+  rejectedCountSpan.innerText = `${rejectedRecords.length} record${rejectedRecords.length !== 1 ? 's' : ''} · ${totalLines} line${totalLines !== 1 ? 's' : ''}`;
+  updateRejectedSelectionUI();
+}
+function getPendingWashLines() {
+  const washedKeys = new Set(washedRecords.map(w => w.selectionKey));
+  const pending = [];
+  acceptedRecords.forEach(record => {
+    record.speciesLines.forEach((line, lineIdx) => {
+      const key = `${record.id}|${lineIdx}`;
+      if (washedKeys.has(key)) return;
+      pending.push({
+        recordId: record.id, lineIndex: lineIdx, selectionKey: key,
+        vehiclePlate: record.vehiclePlate, driverName: record.driverName, driverContact: record.driverContact,
+        group: record.group, individualShop: record.individualShop, dateTime: record.dateTime,
+        healthCertNo: record.healthCertNo || '', sourceCertificate: record.sourceCertificate || '',
+        species: line.species, subBreed: line.subBreed, animalCount: line.animalCount
+      });
+    });
+  });
+  return pending;
+}
+function renderPendingWash() {
+  const pending = getPendingWashLines();
+  if (pending.length === 0) {
+    pendingTableBody.innerHTML = '<tr><td colspan="8" class="empty-msg">✅ No pending wash records</td></tr>';
+  } else {
+    let html = '';
+    for (const r of pending) {
+      const isChecked = pendingSelected.has(r.selectionKey);
+      html += `<tr class="${isChecked ? 'row-selected' : ''}">
+        <td class="select-col"><input type="checkbox" class="row-checkbox pending-checkbox" data-key="${escapeHtml(r.selectionKey)}" ${isChecked ? 'checked' : ''}></td>
+        <td>${escapeHtml(r.vehiclePlate)}</td>
+        <td>${escapeHtml(r.driverName)}<br><span style="color:#888; font-size:0.65rem;">${escapeHtml(r.driverContact)}</span></td>
+        <td>${escapeHtml(r.individualShop)}<br><span style="color:#888; font-size:0.65rem;">${escapeHtml(r.group.replace(' livestock shops',''))}</span></td>
+        <td>${escapeHtml(formatDateTimeDisplay(r.dateTime))}</td>
+        <td><strong>${escapeHtml(r.species)}</strong><br><span style="color:#888; font-size:0.65rem;">${escapeHtml(r.subBreed)}</span></td>
+        <td style="font-weight:700; color:#2d6a4f;">${r.animalCount}</td>
+        <td><span style="font-size:0.65rem; color:#555;">🩺 ${escapeHtml(r.healthCertNo)}</span><br><span style="font-size:0.65rem; color:#888;">🌍 ${escapeHtml(r.sourceCertificate)}</span></td>
+      </tr>`;
+    }
+    pendingTableBody.innerHTML = html;
+  }
+  pendingWashCountSpan.innerText = `${pending.length} line${pending.length !== 1 ? 's' : ''}`;
+  updatePendingSelectionUI();
+}
+function renderWashed() {
+  if (washedRecords.length === 0) {
+    washedTableBody.innerHTML = '<tr><td colspan="9" class="empty-msg">No washed records yet</td></tr>';
+  } else {
+    let html = '';
+    for (const r of washedRecords) {
+      const isChecked = washedSelected.has(r.selectionKey);
+      html += `<tr class="${isChecked ? 'row-selected' : ''}">
+        <td class="select-col"><input type="checkbox" class="row-checkbox washed-checkbox" data-key="${escapeHtml(r.selectionKey)}" ${isChecked ? 'checked' : ''}></td>
+        <td>${escapeHtml(r.vehiclePlate)}</td>
+        <td>${escapeHtml(r.driverName)}<br><span style="color:#888; font-size:0.65rem;">${escapeHtml(r.driverContact)}</span></td>
+        <td>${escapeHtml(r.individualShop)}<br><span style="color:#888; font-size:0.65rem;">${escapeHtml(r.group.replace(' livestock shops',''))}</span></td>
+        <td>${escapeHtml(formatDateTimeDisplay(r.dateTime))}</td>
+        <td><span style="color:#1f4e79; font-weight:700;">${escapeHtml(formatDateTimeDisplay(r.washedAt))}</span></td>
+        <td><strong>${escapeHtml(r.species)}</strong><br><span style="color:#888; font-size:0.65rem;">${escapeHtml(r.subBreed)}</span></td>
+        <td style="font-weight:700; color:#1f4e79;">${r.animalCount}</td>
+        <td><span style="font-size:0.65rem; color:#555;">🩺 ${escapeHtml(r.healthCertNo)}</span><br><span style="font-size:0.65rem; color:#888;">🌍 ${escapeHtml(r.sourceCertificate)}</span></td>
+      </tr>`;
+    }
+    washedTableBody.innerHTML = html;
+  }
+  washedCountSpan.innerText = `${washedRecords.length} line${washedRecords.length !== 1 ? 's' : ''}`;
+  updateWashedSelectionUI();
+}
+function renderAll() {
+  renderAccepted(); renderRejected(); renderPendingWash(); renderWashed();
+}
+function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>"']/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[m])); }
+
+function updateAcceptedSelectionUI() {
+  const count = acceptedSelected.size;
+  document.getElementById('exportAcceptedSelectedCsvBtn').textContent = `📎 CSV Selected (${count})`;
+  document.getElementById('exportAcceptedSelectedPdfBtn').textContent = `📄 PDF Selected (${count})`;
+  document.getElementById('exportAcceptedSelectedCsvBtn').disabled = count === 0;
+  document.getElementById('exportAcceptedSelectedPdfBtn').disabled = count === 0;
+  const visibleRows = acceptedTableBody.querySelectorAll('.accepted-checkbox');
+  let allChecked = visibleRows.length > 0;
+  visibleRows.forEach(cb => { if (!cb.checked) allChecked = false; });
+  selectAllAccepted.checked = allChecked && visibleRows.length > 0;
+  selectAllAccepted.indeterminate = !allChecked && count > 0;
+}
+function updateRejectedSelectionUI() {
+  const count = rejectedSelected.size;
+  document.getElementById('exportRejectedSelectedCsvBtn').textContent = `📎 CSV Selected (${count})`;
+  document.getElementById('exportRejectedSelectedPdfBtn').textContent = `📄 PDF Selected (${count})`;
+  document.getElementById('exportRejectedSelectedCsvBtn').disabled = count === 0;
+  document.getElementById('exportRejectedSelectedPdfBtn').disabled = count === 0;
+  const visibleRows = rejectedTableBody.querySelectorAll('.rejected-checkbox');
+  let allChecked = visibleRows.length > 0;
+  visibleRows.forEach(cb => { if (!cb.checked) allChecked = false; });
+  selectAllRejected.checked = allChecked && visibleRows.length > 0;
+  selectAllRejected.indeterminate = !allChecked && count > 0;
+}
+function updatePendingSelectionUI() {
+  const count = pendingSelected.size;
+  moveToWashedBtn.textContent = `➡️ Move to Washed (${count})`;
+  moveToWashedBtn.disabled = count === 0;
+  const visibleRows = pendingTableBody.querySelectorAll('.pending-checkbox');
+  let allChecked = visibleRows.length > 0;
+  visibleRows.forEach(cb => { if (!cb.checked) allChecked = false; });
+  selectAllPending.checked = allChecked && visibleRows.length > 0;
+  selectAllPending.indeterminate = !allChecked && count > 0;
+}
+function updateWashedSelectionUI() {
+  const count = washedSelected.size;
+  document.getElementById('exportWashedSelectedCsvBtn').textContent = `📎 CSV Selected (${count})`;
+  document.getElementById('exportWashedSelectedPdfBtn').textContent = `📄 PDF Selected (${count})`;
+  document.getElementById('exportWashedSelectedCsvBtn').disabled = count === 0;
+  document.getElementById('exportWashedSelectedPdfBtn').disabled = count === 0;
+  const visibleRows = washedTableBody.querySelectorAll('.washed-checkbox');
+  let allChecked = visibleRows.length > 0;
+  visibleRows.forEach(cb => { if (!cb.checked) allChecked = false; });
+  selectAllWashed.checked = allChecked && visibleRows.length > 0;
+  selectAllWashed.indeterminate = !allChecked && count > 0;
+}
+
+acceptedTableBody.addEventListener('change', (e) => {
+  if (e.target.classList.contains('accepted-checkbox')) {
+    const key = e.target.dataset.key;
+    if (e.target.checked) acceptedSelected.add(key); else acceptedSelected.delete(key);
+    const row = e.target.closest('tr');
+    if (row) row.classList.toggle('row-selected', e.target.checked);
+    updateAcceptedSelectionUI();
+  }
+});
+rejectedTableBody.addEventListener('change', (e) => {
+  if (e.target.classList.contains('rejected-checkbox')) {
+    const key = e.target.dataset.key;
+    if (e.target.checked) rejectedSelected.add(key); else rejectedSelected.delete(key);
+    const row = e.target.closest('tr');
+    if (row) row.classList.toggle('row-selected', e.target.checked);
+    updateRejectedSelectionUI();
+  }
+});
+pendingTableBody.addEventListener('change', (e) => {
+  if (e.target.classList.contains('pending-checkbox')) {
+    const key = e.target.dataset.key;
+    if (e.target.checked) pendingSelected.add(key); else pendingSelected.delete(key);
+    const row = e.target.closest('tr');
+    if (row) row.classList.toggle('row-selected', e.target.checked);
+    updatePendingSelectionUI();
+  }
+});
+washedTableBody.addEventListener('change', (e) => {
+  if (e.target.classList.contains('washed-checkbox')) {
+    const key = e.target.dataset.key;
+    if (e.target.checked) washedSelected.add(key); else washedSelected.delete(key);
+    const row = e.target.closest('tr');
+    if (row) row.classList.toggle('row-selected', e.target.checked);
+    updateWashedSelectionUI();
+  }
+});
+selectAllAccepted.addEventListener('change', () => {
+  const checked = selectAllAccepted.checked;
+  acceptedTableBody.querySelectorAll('.accepted-checkbox').forEach(cb => {
+    const key = cb.dataset.key; cb.checked = checked;
+    const row = cb.closest('tr'); if (row) row.classList.toggle('row-selected', checked);
+    if (checked) acceptedSelected.add(key); else acceptedSelected.delete(key);
+  });
+  updateAcceptedSelectionUI();
+});
+selectAllRejected.addEventListener('change', () => {
+  const checked = selectAllRejected.checked;
+  rejectedTableBody.querySelectorAll('.rejected-checkbox').forEach(cb => {
+    const key = cb.dataset.key; cb.checked = checked;
+    const row = cb.closest('tr'); if (row) row.classList.toggle('row-selected', checked);
+    if (checked) rejectedSelected.add(key); else rejectedSelected.delete(key);
+  });
+  updateRejectedSelectionUI();
+});
+selectAllPending.addEventListener('change', () => {
+  const checked = selectAllPending.checked;
+  pendingTableBody.querySelectorAll('.pending-checkbox').forEach(cb => {
+    const key = cb.dataset.key; cb.checked = checked;
+    const row = cb.closest('tr'); if (row) row.classList.toggle('row-selected', checked);
+    if (checked) pendingSelected.add(key); else pendingSelected.delete(key);
+  });
+  updatePendingSelectionUI();
+});
+selectAllWashed.addEventListener('change', () => {
+  const checked = selectAllWashed.checked;
+  washedTableBody.querySelectorAll('.washed-checkbox').forEach(cb => {
+    const key = cb.dataset.key; cb.checked = checked;
+    const row = cb.closest('tr'); if (row) row.classList.toggle('row-selected', checked);
+    if (checked) washedSelected.add(key); else washedSelected.delete(key);
+  });
+  updateWashedSelectionUI();
+});
+
+moveToWashedBtn.addEventListener('click', () => {
+  if (pendingSelected.size === 0) return;
+  const now = new Date();
+  const washedAt = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}T${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const pending = getPendingWashLines();
+  pending.forEach(p => {
+    if (pendingSelected.has(p.selectionKey)) washedRecords.push({ ...p, washedAt });
+  });
+  pendingSelected.clear();
+  saveData();
+  renderAll();
+});
+
+// ======================== ANIMAL ID INDEX ========================
+function rebuildAnimalIdIndex() {
+  animalIdIndex = {};
+  rejectedRecords.forEach(record => {
+    (record.rejectedAnimals || []).forEach(animal => {
+      const id = animal.idNumber;
+      if (!animalIdIndex[id]) animalIdIndex[id] = [];
+      animalIdIndex[id].push({
+        status: 'Rejected', recordId: record.id,
+        vehiclePlate: record.vehiclePlate, driverName: record.driverName, driverContact: record.driverContact,
+        individualShop: record.individualShop, group: record.group,
+        dateTime: record.dateTime, rejectionReason: record.rejectionReason,
+        healthCertNo: record.healthCertNo, sourceCertificate: record.sourceCertificate,
+        species: animal.species, subBreed: animal.subBreed, notes: record.notes
+      });
+    });
+  });
+}
+function searchAnimalId(query) {
+  if (!query || !query.trim()) return { exact: null, partial: [] };
+  const q = query.trim();
+  const qLower = q.toLowerCase();
+  const exact = animalIdIndex[q] || null;
+  const partial = [];
+  Object.keys(animalIdIndex).forEach(id => {
+    if (id === q) return;
+    if (id.toLowerCase().includes(qLower)) partial.push({ id, entries: animalIdIndex[id] });
+  });
+  return { exact, partial };
+}
+
+// ======================== ARCHIVE ========================
+const archiveSearchInput = document.getElementById('animalSearchInput');
+const archiveSearchBtn = document.getElementById('animalSearchBtn');
+const searchResultBox = document.getElementById('searchResultBox');
+const archiveRejectedShipmentsBody = document.getElementById('archiveRejectedShipmentsBody');
+const archiveRejectedAnimalsBody = document.getElementById('archiveRejectedAnimalsBody');
+const archiveRejectedShipmentsCount = document.getElementById('archiveRejectedShipmentsCount');
+const archiveRejectedAnimalsCount = document.getElementById('archiveRejectedAnimalsCount');
+const archiveRejectedFilterSubBreed = document.getElementById('archiveRejectedFilterSubBreed');
+subBreedsList.forEach(b => {
+  const opt = document.createElement('option');
+  opt.value = b; opt.textContent = b;
+  archiveRejectedFilterSubBreed.appendChild(opt);
+});
+
+function renderArchive() { renderArchiveShipments(); renderArchiveAnimals(); }
+function renderArchiveShipments() {
+  const filterPlate = (document.getElementById('archiveRejectedFilterPlate').value || '').toLowerCase();
+  const filterReason = (document.getElementById('archiveRejectedFilterReason').value || '').toLowerCase();
+  const filtered = rejectedRecords.filter(r => {
+    if (filterPlate && !r.vehiclePlate.toLowerCase().includes(filterPlate)) return false;
+    if (filterReason && !(r.rejectionReason || '').toLowerCase().includes(filterReason)) return false;
+    return true;
+  });
+  archiveRejectedShipmentsCount.textContent = filtered.length + ' shipments';
+  if (filtered.length === 0) {
+    archiveRejectedShipmentsBody.innerHTML = '<tr><td colspan="7" class="empty-msg">No rejected shipments match</td></tr>';
+    return;
+  }
+  let html = '';
+  filtered.forEach(r => {
+    const totalAnimals = r.speciesLines.reduce((s, l) => s + l.animalCount, 0);
+    const idCount = (r.rejectedAnimals || []).length;
+    const idsCell = idCount > 0
+      ? `<span style="background:#eaf6ee; color:#2d6a4f; padding:1px 7px; border-radius:20px; font-size:0.62rem; font-weight:700;">${idCount} IDs</span>`
+      : `<span class="no-ids-warning" style="font-size:0.62rem;">no IDs</span>`;
+    const btnClass = idCount > 0 ? 'archive-view-ids-btn' : 'archive-view-ids-btn empty';
+    const btnDisabled = idCount > 0 ? '' : 'disabled';
+    html += `<tr>
+      <td><strong>${escapeHtml(r.vehiclePlate)}</strong></td>
+      <td>${escapeHtml(r.driverName)}<br><span style="color:#888; font-size:0.62rem;">${escapeHtml(r.driverContact)}</span></td>
+      <td style="font-weight:700; color:#c0392b;">${totalAnimals}</td>
+      <td>${idsCell}</td>
+      <td><span style="color:#c0392b; font-weight:600; font-size:0.65rem;">${escapeHtml(r.rejectionReason || '—')}</span></td>
+      <td>${escapeHtml(formatDateTimeDisplay(r.dateTime))}</td>
+      <td><button type="button" class="${btnClass}" ${btnDisabled} onclick="openViewIdsModal('${escapeHtml(String(r.id))}')">👁️ View IDs</button></td>
+    </tr>`;
+  });
+  archiveRejectedShipmentsBody.innerHTML = html;
+}
+function renderArchiveAnimals() {
+  const filterId = (document.getElementById('archiveRejectedFilterAnimalId').value || '').toLowerCase();
+  const filterSpecies = document.getElementById('archiveRejectedFilterSpecies').value;
+  const filterSubBreed = archiveRejectedFilterSubBreed.value;
+  const rows = [];
+  rejectedRecords.forEach(r => {
+    (r.rejectedAnimals || []).forEach(a => {
+      if (filterId && !a.idNumber.toLowerCase().includes(filterId)) return;
+      if (filterSpecies && a.species !== filterSpecies) return;
+      if (filterSubBreed && a.subBreed !== filterSubBreed) return;
+      rows.push({ idNumber: a.idNumber, species: a.species, subBreed: a.subBreed, vehiclePlate: r.vehiclePlate, rejectionReason: r.rejectionReason, dateTime: r.dateTime });
+    });
+  });
+  archiveRejectedAnimalsCount.textContent = rows.length + ' animals';
+  if (rows.length === 0) {
+    archiveRejectedAnimalsBody.innerHTML = '<tr><td colspan="6" class="empty-msg">No rejected animal IDs match</td></tr>';
+    return;
+  }
+  let html = '';
+  rows.forEach(a => {
+    html += `<tr>
+      <td><strong style="font-family:monospace;">${escapeHtml(a.idNumber)}</strong></td>
+      <td>${escapeHtml(a.species)}</td>
+      <td>${escapeHtml(a.subBreed)}</td>
+      <td>${escapeHtml(a.vehiclePlate)}</td>
+      <td><span style="color:#c0392b; font-weight:600; font-size:0.65rem;">${escapeHtml(a.rejectionReason || '—')}</span></td>
+      <td>${escapeHtml(formatDateTimeDisplay(a.dateTime))}</td>
+    </tr>`;
+  });
+  archiveRejectedAnimalsBody.innerHTML = html;
+}
+archiveSearchBtn.addEventListener('click', performAnimalSearch);
+archiveSearchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); performAnimalSearch(); } });
+function performAnimalSearch() {
+  const query = archiveSearchInput.value.trim();
+  if (!query) { searchResultBox.style.display = 'none'; return; }
+  const result = searchAnimalId(query);
+  searchResultBox.style.display = 'block';
+  if (result.exact) {
+    let timelineHtml = result.exact.map(entry => `
+      <div class="search-timeline-item rejected">
+        <span class="search-timeline-icon">❌</span>
+        <div class="search-timeline-content">
+          <strong>Rejected</strong> — ${escapeHtml(entry.vehiclePlate)} (${escapeHtml(entry.driverName)})
+          <div class="search-timeline-meta">
+            🏪 ${escapeHtml(entry.individualShop)} · 🩺 ${escapeHtml(entry.healthCertNo || '—')} · 🌍 ${escapeHtml(entry.sourceCertificate || '—')}<br>
+            🐏 ${escapeHtml(entry.species)} / ${escapeHtml(entry.subBreed)} · ❌ ${escapeHtml(entry.rejectionReason || '—')} · 📅 ${escapeHtml(formatDateTimeDisplay(entry.dateTime))}
+          </div>
+        </div>
+      </div>`).join('');
+    searchResultBox.className = 'search-result-box has-result';
+    searchResultBox.innerHTML = `
+      <div class="search-result-title">🔍 Search Results for "${escapeHtml(query)}"</div>
+      <div style="margin-bottom:10px; font-size:0.85rem; color:#c0392b; font-weight:700;">
+        ⚠️ This ID was found in the rejection archive (${result.exact.length} occurrence${result.exact.length > 1 ? 's' : ''}).
+      </div>
+      <div class="search-timeline">${timelineHtml}</div>
+    `;
+    return;
+  }
+  if (result.partial.length > 0) {
+    let partialHtml = '';
+    result.partial.slice(0, 20).forEach(p => {
+      p.entries.forEach(entry => {
+        partialHtml += `<div class="search-timeline-item rejected">
+          <span class="search-timeline-icon">🔍</span>
+          <div class="search-timeline-content">
+            <strong>${escapeHtml(p.id)}</strong> — Rejected at ${escapeHtml(entry.vehiclePlate)}
+            <div class="search-timeline-meta">
+              🐏 ${escapeHtml(entry.species)} / ${escapeHtml(entry.subBreed)} · ❌ ${escapeHtml(entry.rejectionReason || '—')} · 📅 ${escapeHtml(formatDateTimeDisplay(entry.dateTime))}
+            </div>
+          </div>
+        </div>`;
+      });
+    });
+    searchResultBox.className = 'search-result-box has-result';
+    searchResultBox.innerHTML = `
+      <div class="search-result-title">🔍 No exact match for "${escapeHtml(query)}"</div>
+      <div style="margin-bottom:10px; font-size:0.8rem; color:#b07d00;">Found ${result.partial.length} similar ID(s):</div>
+      <div class="search-timeline">${partialHtml}</div>
+    `;
+    return;
+  }
+  searchResultBox.className = 'search-result-box no-result';
+  searchResultBox.innerHTML = `
+    <div class="search-result-title">🔍 Search Results for "${escapeHtml(query)}"</div>
+    <div style="font-size:0.85rem; color:#666;">✅ <strong>No rejection record found</strong> for this ID.</div>
+  `;
+}
+const viewIdsModal = document.getElementById('viewIdsModal');
+const viewIdsTitle = document.getElementById('viewIdsTitle');
+const viewIdsBody = document.getElementById('viewIdsBody');
+document.getElementById('closeViewIdsBtn').addEventListener('click', () => viewIdsModal.classList.remove('active'));
+viewIdsModal.addEventListener('click', (e) => { if (e.target === viewIdsModal) viewIdsModal.classList.remove('active'); });
+window.openViewIdsModal = function(recordId) {
+  const record = rejectedRecords.find(r => String(r.id) === String(recordId));
+  if (!record) return;
+  const animals = record.rejectedAnimals || [];
+  viewIdsTitle.textContent = `🐏 Rejected IDs — ${record.vehiclePlate} (${animals.length})`;
+  let html = `
+    <div style="margin-bottom:12px; font-size:0.8rem; color:#666;">
+      <strong>Driver:</strong> ${escapeHtml(record.driverName)} · ${escapeHtml(record.driverContact)}<br>
+      <strong>Reason:</strong> <span style="color:#c0392b; font-weight:700;">${escapeHtml(record.rejectionReason || '—')}</span><br>
+      <strong>Date:</strong> ${escapeHtml(formatDateTimeDisplay(record.dateTime))}
+    </div>
+  `;
+  if (animals.length === 0) {
+    html += '<p style="text-align:center; color:#888; padding:20px;">No individual animal IDs were registered for this shipment.</p>';
+  } else {
+    const groups = {};
+    animals.forEach(a => {
+      const key = a.species + '||' + a.subBreed;
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(a.idNumber);
+    });
+    html += '<div style="display:flex; flex-direction:column; gap:12px;">';
+    Object.keys(groups).forEach(key => {
+      const [species, subBreed] = key.split('||');
+      html += `<div style="border:1px solid #f0c0bb; border-radius:12px; overflow:hidden;">
+        <div style="background:#fdecea; padding:8px 12px; font-weight:700; color:#a53125; font-size:0.8rem;">
+          🐏 ${escapeHtml(species)} / ${escapeHtml(subBreed)} — ${groups[key].length} IDs
+        </div>
+        <div style="padding:10px 12px; display:flex; flex-wrap:wrap; gap:4px; max-height:300px; overflow-y:auto; background:white;">
+          ${groups[key].map(id => `<span style="background:#fdecea; color:#842318; padding:2px 9px; border-radius:20px; font-size:0.72rem; font-weight:600; border:1px solid #f0c0bb; font-family:monospace;">${escapeHtml(id)}</span>`).join('')}
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+  }
+  viewIdsBody.innerHTML = html;
+  viewIdsModal.classList.add('active');
+};
+
+// ======================== CSV EXPORT ========================
+function rowsFromRecords(records, statusLabel, selectionFilter, includeReason) {
+  const headers = ["Status","Date_Time","Vehicle_Plate_Number","Emirate","Vehicle_Plate_Full","Driver_Name","Driver_ID","Driver_Contact","Group","Individual_Shop","Health_Cert_No","Total_In_Certificate","Source_Certificate","Species","Sub_Breed","Animals_Count","Rejection_Reason","Notes"];
+  const rows = [];
+  records.forEach(record => {
+    record.speciesLines.forEach((line, lineIdx) => {
+      const key = `${record.id}|${lineIdx}`;
+      if (selectionFilter && !selectionFilter.has(key)) return;
+      rows.push([
+        statusLabel, record.dateTime, record.vehiclePlateNumber, record.vehicleEmirate, record.vehiclePlate,
+        record.driverName, record.driverId, record.driverContact, record.group, record.individualShop,
+        record.healthCertNo || '', record.totalInCertificate || '', record.sourceCertificate || '', line.species, line.subBreed, line.animalCount,
+        includeReason ? (record.rejectionReason || '') : '', record.notes
+      ]);
+    });
+  });
+  return { headers, rows };
+}
+function downloadCSV(headers, rows, filenameSuffix) {
+  if (rows.length === 0) { alert("⚠️ Nothing to export."); return; }
+  const csvContent = [headers, ...rows].map(row => row.map(cell => {
+    let s = String(cell);
+    if (s.includes(',') || s.includes('"') || s.includes('\n')) s = `"${s.replace(/"/g, '""')}"`;
+    return s;
+  }).join(',')).join('\n');
+  const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  link.href = url;
+  link.setAttribute("download", `livestock_${filenameSuffix}_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.csv`);
+  document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
+}
+
+// ======================== PDF EXPORT ========================
+function exportGenericPdf(title, headers, rows, filenameSuffix, headerColor, footerLabel) {
+  if (rows.length === 0) { alert("⚠️ Nothing to export."); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const marginX = 30;
+  doc.setFontSize(16); doc.setTextColor(headerColor[0], headerColor[1], headerColor[2]); doc.setFont(undefined,'bold');
+  doc.text(title, marginX, 40);
+  doc.setFontSize(9); doc.setTextColor(100); doc.setFont(undefined,'normal');
+  doc.text(`Generated: ${new Date().toLocaleString()}`, marginX, 56);
+  doc.autoTable({
+    head: [headers], body: rows, startY: 70, margin: { left: marginX, right: marginX },
+    styles: { fontSize: 7, cellPadding: 3, overflow: 'linebreak', valign: 'top', textColor: [40,40,40] },
+    headStyles: { fillColor: headerColor, textColor: [255,255,255], fontStyle: 'bold', fontSize: 7.5 },
+    alternateRowStyles: { fillColor: [248,252,249] },
+    didDrawPage: function () {
+      const pageCount = doc.internal.getNumberOfPages();
+      const pageCurrent = doc.internal.getCurrentPageInfo().pageNumber;
+      doc.setFontSize(8); doc.setTextColor(120);
+      doc.text(`Page ${pageCurrent} of ${pageCount}`, pageWidth - marginX, doc.internal.pageSize.getHeight() - 15, { align: 'right' });
+      doc.text(footerLabel, marginX, doc.internal.pageSize.getHeight() - 15);
+    }
+  });
+  doc.save(`livestock_${filenameSuffix}_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.pdf`);
+}
+function buildPdfRowsMain(records, statusLabel, selectionFilter, includeReason) {
+  const rows = [];
+  records.forEach(record => {
+    record.speciesLines.forEach((line, lineIdx) => {
+      const key = `${record.id}|${lineIdx}`;
+      if (selectionFilter && !selectionFilter.has(key)) return;
+      rows.push([
+        statusLabel, formatDateTimeDisplay(record.dateTime), record.vehiclePlate, record.driverName, record.driverId,
+        record.driverContact, record.individualShop, record.group.replace(' livestock shops',''),
+        record.healthCertNo || '', record.sourceCertificate || '', line.species, line.subBreed, String(line.animalCount),
+        includeReason ? (record.rejectionReason || '') : '', record.notes
+      ]);
+    });
+  });
+  return rows;
+}
+function washedToRows(recordsFilter) {
+  const headers = ["Vehicle_Plate","Driver_Name","Driver_Contact","Group","Individual_Shop","Accepted_Date_Time","Washed_At","Health_Cert_No","Source","Species","Sub_Breed","Animals_Count"];
+  const rows = recordsFilter.map(r => [r.vehiclePlate, r.driverName, r.driverContact, r.group, r.individualShop, r.dateTime, r.washedAt, r.healthCertNo, r.sourceCertificate, r.species, r.subBreed, r.animalCount]);
+  return { headers, rows };
+}
+function washedToPdfRows(recordsFilter) {
+  return recordsFilter.map(r => ['Washed', formatDateTimeDisplay(r.dateTime), r.vehiclePlate, r.driverName, r.individualShop, r.group.replace(' livestock shops',''), r.healthCertNo, r.sourceCertificate, r.species, r.subBreed, String(r.animalCount), formatDateTimeDisplay(r.washedAt)]);
+}
+
+document.getElementById('exportWashedSelectedCsvBtn').addEventListener('click', () => {
+  if (washedSelected.size === 0) return;
+  const selected = washedRecords.filter(r => washedSelected.has(r.selectionKey));
+  const { headers, rows } = washedToRows(selected);
+  downloadCSV(headers, rows, 'washed_selected');
+});
+document.getElementById('exportWashedSelectedPdfBtn').addEventListener('click', () => {
+  if (washedSelected.size === 0) return;
+  const selected = washedRecords.filter(r => washedSelected.has(r.selectionKey));
+  const rows = washedToPdfRows(selected);
+  const headers = ["Status","Accepted Date","Plate","Driver","Shop","Group","HC No.","Source","Species","Breed","Count","Washed At"];
+  exportGenericPdf('Washed Vehicles — Selected', headers, rows, 'washed_selected', [31,78,121], 'Livestock Population Monitor — Abu Dhabi');
+});
+document.getElementById('exportWashedCsvBtn').addEventListener('click', () => {
+  if (washedRecords.length === 0) { alert("⚠️ No washed records."); return; }
+  const { headers, rows } = washedToRows(washedRecords);
+  downloadCSV(headers, rows, 'washed_vehicles');
+});
+document.getElementById('exportWashedPdfBtn').addEventListener('click', () => {
+  if (washedRecords.length === 0) { alert("⚠️ No washed records."); return; }
+  const rows = washedToPdfRows(washedRecords);
+  const headers = ["Status","Accepted Date","Plate","Driver","Shop","Group","HC No.","Source","Species","Breed","Count","Washed At"];
+  exportGenericPdf('Washed Vehicles — All', headers, rows, 'washed_vehicles', [31,78,121], 'Livestock Population Monitor — Abu Dhabi');
+});
+document.getElementById('exportPendingCsvBtn').addEventListener('click', () => {
+  const pending = getPendingWashLines();
+  if (pending.length === 0) { alert("⚠️ No pending wash records."); return; }
+  const headers = ["Vehicle_Plate","Driver_Name","Driver_Contact","Group","Individual_Shop","Accepted_Date_Time","Health_Cert_No","Source","Species","Sub_Breed","Animals_Count"];
+  const rows = pending.map(r => [r.vehiclePlate, r.driverName, r.driverContact, r.group, r.individualShop, r.dateTime, r.healthCertNo, r.sourceCertificate, r.species, r.subBreed, r.animalCount]);
+  downloadCSV(headers, rows, 'pending_wash');
+});
+document.getElementById('exportPendingPdfBtn').addEventListener('click', () => {
+  const pending = getPendingWashLines();
+  if (pending.length === 0) { alert("⚠️ No pending records."); return; }
+  const rows = pending.map(r => ['Pending', formatDateTimeDisplay(r.dateTime), r.vehiclePlate, r.driverName, r.individualShop, r.group.replace(' livestock shops',''), r.healthCertNo, r.sourceCertificate, r.species, r.subBreed, String(r.animalCount)]);
+  const headers = ["Status","Accepted Date","Plate","Driver","Shop","Group","HC No.","Source","Species","Breed","Count"];
+  exportGenericPdf('Pending Wash — Accepted Shipments', headers, rows, 'pending_wash', [45,106,79], 'Livestock Population Monitor — Abu Dhabi');
+});
+document.getElementById('exportAcceptedSelectedCsvBtn').addEventListener('click', () => {
+  const { headers, rows } = rowsFromRecords(acceptedRecords, 'Accepted', acceptedSelected, false);
+  downloadCSV(headers, rows, 'accepted_selected');
+});
+document.getElementById('exportRejectedSelectedCsvBtn').addEventListener('click', () => {
+  const { headers, rows } = rowsFromRecords(rejectedRecords, 'Rejected', rejectedSelected, true);
+  downloadCSV(headers, rows, 'rejected_selected');
+});
+document.getElementById('exportAcceptedCsvBtn').addEventListener('click', () => {
+  if (acceptedRecords.length === 0) { alert("⚠️ No accepted data."); return; }
+  const { headers, rows } = rowsFromRecords(acceptedRecords, 'Accepted', null, false);
+  downloadCSV(headers, rows, 'accepted_all');
+});
+document.getElementById('exportRejectedCsvBtn').addEventListener('click', () => {
+  if (rejectedRecords.length === 0) { alert("⚠️ No rejected data."); return; }
+  const { headers, rows } = rowsFromRecords(rejectedRecords, 'Rejected', null, true);
+  downloadCSV(headers, rows, 'rejected_all');
+});
+document.getElementById('exportAllCsvBtn').addEventListener('click', () => {
+  if (acceptedRecords.length === 0 && rejectedRecords.length === 0) { alert("⚠️ No data."); return; }
+  const a = rowsFromRecords(acceptedRecords, 'Accepted', null, false);
+  const r = rowsFromRecords(rejectedRecords, 'Rejected', null, true);
+  downloadCSV(a.headers, [...a.rows, ...r.rows], 'all_records');
+});
+document.getElementById('exportAcceptedSelectedPdfBtn').addEventListener('click', () => {
+  const rows = buildPdfRowsMain(acceptedRecords, 'Accepted', acceptedSelected, false);
+  const headers = ["Status","Date & Time","Plate","Driver","Driver ID","Contact","Shop","Group","HC No.","Source","Species","Sub-breed","Count","Reason","Notes"];
+  exportGenericPdf('Accepted Shipments — Selected', headers, rows, 'accepted_selected', [45,106,79], 'Livestock Population Monitor — Abu Dhabi');
+});
+document.getElementById('exportRejectedSelectedPdfBtn').addEventListener('click', () => {
+  const rows = buildPdfRowsMain(rejectedRecords, 'Rejected', rejectedSelected, true);
+  const headers = ["Status","Date & Time","Plate","Driver","Driver ID","Contact","Shop","Group","HC No.","Source","Species","Sub-breed","Count","Reason","Notes"];
+  exportGenericPdf('Rejected Shipments — Selected', headers, rows, 'rejected_selected', [192,57,43], 'Livestock Population Monitor — Abu Dhabi');
+});
+document.getElementById('exportAcceptedPdfBtn').addEventListener('click', () => {
+  if (acceptedRecords.length === 0) { alert("⚠️ No accepted data."); return; }
+  const rows = buildPdfRowsMain(acceptedRecords, 'Accepted', null, false);
+  const headers = ["Status","Date & Time","Plate","Driver","Driver ID","Contact","Shop","Group","HC No.","Source","Species","Sub-breed","Count","Reason","Notes"];
+  exportGenericPdf('Accepted Shipments — All', headers, rows, 'accepted_all', [45,106,79], 'Livestock Population Monitor — Abu Dhabi');
+});
+document.getElementById('exportRejectedPdfBtn').addEventListener('click', () => {
+  if (rejectedRecords.length === 0) { alert("⚠️ No rejected data."); return; }
+  const rows = buildPdfRowsMain(rejectedRecords, 'Rejected', null, true);
+  const headers = ["Status","Date & Time","Plate","Driver","Driver ID","Contact","Shop","Group","HC No.","Source","Species","Sub-breed","Count","Reason","Notes"];
+  exportGenericPdf('Rejected Shipments — All', headers, rows, 'rejected_all', [192,57,43], 'Livestock Population Monitor — Abu Dhabi');
+});
+document.getElementById('exportAllPdfBtn').addEventListener('click', () => {
+  if (acceptedRecords.length === 0 && rejectedRecords.length === 0) { alert("⚠️ No data."); return; }
+  const accRows = buildPdfRowsMain(acceptedRecords, 'Accepted', null, false);
+  const rejRows = buildPdfRowsMain(rejectedRecords, 'Rejected', null, true);
+  const headers = ["Status","Date & Time","Plate","Driver","Driver ID","Contact","Shop","Group","HC No.","Source","Species","Sub-breed","Count","Reason","Notes"];
+  exportGenericPdf('Livestock Records — All (Accepted + Rejected)', headers, [...accRows, ...rejRows], 'all_records', [45,106,79], 'Livestock Population Monitor — Abu Dhabi');
+});
+
+document.getElementById('archiveExportShipmentsCsvBtn').addEventListener('click', () => {
+  if (rejectedRecords.length === 0) { alert("⚠️ No rejected shipments."); return; }
+  const headers = ["Vehicle_Plate","Driver_Name","Driver_Contact","Individual_Shop","Group","Total_Animals","Registered_IDs","Rejection_Reason","Date_Time","Health_Cert_No","Source","Notes"];
+  const rows = rejectedRecords.map(r => {
+    const total = r.speciesLines.reduce((s, l) => s + l.animalCount, 0);
+    return [r.vehiclePlate, r.driverName, r.driverContact, r.individualShop, r.group, total, (r.rejectedAnimals || []).length, r.rejectionReason, r.dateTime, r.healthCertNo, r.sourceCertificate, r.notes];
+  });
+  downloadCSV(headers, rows, 'rejected_shipments_archive');
+});
+document.getElementById('archiveExportShipmentsPdfBtn').addEventListener('click', () => {
+  if (rejectedRecords.length === 0) { alert("⚠️ No rejected shipments."); return; }
+  const headers = ["Plate","Driver","Total","IDs","Reason","Date","HC","Source"];
+  const rows = rejectedRecords.map(r => {
+    const total = r.speciesLines.reduce((s, l) => s + l.animalCount, 0);
+    return [r.vehiclePlate, r.driverName, String(total), String((r.rejectedAnimals || []).length), r.rejectionReason, formatDateTimeDisplay(r.dateTime), r.healthCertNo, r.sourceCertificate];
+  });
+  exportGenericPdf('Rejected Shipments Archive', headers, rows, 'rejected_shipments_archive', [192,57,43], 'Livestock Population Monitor — Abu Dhabi');
+});
+document.getElementById('archiveExportAnimalsCsvBtn').addEventListener('click', () => {
+  const rows = [];
+  rejectedRecords.forEach(r => {
+    (r.rejectedAnimals || []).forEach(a => {
+      rows.push([a.idNumber, a.species, a.subBreed, r.vehiclePlate, r.driverName, r.rejectionReason, r.dateTime, r.healthCertNo, r.sourceCertificate, r.individualShop, r.group]);
+    });
+  });
+  if (rows.length === 0) { alert("⚠️ No rejected animal IDs to export."); return; }
+  const headers = ["Animal_ID","Species","Sub_Breed","Vehicle_Plate","Driver_Name","Rejection_Reason","Date_Time","Health_Cert_No","Source","Individual_Shop","Group"];
+  downloadCSV(headers, rows, 'rejected_animal_ids');
+});
+document.getElementById('archiveExportAnimalsPdfBtn').addEventListener('click', () => {
+  const rows = [];
+  rejectedRecords.forEach(r => {
+    (r.rejectedAnimals || []).forEach(a => {
+      rows.push([a.idNumber, a.species, a.subBreed, r.vehiclePlate, r.rejectionReason, formatDateTimeDisplay(r.dateTime)]);
+    });
+  });
+  if (rows.length === 0) { alert("⚠️ No rejected animal IDs to export."); return; }
+  const headers = ["Animal ID","Species","Breed","Plate","Reason","Date"];
+  exportGenericPdf('Rejected Animal IDs Archive', headers, rows, 'rejected_animal_ids', [192,57,43], 'Livestock Population Monitor — Abu Dhabi');
+});
+
+document.getElementById('archiveRejectedFilterPlate').addEventListener('input', renderArchiveShipments);
+document.getElementById('archiveRejectedFilterReason').addEventListener('input', renderArchiveShipments);
+document.getElementById('archiveRejectedFilterAnimalId').addEventListener('input', renderArchiveAnimals);
+document.getElementById('archiveRejectedFilterSpecies').addEventListener('change', renderArchiveAnimals);
+archiveRejectedFilterSubBreed.addEventListener('change', renderArchiveAnimals);
+
+// ======================== EXPORT / IMPORT JSON ========================
+document.getElementById('exportJsonBtn').addEventListener('click', () => {
+  const backup = {
+    _meta: {
+      app: 'Livestock Population Monitor',
+      version: '1.1',
+      exportedAt: new Date().toISOString(),
+      exportedBy: 'Abu Dhabi Animal Shops'
+    },
+    providers: providers,
+    acceptedRecords: acceptedRecords,
+    rejectedRecords: rejectedRecords,
+    washedRecords: washedRecords
+  };
+  const jsonStr = JSON.stringify(backup, null, 2);
+  const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+  link.download = `livestock_backup_${stamp}.json`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+});
+
+let pendingImportData = null;
+
+document.getElementById('importJsonBtn').addEventListener('click', () => {
+  document.getElementById('importFileInput').click();
+});
+
+document.getElementById('importFileInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    try {
+      const data = JSON.parse(evt.target.result);
+      if (!data._meta || !data._meta.app || data._meta.app !== 'Livestock Population Monitor') {
+        alert('❌ Invalid file: this is not a Livestock Population Monitor backup.');
+        e.target.value = '';
+        return;
+      }
+      pendingImportData = data;
+      const summary = document.getElementById('importFileSummary');
+      const accCount = (data.acceptedRecords || []).length;
+      const rejCount = (data.rejectedRecords || []).length;
+      const washCount = (data.washedRecords || []).length;
+      const provCount = (data.providers || []).length;
+      const exportDate = data._meta.exportedAt ? new Date(data._meta.exportedAt).toLocaleString() : 'unknown';
+      summary.innerHTML = `
+        <strong>📄 File ready to import</strong><br>
+        Exported: ${exportDate}<br>
+        ✅ Accepted: <strong>${accCount}</strong> · ❌ Rejected: <strong>${rejCount}</strong> · 🚿 Washed: <strong>${washCount}</strong> · 🚛 Providers: <strong>${provCount}</strong>
+      `;
+      document.getElementById('importModeModal').classList.add('active');
+    } catch (err) {
+      alert('❌ Failed to parse file: ' + err.message);
+    }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+});
+
+document.getElementById('closeImportModeBtn').addEventListener('click', closeImportModal);
+document.getElementById('cancelImportBtn').addEventListener('click', closeImportModal);
+document.getElementById('importModeModal').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('importModeModal')) closeImportModal();
+});
+function closeImportModal() {
+  document.getElementById('importModeModal').classList.remove('active');
+  pendingImportData = null;
+}
+
+document.getElementById('confirmImportBtn').addEventListener('click', () => {
+  if (!pendingImportData) return;
+  const mode = document.querySelector('input[name="importMode"]:checked').value;
+  const imported = pendingImportData;
+  const currentStats = {
+    accepted: acceptedRecords.length,
+    rejected: rejectedRecords.length,
+    washed: washedRecords.length,
+    providers: providers.length
+  };
+
+  if (mode === 'replace') {
+    if (!confirm(`⚠️ This will DELETE ALL current data and replace it with the imported file.\n\nCurrent: ${currentStats.accepted} accepted, ${currentStats.rejected} rejected, ${currentStats.washed} washed, ${currentStats.providers} providers.\n\nProceed?`)) {
+      return;
+    }
+    acceptedRecords = imported.acceptedRecords || [];
+    rejectedRecords = imported.rejectedRecords || [];
+    washedRecords = imported.washedRecords || [];
+    providers = imported.providers || [];
+    saveProviders();
+    saveData();
+    rebuildAnimalIdIndex();
+    renderAll();
+    renderArchive();
+    closeImportModal();
+    alert(`✅ Data replaced successfully!\n\nImported: ${acceptedRecords.length} accepted, ${rejectedRecords.length} rejected, ${washedRecords.length} washed, ${providers.length} providers.`);
+    return;
+  }
+
+  let added = { accepted: 0, rejected: 0, washed: 0, providers: 0 };
+  let updated = { accepted: 0, rejected: 0, washed: 0, providers: 0 };
+
+  (imported.acceptedRecords || []).forEach(rec => {
+    const existingIdx = acceptedRecords.findIndex(r => String(r.id) === String(rec.id));
+    if (existingIdx >= 0) {
+      if (mode === 'overwrite') { acceptedRecords[existingIdx] = rec; updated.accepted++; }
+    } else {
+      acceptedRecords.push(rec); added.accepted++;
+    }
+  });
+
+  (imported.rejectedRecords || []).forEach(rec => {
+    const existingIdx = rejectedRecords.findIndex(r => String(r.id) === String(rec.id));
+    if (existingIdx >= 0) {
+      if (mode === 'overwrite') { rejectedRecords[existingIdx] = rec; updated.rejected++; }
+    } else {
+      rejectedRecords.push(rec); added.rejected++;
+    }
+  });
+
+  (imported.washedRecords || []).forEach(rec => {
+    const existingIdx = washedRecords.findIndex(r => String(r.selectionKey) === String(rec.selectionKey));
+    if (existingIdx >= 0) {
+      if (mode === 'overwrite') { washedRecords[existingIdx] = rec; updated.washed++; }
+    } else {
+      washedRecords.push(rec); added.washed++;
+    }
+  });
+
+  (imported.providers || []).forEach(p => {
+    const existingIdx = providers.findIndex(pr => pr.plate === p.plate && pr.emirate === p.emirate);
+    if (existingIdx >= 0) {
+      if (mode === 'overwrite') {
+        providers[existingIdx] = p; updated.providers++;
+      } else {
+        p.drivers.forEach(newDrv => {
+          const drvExists = providers[existingIdx].drivers.find(d => d.id === newDrv.id);
+          if (!drvExists) providers[existingIdx].drivers.push(newDrv);
+        });
+      }
+    } else {
+      providers.push(p); added.providers++;
+    }
+  });
+
+  saveProviders();
+  saveData();
+  rebuildAnimalIdIndex();
+  renderAll();
+  renderArchive();
+  closeImportModal();
+
+  alert(`✅ Import complete!\n\n` +
+    `Added: ${added.accepted} accepted, ${added.rejected} rejected, ${added.washed} washed, ${added.providers} providers\n` +
+    `Updated: ${updated.accepted} accepted, ${updated.rejected} rejected, ${updated.washed} washed, ${updated.providers} providers`
+  );
+});
+
+// ======================== CLEAR (WITH PASSWORD) ========================
+document.getElementById('clearAcceptedBtn').addEventListener('click', () => {
+  if (acceptedRecords.length === 0) { alert("⚠️ No accepted records to clear."); return; }
+  requirePassword(() => {
+    if (confirm("⚠️ Delete ALL accepted records? This will also affect the pending wash queue.")) {
+      acceptedRecords = []; acceptedSelected.clear(); pendingSelected.clear(); washedSelected.clear();
+      washedRecords = washedRecords.filter(w => acceptedRecords.find(a => a.id === w.recordId));
+      rebuildAnimalIdIndex();
+      saveData();
+      renderAll();
+    }
+  });
+});
+document.getElementById('clearRejectedBtn').addEventListener('click', () => {
+  if (rejectedRecords.length === 0) { alert("⚠️ No rejected records to clear."); return; }
+  requirePassword(() => {
+    if (confirm("⚠️ Delete ALL rejected records (including animal IDs)?")) {
+      rejectedRecords = []; rejectedSelected.clear();
+      rebuildAnimalIdIndex();
+      saveData();
+      renderAll(); renderArchive();
+    }
+  });
+});
+document.getElementById('clearWashedBtn').addEventListener('click', () => {
+  if (washedRecords.length === 0) { alert("⚠️ No washed records to clear."); return; }
+  requirePassword(() => {
+    if (confirm("⚠️ Delete ALL washed records?")) {
+      washedRecords = []; washedSelected.clear(); saveData(); renderAll();
+    }
+  });
+});
+document.getElementById('clearAllBtn').addEventListener('click', () => {
+  if (acceptedRecords.length === 0 && rejectedRecords.length === 0 && washedRecords.length === 0) {
+    alert("⚠️ No data to clear."); return;
+  }
+  requirePassword(() => {
+    if (confirm("⚠️ Delete ALL records (accepted + rejected + washed)?")) {
+      acceptedRecords = []; rejectedRecords = []; washedRecords = [];
+      acceptedSelected.clear(); rejectedSelected.clear(); pendingSelected.clear(); washedSelected.clear();
+      rebuildAnimalIdIndex();
+      saveData();
+      renderAll(); renderArchive();
+    }
+  });
+});
+
+// ======================== FILTER LISTENERS ========================
+acceptedFilterSpecies.addEventListener('change', renderAccepted);
+acceptedFilterGroup.addEventListener('change', renderAccepted);
+acceptedFilterShop.addEventListener('input', renderAccepted);
+rejectedFilterSpecies.addEventListener('change', renderRejected);
+rejectedFilterGroup.addEventListener('change', renderRejected);
+rejectedFilterShop.addEventListener('input', renderRejected);
+
+// ======================== INIT ========================
+loadData();
+setDateTimeToNow();
+populateShopDropdown();
+createSpeciesRow();
+renderAll();
+renderArchive();
+attachAutosaveListeners();
+updateHealthCertHint();
+
+setTimeout(() => {
+  const draftRestored = restoreFormDraft();
+  if (!draftRestored && acceptedRecords.length === 0 && rejectedRecords.length === 0 &&
+      confirm("Load sample livestock records for testing? (Accepted + Rejected with Animal IDs)")) {
+    const now = new Date();
+    const d1 = new Date(now.getTime() - 25 * 60 * 1000);
+    const d2 = new Date(now.getTime() - 15 * 60 * 1000);
+    const d3 = new Date(now.getTime() - 5 * 60 * 1000);
+    const fmtLocal = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+
+    acceptedRecords.push({
+      id: Date.now() + Math.random(), vehiclePlateNumber: "12345", vehicleEmirate: "Abu Dhabi", vehiclePlate: "12345 - Abu Dhabi",
+      driverName: "Ahmed Al Mansoori", driverId: "784-1990-1234567-1", driverContact: "+971 50 123 4567",
+      dateTime: fmtLocal(d1), group: "Baniyas livestock shops",
+      individualShop: "1B SAMA LIWA LIVESTOCK - SOLE PROPRIETORSHIP L.L.C.",
+      healthCertNo: "HC-2024-00123", totalInCertificate: 100, sourceCertificate: "ADM", rejectionReason: "",
+      notes: "Mixed herd – local sheep and imported goats",
+      speciesLines: [{ species: "Sheep", subBreed: "Local", animalCount: 50 }, { species: "Goat", subBreed: "Pakistan", animalCount: 4 }],
+      rejectedAnimals: []
+    });
+
+    const rejectedAnimals = [];
+    for (let n = 1001; n <= 1030; n++) rejectedAnimals.push({ idNumber: 'A-' + n, species: 'Sheep', subBreed: 'Local' });
+    rejectedAnimals.push({ idNumber: 'B-001', species: 'Goat', subBreed: 'Iran' });
+    rejectedAnimals.push({ idNumber: 'B-002', species: 'Goat', subBreed: 'Iran' });
+
+    rejectedRecords.push({
+      id: Date.now() + Math.random(), vehiclePlateNumber: "55443", vehicleEmirate: "Sharjah", vehiclePlate: "55443 - Sharjah",
+      driverName: "Khalid Al Zaabi", driverId: "784-1988-3334445-5", driverContact: "+971 52 444 5566",
+      dateTime: fmtLocal(d3), group: "Baniyas livestock shops",
+      individualShop: "1A- CN- 1098553 AL SAHAB LIVESTOCK TRADING & SALES",
+      healthCertNo: "HC-2024-00789", totalInCertificate: 0, sourceCertificate: "SHJ", rejectionReason: "FEVER",
+      notes: "Fever detected — 32 animals rejected",
+      speciesLines: [{ species: "Sheep", subBreed: "Local", animalCount: 30 }, { species: "Goat", subBreed: "Iran", animalCount: 2 }],
+      rejectedAnimals: rejectedAnimals
+    });
+
+    rejectedRecords.push({
+      id: Date.now() + Math.random(), vehiclePlateNumber: "77001", vehicleEmirate: "Dubai", vehiclePlate: "77001 - Dubai",
+      driverName: "Salem Al Marri", driverId: "784-1992-5556667-3", driverContact: "+971 55 777 8899",
+      dateTime: fmtLocal(d2), group: "Mina livestock shops", individualShop: "Mina Livestock 12",
+      healthCertNo: "HC-2024-00888", totalInCertificate: 0, sourceCertificate: "DXB", rejectionReason: "DOCUMENTS ISSUE",
+      notes: "Missing import permit — shipment-level rejection",
+      speciesLines: [{ species: "Sheep", subBreed: "Australian", animalCount: 100 }],
+      rejectedAnimals: []
+    });
+
+    rebuildAnimalIdIndex();
+    saveData();
+    renderAll();
+    renderArchive();
+  }
+}, 300);
+</script>
+</body>
+</html>
