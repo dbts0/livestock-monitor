@@ -1,0 +1,2599 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Livestock Market Management & Monitoring</title>
+  <style>
+    * { box-sizing: border-box; font-family: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Tahoma', sans-serif; }
+    body { background: #f0f4e8; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+    .container { max-width: 1500px; width: 100%; background: white; border-radius: 32px; box-shadow: 0 12px 30px rgba(0,0,0,0.1); overflow: hidden; position: relative; }
+    .header { background: #2d6a4f; color: white; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+    .header-text h1 { margin: 0 0 4px 0; font-weight: 600; font-size: 1.5rem; }
+    .header-text p { margin: 0; opacity: 0.9; font-size: 0.85rem; }
+    .stats-badge { background: rgba(255,255,255,0.2); border-radius: 40px; padding: 3px 10px; display: inline-block; font-size: 0.7rem; margin-top: 6px; }
+    .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .manage-providers-btn { background: #f0f4e8; color: #2d6a4f; border: none; padding: 8px 16px; border-radius: 40px; font-weight: 700; font-size: 0.8rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.15); transition: 0.2s; display: flex; align-items: center; gap: 6px; }
+    .manage-providers-btn:hover { background: white; transform: translateY(-1px); }
+    .form-card { padding: 20px 24px 24px 24px; }
+    .quick-select-box { background: #e8f3ec; border: 2px dashed #2d6a4f; border-radius: 12px; padding: 12px 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .quick-select-box label { font-weight: 700; color: #2d6a4f; font-size: 0.85rem; }
+    .quick-select-box select { flex: 1; min-width: 250px; padding: 10px 12px; border-radius: 8px; border: 1px solid #c8e0d0; font-size: 0.9rem; font-weight: 600; color: #2d6a4f; background: white; cursor: pointer; }
+    .compact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 14px; margin-bottom: 16px; }
+    .compact-grid .field-item { display: flex; flex-direction: column; gap: 3px; }
+    .compact-grid .field-item label { font-size: 0.7rem; font-weight: 700; color: #2d6a4f; letter-spacing: 0.2px; }
+    .compact-grid .field-item input, .compact-grid .field-item select { padding: 7px 10px; border: 1px solid #c8e0d0; border-radius: 12px; font-size: 0.8rem; background: #fefef7; transition: 0.2s; width: 100%; }
+    .compact-grid .field-item input:focus, .compact-grid .field-item select:focus { border-color: #2d6a4f; outline: none; box-shadow: 0 0 0 2px rgba(45,106,79,0.15); background: white; }
+    .vehicle-plate-group { display: flex; gap: 5px; }
+    .vehicle-plate-group .plate-number { flex: 1.5; min-width: 0; }
+    .vehicle-plate-group .plate-emirate { flex: 1.2; min-width: 0; }
+    .driver-name-group { display: flex; gap: 5px; align-items: stretch; }
+    .driver-name-group input { flex: 1; min-width: 0; }
+    .datetime-group { display: flex; gap: 5px; align-items: stretch; }
+    .datetime-group input { flex: 1; min-width: 0; }
+    .datetime-group .now-btn { flex: 0 0 auto; padding: 0 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; background: #e8f3ec; color: #2d6a4f; border: 1px solid #c8e0d0; cursor: pointer; transition: 0.15s; white-space: nowrap; }
+    .datetime-group .now-btn:hover { background: #d8ecdf; transform: translateY(-1px); }
+    .compact-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 14px; margin-bottom: 16px; }
+    .compact-grid-2 .field-item { display: flex; flex-direction: column; gap: 3px; }
+    .compact-grid-2 .field-item label { font-size: 0.7rem; font-weight: 700; color: #2d6a4f; letter-spacing: 0.2px; }
+    .compact-grid-2 .field-item input, .compact-grid-2 .field-item select { padding: 7px 10px; border: 1px solid #c8e0d0; border-radius: 12px; font-size: 0.8rem; background: #fefef7; transition: 0.2s; width: 100%; }
+    .compact-grid-2 .field-item input:focus, .compact-grid-2 .field-item select:focus { border-color: #2d6a4f; outline: none; box-shadow: 0 0 0 2px rgba(45,106,79,0.15); background: white; }
+    .cert-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 10px 14px; margin-bottom: 16px; }
+    .cert-alert { margin-top: 6px; padding: 8px 12px; border-radius: 10px; font-size: 0.72rem; display: none; }
+    .cert-alert.show { display: block; }
+    .cert-alert.info { background: #e8f3ec; color: #2d6a4f; border: 1px solid #b8dcc5; }
+    .cert-alert.warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+    .cert-alert.danger { background: #fdecea; color: #a53125; border: 1px solid #f5c2c2; }
+    .form-row { margin-bottom: 16px; display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px; }
+    .form-row label { width: 130px; font-weight: 600; color: #2d6a4f; padding-top: 8px; font-size: 0.8rem; }
+    .field-group { flex: 1; min-width: 250px; }
+    textarea { width: 100%; padding: 8px 12px; border: 1px solid #c8e0d0; border-radius: 16px; font-size: 0.85rem; background: #fefef7; transition: 0.2s; resize: vertical; }
+    textarea:focus { border-color: #2d6a4f; outline: none; box-shadow: 0 0 0 2px rgba(45,106,79,0.15); background: white; }
+    .inline-hint { font-size: 0.65rem; color: #6b8f7c; margin-top: 2px; }
+    .manual-input { margin-top: 4px; display: none; }
+    .manual-input.show { display: block; }
+    .submit-btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; margin-bottom: 12px; }
+    .submit-btn { border: none; padding: 14px 20px; border-radius: 40px; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 3px 8px rgba(0,0,0,0.12); }
+    .submit-btn.accept { background: #2d6a4f; color: white; }
+    .submit-btn.accept:hover { background: #1f543d; transform: translateY(-2px); box-shadow: 0 5px 14px rgba(45,106,79,0.35); }
+    .submit-btn.reject { background: #c0392b; color: white; }
+    .submit-btn.reject:hover { background: #a53125; transform: translateY(-2px); box-shadow: 0 5px 14px rgba(192,57,43,0.35); }
+    .submit-btn.save { background: #1f4e79; color: white; display: none; }
+    .submit-btn.save:hover { background: #163a5c; transform: translateY(-2px); }
+    .submit-btn.cancel-edit { background: #666; color: white; display: none; }
+    .secondary-btn-group { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center; margin-top: 8px; }
+    button.secondary { border: 1px solid #c8e0d0; padding: 9px 18px; border-radius: 40px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.2s; background: #eef3ef; color: #2d6a4f; }
+    button.secondary:hover { background: #e2ece4; }
+    .species-table-wrapper { width: 100%; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; background: white; }
+    .species-table-header { background: #c8102e; color: white; padding: 7px 12px; font-weight: 700; font-size: 0.8rem; letter-spacing: 0.3px; }
+    .species-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .species-table th { background: #f0f0f0; color: #222; font-weight: 700; padding: 8px 10px; text-align: center; border: 1px solid #ddd; font-size: 0.78rem; }
+    .species-table td { padding: 6px 8px; border: 1px solid #ddd; vertical-align: middle; background: white; }
+    .species-table select, .species-table input[type="number"] { width: 100%; padding: 7px 9px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.82rem; background: white; color: #333; }
+    .species-table select:focus, .species-table input:focus { border-color: #c8102e; box-shadow: 0 0 0 2px rgba(200,16,46,0.15); outline: none; }
+    .required-star { color: #c8102e; font-weight: 700; margin-left: 3px; }
+    .add-row-cell { text-align: center; width: 50px; }
+    .add-row-btn { background: #4caf50; color: white; border: none; width: 28px; height: 28px; border-radius: 50%; font-size: 1rem; cursor: pointer; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; padding: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.15); transition: 0.15s; }
+    .add-row-btn:hover { background: #3d8b40; transform: scale(1.08); }
+    .remove-row-btn { background: #e74c3c; color: white; border: none; width: 24px; height: 24px; border-radius: 50%; font-size: 0.8rem; cursor: pointer; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+    .remove-row-btn:hover { background: #c0392b; }
+    .total-row td { background: #fafafa; font-weight: 700; color: #222; padding: 8px 10px; font-size: 0.82rem; }
+    .total-row .total-label { text-align: right; padding-right: 14px; }
+    .total-row .total-input { width: 120px; padding: 7px 9px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.82rem; background: #f0f0f0; color: #c8102e; font-weight: 700; text-align: center; }
+    .records-section { margin-top: 24px; padding-top: 20px; border-top: 2px dashed #c8e0d0; }
+    .records-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .records-panel { border-radius: 16px; overflow: hidden; border: 1px solid #d8e8dc; display: flex; flex-direction: column; }
+    .records-panel.accepted { border-color: #b8dcc5; }
+    .records-panel.rejected { border-color: #f0c0bb; }
+    .records-panel.washed { border-color: #b8cbe0; }
+    .records-panel-header { padding: 10px 14px; color: white; display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .records-panel.accepted .records-panel-header { background: #2d6a4f; }
+    .records-panel.rejected .records-panel-header { background: #c0392b; }
+    .records-panel.washed .records-panel-header { background: #1f4e79; }
+    .records-panel-title { font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; }
+    .records-panel-count { background: rgba(255,255,255,0.25); padding: 2px 10px; border-radius: 40px; font-size: 0.7rem; font-weight: 600; }
+    .records-panel-total { padding: 12px 14px; border-bottom: 1px solid #e8f3ec; }
+    .records-panel.accepted .records-panel-total { background: linear-gradient(180deg, #eaf6ee 0%, #f4faf6 100%); }
+    .records-panel.rejected .records-panel-total { background: linear-gradient(180deg, #fdecea 0%, #fef5f4 100%); border-bottom-color: #f8d7da; }
+    .records-panel.washed .records-panel-total { background: linear-gradient(180deg, #e8f0f8 0%, #f2f7fc 100%); border-bottom-color: #d0e0f0; }
+    .total-header-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+    .total-label-text { font-size: 0.72rem; font-weight: 700; color: #2d6a4f; text-transform: uppercase; letter-spacing: 0.4px; }
+    .records-panel.rejected .total-label-text { color: #a53125; }
+    .records-panel.washed .total-label-text { color: #1f4e79; }
+    .total-grand-value { font-size: 1.3rem; font-weight: 800; color: #2d6a4f; background: white; padding: 4px 16px; border-radius: 40px; border: 2px solid #b8dcc5; min-width: 70px; text-align: center; box-shadow: 0 2px 6px rgba(45,106,79,0.15); }
+    .records-panel.rejected .total-grand-value { color: #a53125; border-color: #f0c0bb; box-shadow: 0 2px 6px rgba(192,57,43,0.15); }
+    .records-panel.washed .total-grand-value { color: #1f4e79; border-color: #b8cbe0; box-shadow: 0 2px 6px rgba(31,78,121,0.15); }
+    .species-breakdown { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 6px; }
+    .species-chip { display: flex; justify-content: space-between; align-items: center; gap: 6px; padding: 5px 10px; background: white; border-radius: 10px; border: 1px solid #d8e8dc; font-size: 0.72rem; }
+    .species-chip .chip-name { font-weight: 600; color: #2d6a4f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .species-chip .chip-count { font-weight: 800; color: #1f543d; background: #eaf6ee; padding: 1px 8px; border-radius: 20px; font-size: 0.72rem; min-width: 30px; text-align: center; }
+    .species-breakdown-empty { font-size: 0.7rem; color: #888; font-style: italic; padding: 4px 0; }
+    .records-panel-filters { display: flex; gap: 6px; padding: 8px 10px; flex-wrap: wrap; background: #fafdfb; border-bottom: 1px solid #e8f3ec; align-items: center; }
+    .records-panel-filters select, .records-panel-filters input { width: auto; min-width: 0; padding: 4px 8px; font-size: 0.7rem; border-radius: 10px; border: 1px solid #c8e0d0; background: white; flex: 1; }
+    .records-panel-actions { display: flex; gap: 6px; padding: 8px 10px; background: #fafdfb; border-bottom: 1px solid #e8f3ec; flex-wrap: wrap; }
+    .records-panel-actions button { padding: 5px 10px; font-size: 0.7rem; border-radius: 40px; flex: 1; min-width: 90px; }
+    .records-panel-actions button.export-selected { background: #1f543d; color: white; border-color: #1f543d; font-weight: 700; }
+    .records-panel-actions button.export-selected:disabled, .records-panel-actions button.pdf-btn:disabled { background: #ccc; border-color: #ccc; color: #888; cursor: not-allowed; opacity: 0.6; }
+    .records-panel-actions button.pdf-btn { background: #c8102e; color: white; border-color: #c8102e; font-weight: 700; }
+    .records-panel-actions button.wash-btn { background: #1f4e79; color: white; border-color: #1f4e79; font-weight: 700; }
+    .records-panel-actions button.wash-btn:disabled { background: #ccc; border-color: #ccc; color: #888; cursor: not-allowed; opacity: 0.6; }
+    .records-panel-table-wrapper { overflow-x: auto; overflow-y: auto; max-height: 400px; background: white; flex: 1; }
+    .records-panel table { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+    .records-panel th, .records-panel td { padding: 6px 5px; text-align: left; border-bottom: 1px solid #eef5ef; vertical-align: top; }
+    .records-panel th { background: #e8f3ec; color: #2d6a4f; font-weight: 600; position: sticky; top: 0; font-size: 0.68rem; }
+    .records-panel.rejected th { background: #fdecea; color: #a53125; }
+    .records-panel.washed th { background: #e8f0f8; color: #1f4e79; }
+    .records-panel .empty-msg { padding: 24px; text-align: center; color: #999; font-size: 0.8rem; }
+    .select-col { width: 30px; text-align: center; padding-left: 8px !important; }
+    .select-col input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: #2d6a4f; }
+    tr.row-selected { background: #f0f8f3; }
+    .section-label { font-size: 0.7rem; font-weight: 700; color: #2d6a4f; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; padding-left: 2px; }
+    .section-divider { margin: 6px 0 14px 0; border: none; border-top: 1px dashed #c8e0d0; }
+    .footer-note { margin-top: 16px; background: #f4faf6; padding: 10px 14px; border-radius: 20px; font-size: 0.7rem; color: #3a6b58; text-align: center; }
+    .tab-bar { display: flex; gap: 6px; border-bottom: 2px solid #c8e0d0; margin-bottom: 18px; padding-bottom: 4px; flex-wrap: wrap; }
+    .tab-btn { background: none; border: none; padding: 10px 18px; font-size: 0.85rem; font-weight: 700; color: #6b8f7c; cursor: pointer; border-radius: 12px 12px 0 0; transition: 0.2s; }
+    .tab-btn:hover { background: #eaf6ee; color: #2d6a4f; }
+    .tab-btn.active { background: #2d6a4f; color: white; }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.active { display: flex; }
+    .modal-content { background: white; width: 100%; max-width: 800px; max-height: 90vh; border-radius: 24px; box-shadow: 0 12px 40px rgba(0,0,0,0.2); display: flex; flex-direction: column; overflow: hidden; }
+    .modal-content.wide { max-width: 1200px; }
+    .modal-content.narrow { max-width: 500px; }
+    .modal-header { background: #2d6a4f; color: white; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+    .modal-header.rejected-header { background: #c0392b; }
+    .modal-header.warning-header { background: #b07d00; }
+    .modal-header h2 { margin: 0; font-size: 1.2rem; }
+    .close-modal-btn { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; line-height: 1; padding: 0; opacity: 0.8; }
+    .close-modal-btn:hover { opacity: 1; }
+    .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+    .modal-footer { padding: 14px 20px; border-top: 1px solid #eef5ef; display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+    .modal-footer button { padding: 10px 20px; border-radius: 40px; font-weight: 700; font-size: 0.85rem; cursor: pointer; border: none; transition: 0.15s; }
+    .modal-footer button.primary { background: #2d6a4f; color: white; }
+    .modal-footer button.primary:hover { background: #1f543d; }
+    .modal-footer button.cancel { background: #eef3ef; color: #555; border: 1px solid #c8e0d0; }
+    .modal-footer button.cancel:hover { background: #e2ece4; }
+    .password-input { width: 100%; padding: 12px 16px; border: 2px solid #c8e0d0; border-radius: 12px; font-size: 1rem; text-align: center; letter-spacing: 3px; }
+    .password-input:focus { outline: none; border-color: #2d6a4f; box-shadow: 0 0 0 3px rgba(45,106,79,0.15); }
+    .password-error { color: #c0392b; font-size: 0.8rem; margin-top: 8px; text-align: center; display: none; }
+    .password-error.show { display: block; }
+    .add-vehicle-section { background: #f4faf6; border: 1px solid #c8e0d0; border-radius: 16px; padding: 16px; margin-bottom: 24px; }
+    .add-vehicle-section h3 { margin: 0 0 12px 0; font-size: 0.9rem; color: #2d6a4f; }
+    .add-vehicle-form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .add-vehicle-form .field-item { display: flex; flex-direction: column; gap: 3px; }
+    .add-vehicle-form .field-item label { font-size: 0.7rem; font-weight: 700; color: #2d6a4f; }
+    .add-vehicle-form .field-item input, .add-vehicle-form .field-item select { padding: 7px 10px; border: 1px solid #c8e0d0; border-radius: 12px; font-size: 0.8rem; background: white; }
+    .add-vehicle-form .full-width { grid-column: span 2; }
+    .add-vehicle-btn { grid-column: span 2; background: #2d6a4f; color: white; border: none; padding: 10px; border-radius: 40px; font-weight: 700; cursor: pointer; transition: 0.2s; margin-top: 4px; }
+    .add-vehicle-btn:hover { background: #1f543d; }
+    .providers-list { display: flex; flex-direction: column; gap: 12px; }
+    .provider-card { border: 1px solid #c8e0d0; border-radius: 12px; overflow: hidden; }
+    .provider-vehicle-header { background: #e8f3ec; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; }
+    .provider-vehicle-title { font-weight: 700; color: #2d6a4f; font-size: 0.85rem; }
+    .delete-vehicle-btn { background: #fde8e8; color: #c0392b; border: 1px solid #f5c2c2; padding: 4px 10px; border-radius: 40px; font-size: 0.7rem; font-weight: 700; cursor: pointer; }
+    .delete-vehicle-btn:hover { background: #fbd5d5; }
+    .provider-drivers-list { padding: 10px 14px; display: flex; flex-direction: column; gap: 8px; }
+    .provider-driver-row { display: flex; justify-content: space-between; align-items: center; background: #fafdfb; border: 1px solid #eef5ef; padding: 8px 12px; border-radius: 10px; font-size: 0.78rem; }
+    .driver-info strong { color: #2d6a4f; }
+    .driver-info span { color: #666; margin-left: 8px; font-size: 0.72rem; }
+    .delete-driver-btn { background: none; border: none; color: #c0392b; cursor: pointer; font-size: 1rem; padding: 4px; border-radius: 50%; }
+    .delete-driver-btn:hover { background: #fdecea; }
+    .add-driver-inline-form { display: flex; gap: 6px; margin-top: 6px; padding-top: 10px; border-top: 1px dashed #d8e8dc; }
+    .add-driver-inline-form input { flex: 1; min-width: 0; padding: 6px 10px; border: 1px solid #c8e0d0; border-radius: 8px; font-size: 0.75rem; }
+    .add-driver-inline-btn { background: #2d6a4f; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .add-driver-inline-btn:hover { background: #1f543d; }
+    .wash-queue-section { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 8px; }
+    .animal-ids-section { margin-top: 16px; border: 2px solid #f0c0bb; border-radius: 16px; overflow: hidden; background: #fefaf9; }
+    .animal-ids-section.accepted { border-color: #b8dcc5; background: #f4faf6; }
+    .animal-ids-header { background: #c0392b; color: white; padding: 10px 16px; font-weight: 700; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .animal-ids-section.accepted .animal-ids-header { background: #2d6a4f; }
+    .animal-ids-count-badge { background: rgba(255,255,255,0.25); padding: 2px 10px; border-radius: 40px; font-size: 0.7rem; }
+    .animal-ids-body { padding: 14px 16px; }
+    .input-mode-tabs { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+    .input-mode-tab { padding: 8px 16px; border: 2px solid #f0c0bb; background: white; border-radius: 40px; font-size: 0.78rem; font-weight: 700; cursor: pointer; color: #a53125; }
+    .animal-ids-section.accepted .input-mode-tab { border-color: #b8dcc5; color: #2d6a4f; }
+    .input-mode-tab:hover { background: #fdecea; }
+    .animal-ids-section.accepted .input-mode-tab:hover { background: #eaf6ee; }
+    .input-mode-tab.active { background: #c0392b; color: white; border-color: #c0392b; }
+    .animal-ids-section.accepted .input-mode-tab.active { background: #2d6a4f; color: white; border-color: #2d6a4f; }
+    .input-mode-pane { display: none; }
+    .input-mode-pane.active { display: block; }
+    .individual-ids-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; max-height: 240px; overflow-y: auto; }
+    .individual-id-row { display: grid; grid-template-columns: 2fr 1.5fr 1.5fr 40px; gap: 6px; align-items: center; padding: 6px 8px; background: white; border: 1px solid #f0c0bb; border-radius: 10px; }
+    .animal-ids-section.accepted .individual-id-row { border-color: #b8dcc5; }
+    .individual-id-row input, .individual-id-row select { width: 100%; padding: 6px 9px; border: 1px solid #e0c0bb; border-radius: 8px; font-size: 0.78rem; background: white; }
+    .animal-ids-section.accepted .individual-id-row input, .animal-ids-section.accepted .individual-id-row select { border-color: #c8e0d0; }
+    .individual-id-row input:focus, .individual-id-row select:focus { border-color: #c0392b; outline: none; box-shadow: 0 0 0 2px rgba(192,57,43,0.12); }
+    .animal-ids-section.accepted .individual-id-row input:focus, .animal-ids-section.accepted .individual-id-row select:focus { border-color: #2d6a4f; box-shadow: 0 0 0 2px rgba(45,106,79,0.12); }
+    .remove-id-btn { background: #fde8e8; color: #c0392b; border: 1px solid #f5c2c2; width: 30px; height: 30px; border-radius: 50%; font-size: 1rem; cursor: pointer; font-weight: 700; padding: 0; }
+    .remove-id-btn:hover { background: #fbd5d5; }
+    .add-id-btn { background: #c0392b; color: white; border: none; padding: 7px 16px; border-radius: 40px; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
+    .animal-ids-section.accepted .add-id-btn { background: #2d6a4f; }
+    .add-id-btn:hover { background: #a53125; }
+    .animal-ids-section.accepted .add-id-btn:hover { background: #1f543d; }
+    .range-form { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
+    .range-form .range-item { display: flex; flex-direction: column; gap: 3px; }
+    .range-form .range-item label { font-size: 0.68rem; font-weight: 700; color: #a53125; }
+    .animal-ids-section.accepted .range-form .range-item label { color: #2d6a4f; }
+    .range-form .range-item input, .range-form .range-item select { padding: 7px 9px; border: 1px solid #e0c0bb; border-radius: 8px; font-size: 0.78rem; background: white; width: 100%; }
+    .animal-ids-section.accepted .range-form .range-item input, .animal-ids-section.accepted .range-form .range-item select { border-color: #c8e0d0; }
+    .range-preview { background: white; border: 1px dashed #c0392b; border-radius: 10px; padding: 10px 12px; font-size: 0.75rem; color: #a53125; margin-top: 8px; max-height: 100px; overflow-y: auto; font-family: monospace; }
+    .animal-ids-section.accepted .range-preview { border-color: #2d6a4f; color: #2d6a4f; }
+    .range-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .range-btn { background: #c0392b; color: white; border: none; padding: 8px 18px; border-radius: 40px; font-size: 0.78rem; font-weight: 700; cursor: pointer; }
+    .animal-ids-section.accepted .range-btn { background: #2d6a4f; }
+    .range-btn:hover { background: #a53125; }
+    .animal-ids-section.accepted .range-btn:hover { background: #1f543d; }
+    .range-btn.secondary { background: #eef3ef; color: #2d6a4f; border: 1px solid #c8e0d0; }
+    .paste-textarea { width: 100%; padding: 10px 12px; border: 1px solid #e0c0bb; border-radius: 12px; font-size: 0.78rem; font-family: monospace; background: white; resize: vertical; min-height: 100px; }
+    .animal-ids-section.accepted .paste-textarea { border-color: #c8e0d0; }
+    .paste-hint { font-size: 0.68rem; color: #888; margin-top: 4px; }
+    .paste-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .registered-ids-summary { margin-top: 14px; background: white; border: 1px solid #f0c0bb; border-radius: 12px; padding: 10px 12px; }
+    .animal-ids-section.accepted .registered-ids-summary { border-color: #b8dcc5; }
+    .registered-ids-summary h4 { margin: 0 0 8px 0; font-size: 0.78rem; color: #a53125; }
+    .animal-ids-section.accepted .registered-ids-summary h4 { color: #2d6a4f; }
+    .registered-ids-list { display: flex; flex-wrap: wrap; gap: 4px; max-height: 120px; overflow-y: auto; }
+    .id-chip { background: #fdecea; color: #842318; padding: 2px 9px; border-radius: 20px; font-size: 0.68rem; font-weight: 600; border: 1px solid #f0c0bb; display: inline-flex; align-items: center; gap: 4px; }
+    .animal-ids-section.accepted .id-chip { background: #eaf6ee; color: #1f543d; border-color: #b8dcc5; }
+    .id-chip .id-chip-close { cursor: pointer; opacity: 0.6; font-size: 0.8rem; line-height: 1; }
+    .archive-search-box { background: linear-gradient(135deg, #2d6a4f 0%, #1f543d 100%); color: white; padding: 20px 24px; border-radius: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(45,106,79,0.2); }
+    .archive-search-box h3 { margin: 0 0 4px 0; font-size: 1.05rem; }
+    .archive-search-box p { margin: 0 0 12px 0; font-size: 0.75rem; opacity: 0.9; }
+    .archive-search-input-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .archive-search-input-group input, .archive-search-input-group select { padding: 12px 16px; border: none; border-radius: 40px; font-size: 0.9rem; background: white; color: #333; flex: 1; min-width: 200px; }
+    .archive-search-input-group input:focus, .archive-search-input-group select:focus { outline: none; box-shadow: 0 0 0 3px rgba(255,255,255,0.3); }
+    .archive-search-btn { background: #c8102e; color: white; border: none; padding: 12px 26px; border-radius: 40px; font-size: 0.9rem; font-weight: 700; cursor: pointer; }
+    .search-result-box { background: white; border-radius: 16px; padding: 16px 20px; margin-bottom: 20px; border: 2px solid #c8e0d0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .search-result-box.has-result { border-color: #2d6a4f; }
+    .search-result-box.no-result { border-color: #ddd; background: #fafafa; }
+    .search-result-title { font-size: 0.9rem; font-weight: 700; color: #2d6a4f; margin-bottom: 10px; }
+    .search-timeline { display: flex; flex-direction: column; gap: 8px; }
+    .search-timeline-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 14px; border-radius: 12px; font-size: 0.78rem; }
+    .search-timeline-item.rejected { background: #fdecea; border-left: 4px solid #c0392b; }
+    .search-timeline-item.accepted { background: #eaf6ee; border-left: 4px solid #2d6a4f; }
+    .search-timeline-icon { font-size: 1.1rem; }
+    .search-timeline-content { flex: 1; }
+    .search-timeline-meta { font-size: 0.7rem; color: #666; margin-top: 4px; }
+    .archive-tables-wrapper { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .archive-section-header { background: linear-gradient(135deg, #c0392b 0%, #a53125 100%); color: white; padding: 12px 16px; border-radius: 14px 14px 0 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .archive-section-header.blue { background: linear-gradient(135deg, #1f4e79 0%, #163a5c 100%); }
+    .archive-section-title { font-weight: 700; font-size: 0.9rem; }
+    .archive-section-count { background: rgba(255,255,255,0.25); padding: 2px 10px; border-radius: 40px; font-size: 0.7rem; }
+    .archive-section-body { background: white; border: 1px solid #f0c0bb; border-top: none; border-radius: 0 0 14px 14px; padding: 12px; }
+    .archive-table-wrapper { overflow-x: auto; overflow-y: auto; max-height: 420px; }
+    .archive-table-wrapper table { width: 100%; border-collapse: collapse; font-size: 0.72rem; }
+    .archive-table-wrapper th { background: #fdecea; color: #a53125; font-weight: 600; position: sticky; top: 0; padding: 7px 6px; text-align: left; font-size: 0.68rem; border-bottom: 1px solid #f8d7da; }
+    .archive-table-wrapper.blue th { background: #e8f0f8; color: #1f4e79; border-bottom-color: #d0e0f0; }
+    .archive-table-wrapper td { padding: 6px 5px; border-bottom: 1px solid #fef5f4; vertical-align: top; }
+    .archive-view-ids-btn { background: #1f4e79; color: white; border: none; padding: 3px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .archive-view-ids-btn:disabled { background: #ccc; cursor: not-allowed; opacity: 0.6; }
+    .no-ids-warning { color: #b07d00; font-size: 0.65rem; font-weight: 600; }
+    .archive-filter-row { display: flex; gap: 6px; padding: 8px 0; flex-wrap: wrap; }
+    .archive-filter-row select, .archive-filter-row input { padding: 5px 10px; font-size: 0.72rem; border-radius: 10px; border: 1px solid #e0c0bb; background: white; flex: 1; min-width: 0; }
+    .archive-filter-row.blue select, .archive-filter-row.blue input { border-color: #b8cbe0; }
+    .archive-export-row { display: flex; gap: 6px; padding: 8px 0 10px 0; flex-wrap: wrap; }
+    .archive-export-row button { padding: 5px 12px; font-size: 0.7rem; border-radius: 40px; flex: 1; min-width: 90px; }
+    .help-btn { background: #f0f4e8; color: #2d6a4f; border: none; width: 36px; height: 36px; border-radius: 50%; font-weight: 700; font-size: 1rem; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.15); transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+    .help-btn:hover { background: white; transform: translateY(-1px); }
+    .help-section { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #eef5ef; }
+    .help-section:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0; }
+    .help-section h3 { margin: 0 0 8px 0; color: #2d6a4f; font-size: 1rem; }
+    .help-section h4 { margin: 12px 0 6px 0; color: #555; font-size: 0.85rem; }
+    .help-section p { margin: 0 0 8px 0; font-size: 0.82rem; line-height: 1.5; color: #444; }
+    .help-section ul { margin: 0 0 8px 0; padding-left: 20px; font-size: 0.82rem; line-height: 1.6; color: #444; }
+    .help-section code { background: #eaf6ee; color: #2d6a4f; padding: 2px 6px; border-radius: 4px; font-size: 0.78rem; font-family: monospace; }
+    .import-option { display: flex; align-items: flex-start; gap: 10px; padding: 10px; border: 2px solid #c8e0d0; border-radius: 12px; cursor: pointer; margin-bottom: 10px; transition: 0.15s; }
+    .import-option:hover { background: #f4faf6; }
+    .import-option input[type="radio"] { margin-top: 3px; }
+    .action-btn-edit { background: #e8f0f8; color: #1f4e79; border: 1px solid #b8cbe0; padding: 3px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 700; cursor: pointer; transition: 0.15s; white-space: nowrap; }
+    .action-btn-edit:hover { background: #d0e0f0; }
+    @media (max-width: 1100px) { .archive-tables-wrapper { grid-template-columns: 1fr; } .range-form { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 1000px) { .records-panels, .wash-queue-section { grid-template-columns: 1fr; } }
+    @media (max-width: 720px) { .compact-grid { grid-template-columns: repeat(2, 1fr); } .compact-grid-2, .cert-grid { grid-template-columns: 1fr; } .submit-btn-group { grid-template-columns: 1fr; } .add-vehicle-form { grid-template-columns: 1fr; } .add-vehicle-form .full-width { grid-column: span 1; } .add-vehicle-btn { grid-column: span 1; } .individual-id-row { grid-template-columns: 1fr; } }
+    @media (max-width: 480px) { .compact-grid { grid-template-columns: 1fr; } }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="header-text">
+      <h1>🐪 Livestock Market Management & Monitoring</h1>
+      <p>Automated · Shahama · Wathba · Baniyas | إدارة ومراقبة أسواق الماشية</p>
+      <div class="stats-badge">📍 Automated | Shahama | Wathba | Baniyas livestock shops</div>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="help-btn" id="openHelpBtn" title="Help / Guide">?</button>
+      <button type="button" class="manage-providers-btn" id="exportJsonBtn" title="Export all data to JSON file">📤 Export All</button>
+      <button type="button" class="manage-providers-btn" id="importJsonBtn" title="Import data from JSON file">📥 Import All</button>
+      <button type="button" class="manage-providers-btn" id="openProvidersBtn">🚛 Manage Providers</button>
+    </div>
+  </div>
+  <input type="file" id="importFileInput" accept=".json,application/json" style="display:none;">
+  <input type="file" id="importProvidersFileInput" accept=".json,application/json" style="display:none;">
+  
+  <div class="form-card">
+    <div class="tab-bar">
+      <button type="button" class="tab-btn active" data-tab="entryTab">📝 Data Entry</button>
+      <button type="button" class="tab-btn" data-tab="washTab">🚿 Vehicle Spray/Wash</button>
+      <button type="button" class="tab-btn" data-tab="liveInventoryTab">🏪 Live Inventory</button>
+      <button type="button" class="tab-btn" data-tab="archiveTab">🔍 Search &amp; Archive</button>
+    </div>
+
+    <!-- TAB 1: DATA ENTRY -->
+    <div class="tab-pane active" id="entryTab">
+      <form id="populationForm">
+        <div class="quick-select-box">
+          <label>🚛 Quick Select Saved Vehicle:</label>
+          <select id="quickSelectVehicle">
+            <option value="">-- Choose to auto-fill vehicle & driver details --</option>
+          </select>
+        </div>
+
+        <div class="section-label">🚛 Vehicle &amp; Driver Information</div>
+        <div class="compact-grid">
+          <div class="field-item">
+            <label>🚗 Vehicle Plate No. *</label>
+            <div class="vehicle-plate-group">
+              <input type="text" id="vehiclePlateNumber" class="plate-number" placeholder="12345" required>
+              <select id="vehicleEmirate" class="plate-emirate" required>
+                <option value="" disabled selected>— Emirate —</option>
+                <option value="Abu Dhabi">Abu Dhabi</option>
+                <option value="Dubai">Dubai</option>
+                <option value="Sharjah">Sharjah</option>
+                <option value="Ajman">Ajman</option>
+                <option value="Umm Al Quwain">Umm Al Quwain</option>
+                <option value="Ras Al Khaimah">Ras Al Khaimah</option>
+                <option value="Fujairah">Fujairah</option>
+              </select>
+            </div>
+            <div class="inline-hint" id="lookupHint"></div>
+          </div>
+          <div class="field-item">
+            <label>🧑‍✈️ Driver Name *</label>
+            <div class="driver-name-group">
+              <input type="text" id="driverName" required>
+            </div>
+          </div>
+          <div class="field-item">
+            <label>🪪 Driver ID No. *</label>
+            <input type="text" id="driverId" placeholder="784-XXXX-XXXXXXX-X" required>
+          </div>
+        </div>
+        <div class="compact-grid">
+          <div class="field-item">
+            <label>📞 Driver Contact No. *</label>
+            <input type="tel" id="driverContact" placeholder="+971 50 123 4567" required>
+          </div>
+          <div class="field-item">
+            <label>📅 Date &amp; Time *</label>
+            <div class="datetime-group">
+              <input type="datetime-local" id="recordDateTime" required>
+              <button type="button" class="now-btn" id="nowBtn">🔄 Now</button>
+            </div>
+          </div>
+          <div class="field-item"></div>
+        </div>
+        
+        <hr class="section-divider">
+        <div class="section-label">🏪 Shop Information</div>
+        <div class="compact-grid-2">
+          <div class="field-item">
+            <label>🏪 Shop Group *</label>
+            <select id="shopGroup" required>
+              <option value="" disabled selected>— select livestock shop group —</option>
+              <option value="Automated livestock shops">Automated livestock shops</option>
+              <option value="Shahama livestock shops">Shahama livestock shops</option>
+              <option value="Wathba livestock shops">Wathba livestock shops</option>
+              <option value="Baniyas livestock shops">Baniyas livestock shops</option>
+            </select>
+          </div>
+          <div class="field-item">
+            <label>🏪 Individual Shop *</label>
+            <select id="shopName" required>
+              <option value="" disabled selected>— first select a group —</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="cert-grid">
+          <div class="field-item">
+            <label id="healthCertLabel">🩺 Health Certificate No.</label>
+            <input type="text" id="healthCertNo" placeholder="Required only for non-Local breeds">
+            <div class="inline-hint" id="healthCertHint">Optional for Local breed · Required for imported breeds</div>
+          </div>
+          <div class="field-item">
+            <label>📊 Total in Certificate</label>
+            <input type="number" id="totalInCertificate" min="0" step="1" placeholder="Optional — e.g., 100">
+            <div class="inline-hint">Used to track remaining balance if same cert used for multiple shipments</div>
+          </div>
+        </div>
+        <div class="cert-alert" id="certAlert"></div>
+        
+        <div class="compact-grid-2" style="margin-top:16px;">
+          <div class="field-item">
+            <label>🌍 Source / Certificate Origin *</label>
+            <select id="sourceCertificate" required>
+              <option value="" disabled selected>— select source —</option>
+              <option value="ADM">ADM</option>
+              <option value="AAM">AAM</option>
+              <option value="DRM">DRM</option>
+              <option value="DXB">DXB</option>
+              <option value="SHJ">SHJ</option>
+              <option value="AJM">AJM</option>
+              <option value="UAQ">UAQ</option>
+              <option value="RAK">RAK</option>
+              <option value="FUJ">FUJ</option>
+              <option value="OTHER">Other (manual entry)…</option>
+            </select>
+            <input type="text" id="sourceCertificateOther" class="manual-input" placeholder="Type custom source / certificate origin">
+          </div>
+        </div>
+        
+        <hr class="section-divider">
+        <div class="section-label">🐏 Species &amp; Sub-breeds (Main Entries)</div>
+        <div class="species-table-wrapper">
+          <div class="species-table-header">Main entries</div>
+          <table class="species-table">
+            <thead>
+              <tr>
+                <th style="width:40%;">Animal</th>
+                <th style="width:40%;">Breed</th>
+                <th style="width:20%;">No. of animals</th>
+                <th style="width:50px;"></th>
+              </tr>
+            </thead>
+            <tbody id="speciesTableBody"></tbody>
+            <tfoot>
+              <tr class="total-row">
+                <td colspan="2" class="total-label">Total Animal Count :</td>
+                <td colspan="2"><input type="text" class="total-input" id="totalAnimalCount" value="0" readonly></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        <div class="inline-hint" style="margin-top:6px;">Click the green ➕ button to add another species row. Use the red ✖ button to remove a row.</div>
+        
+        <div class="animal-ids-section accepted" id="acceptedIdsSection">
+          <div class="animal-ids-header">
+            <span>🐏 Animal IDs (Optional)</span>
+            <span class="animal-ids-count-badge" id="acceptedIdsCountBadge">0 registered</span>
+          </div>
+          <div class="animal-ids-body">
+            <div class="inline-hint" style="margin-bottom:10px;">
+              Register the specific animal ID numbers that were accepted. Optional — skip if animals don't have IDs or you don't want to register them.
+            </div>
+            <div class="input-mode-tabs" id="acceptedInputModeTabs">
+              <button type="button" class="input-mode-tab active" data-target="accepted" data-mode="individual">✏️ Individual</button>
+              <button type="button" class="input-mode-tab" data-target="accepted" data-mode="range">🔢 Sequential Range</button>
+              <button type="button" class="input-mode-tab" data-target="accepted" data-mode="paste">📋 Paste List</button>
+            </div>
+            
+            <div class="input-mode-pane active" id="accepted-pane-individual">
+              <div class="individual-ids-list" id="acceptedIndividualIdsList"></div>
+              <button type="button" class="add-id-btn" id="acceptedAddIndividualIdBtn">➕ Add Row</button>
+            </div>
+            
+            <div class="input-mode-pane" id="accepted-pane-range">
+              <div class="range-form">
+                <div class="range-item"><label>Prefix</label><input type="text" id="acceptedRangePrefix" placeholder="e.g., A-"></div>
+                <div class="range-item"><label>From *</label><input type="number" id="acceptedRangeFrom" placeholder="1001" min="0"></div>
+                <div class="range-item"><label>To *</label><input type="number" id="acceptedRangeTo" placeholder="1050" min="0"></div>
+                <div class="range-item"><label>Padding</label><select id="acceptedRangePadding"><option value="0">None</option><option value="1">1 digit</option><option value="2">2 digits</option><option value="3">3 digits</option><option value="4">4 digits</option><option value="5">5 digits</option></select></div>
+                <div class="range-item"><label>Suffix</label><input type="text" id="acceptedRangeSuffix" placeholder="-UAE"></div>
+                <div class="range-item"><label>Species *</label><select id="acceptedRangeSpecies"></select></div>
+                <div class="range-item"><label>Sub-breed *</label><select id="acceptedRangeSubBreed"></select></div>
+                <div class="range-item"><label>&nbsp;</label><button type="button" class="range-btn" id="acceptedPreviewRangeBtn">👁️ Preview</button></div>
+              </div>
+              <div class="range-preview" id="acceptedRangePreview" style="display:none;"></div>
+              <div class="range-actions"><button type="button" class="range-btn" id="acceptedAddRangeBtn">➕ Add Range</button></div>
+            </div>
+            
+            <div class="input-mode-pane" id="accepted-pane-paste">
+              <textarea class="paste-textarea" id="acceptedPasteTextarea" placeholder="Paste IDs here, one per line:&#10;A-101, Sheep, Local&#10;A-102, Sheep, Local"></textarea>
+              <div class="paste-actions"><button type="button" class="range-btn" id="acceptedParsePasteBtn">👁️ Parse &amp; Preview</button></div>
+              <div class="range-preview" id="acceptedPastePreview" style="display:none;"></div>
+            </div>
+            
+            <div class="registered-ids-summary" id="acceptedIdsSummary" style="display:none;">
+              <h4>✅ Registered Accepted IDs (<span id="acceptedIdsCount">0</span>)</h4>
+              <div class="registered-ids-list" id="acceptedIdsList"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row" style="margin-top:16px;">
+          <label>📝 Notes</label>
+          <div class="field-group"><textarea id="notes" rows="2" placeholder="Health issues, births, quarantine, vaccination..."></textarea></div>
+        </div>
+        
+        <div class="compact-grid-2" id="rejectionReasonBox" style="display:none;">
+          <div class="field-item" style="grid-column: span 2;">
+            <label>❌ Rejection Reason *</label>
+            <select id="rejectionReason" required>
+              <option value="" disabled selected>— select rejection reason —</option>
+              <option value="EMACIATION">EMACIATION</option>
+              <option value="FEVER">FEVER</option>
+              <option value="RESPIRATORY SYMP.">RESPIRATORY SYMP.</option>
+              <option value="ALOPECIA">ALOPECIA</option>
+              <option value="SUSPECT INFECTIOUS D.">SUSPECT INFECTIOUS D.</option>
+              <option value="TUMORS">TUMORS</option>
+              <option value="EXTERNAL PARASITES">EXTERNAL PARASITES</option>
+              <option value="DOCUMENTS ISSUE">DOCUMENTS ISSUE</option>
+              <option value="OTHER">Other (manual entry)…</option>
+            </select>
+            <input type="text" id="rejectionReasonOther" class="manual-input" placeholder="Type custom rejection reason">
+          </div>
+        </div>
+
+        <div class="animal-ids-section" id="rejectedIdsSection" style="display:none;">
+          <div class="animal-ids-header">
+            <span>🐏 Rejected Animal IDs (Optional)</span>
+            <span class="animal-ids-count-badge" id="rejectedIdsCountBadge">0 registered</span>
+          </div>
+          <div class="animal-ids-body">
+            <div class="inline-hint" style="margin-bottom:10px;">
+              Register the specific animal ID numbers that were rejected. Optional — skip if the rejection is only at shipment level.
+            </div>
+            <div class="input-mode-tabs" id="rejectedInputModeTabs">
+              <button type="button" class="input-mode-tab active" data-target="rejected" data-mode="individual">✏️ Individual</button>
+              <button type="button" class="input-mode-tab" data-target="rejected" data-mode="range">🔢 Sequential Range</button>
+              <button type="button" class="input-mode-tab" data-target="rejected" data-mode="paste">📋 Paste List</button>
+            </div>
+            
+            <div class="input-mode-pane active" id="rejected-pane-individual">
+              <div class="individual-ids-list" id="rejectedIndividualIdsList"></div>
+              <button type="button" class="add-id-btn" id="rejectedAddIndividualIdBtn">➕ Add Row</button>
+            </div>
+            
+            <div class="input-mode-pane" id="rejected-pane-range">
+              <div class="range-form">
+                <div class="range-item"><label>Prefix</label><input type="text" id="rejectedRangePrefix" placeholder="e.g., A-"></div>
+                <div class="range-item"><label>From *</label><input type="number" id="rejectedRangeFrom" placeholder="1001" min="0"></div>
+                <div class="range-item"><label>To *</label><input type="number" id="rejectedRangeTo" placeholder="1050" min="0"></div>
+                <div class="range-item"><label>Padding</label><select id="rejectedRangePadding"><option value="0">None</option><option value="1">1 digit</option><option value="2">2 digits</option><option value="3">3 digits</option><option value="4">4 digits</option><option value="5">5 digits</option></select></div>
+                <div class="range-item"><label>Suffix</label><input type="text" id="rejectedRangeSuffix" placeholder="-UAE"></div>
+                <div class="range-item"><label>Species *</label><select id="rejectedRangeSpecies"></select></div>
+                <div class="range-item"><label>Sub-breed *</label><select id="rejectedRangeSubBreed"></select></div>
+                <div class="range-item"><label>&nbsp;</label><button type="button" class="range-btn" id="rejectedPreviewRangeBtn">👁️ Preview</button></div>
+              </div>
+              <div class="range-preview" id="rejectedRangePreview" style="display:none;"></div>
+              <div class="range-actions"><button type="button" class="range-btn" id="rejectedAddRangeBtn">➕ Add Range</button></div>
+            </div>
+            
+            <div class="input-mode-pane" id="rejected-pane-paste">
+              <textarea class="paste-textarea" id="rejectedPasteTextarea" placeholder="Paste IDs here, one per line:&#10;A-101, Sheep, Local&#10;A-102, Sheep, Local"></textarea>
+              <div class="paste-actions"><button type="button" class="range-btn" id="rejectedParsePasteBtn">👁️ Parse &amp; Preview</button></div>
+              <div class="range-preview" id="rejectedPastePreview" style="display:none;"></div>
+            </div>
+            
+            <div class="registered-ids-summary" id="rejectedIdsSummary" style="display:none;">
+              <h4>✅ Registered Rejected IDs (<span id="rejectedIdsCount">0</span>)</h4>
+              <div class="registered-ids-list" id="rejectedIdsList"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="submit-btn-group">
+          <button type="button" class="submit-btn accept" id="acceptBtn">✅ Accept Shipment</button>
+          <button type="button" class="submit-btn reject" id="rejectBtn">❌ Reject Shipment</button>
+          <button type="button" class="submit-btn save" id="saveEditBtn">💾 Save Changes</button>
+          <button type="button" class="submit-btn cancel-edit" id="cancelEditBtn">✖ Cancel Edit</button>
+        </div>
+        <div class="secondary-btn-group">
+          <button type="button" class="secondary" id="clearFormBtn">🗑️ Clear Form</button>
+          <button type="button" class="secondary" id="exportAllCsvBtn">📎 Export All (CSV)</button>
+          <button type="button" class="secondary" id="exportAllPdfBtn">📄 Export All (PDF)</button>
+          <button type="button" class="secondary" id="clearAllBtn">🗑️ Clear All Data</button>
+        </div>
+        <div class="inline-hint" id="autosaveStatus" style="text-align:center; margin-top:8px;"></div>
+      </form>
+      
+      <div class="records-section">
+        <div class="records-panels">
+          <div class="records-panel accepted">
+            <div class="records-panel-header">
+              <div class="records-panel-title">✅ Accepted Shipments</div>
+              <span class="records-panel-count" id="acceptedCount">0</span>
+            </div>
+            <div class="records-panel-total">
+              <div class="total-header-row">
+                <span class="total-label-text">🐏 Total Accepted Animals</span>
+                <span class="total-grand-value" id="acceptedTotalAnimals">0</span>
+              </div>
+              <div class="species-breakdown" id="acceptedSpeciesBreakdown"></div>
+            </div>
+            <div class="records-panel-filters">
+              <select id="acceptedFilterSpecies">
+                <option value="">All Species</option>
+                <option value="Sheep">Sheep</option>
+                <option value="Goat">Goat</option>
+                <option value="Cattle">Cattle</option>
+                <option value="Camel">Camel</option>
+                <option value="Gazelle">Gazelle</option>
+              </select>
+              <select id="acceptedFilterGroup">
+                <option value="">All Groups</option>
+                <option value="Automated livestock shops">Automated</option>
+                <option value="Shahama livestock shops">Shahama</option>
+                <option value="Wathba livestock shops">Wathba</option>
+                <option value="Baniyas livestock shops">Baniyas</option>
+              </select>
+              <input type="text" id="acceptedFilterShop" placeholder="Shop...">
+            </div>
+            <div class="records-panel-actions">
+              <button type="button" class="export-selected" id="exportAcceptedSelectedCsvBtn" disabled>📎 CSV Selected (0)</button>
+              <button type="button" class="pdf-btn" id="exportAcceptedSelectedPdfBtn" disabled>📄 PDF Selected (0)</button>
+              <button type="button" class="secondary" id="exportAcceptedCsvBtn">📎 CSV All</button>
+              <button type="button" class="pdf-btn" id="exportAcceptedPdfBtn">📄 PDF All</button>
+              <button type="button" class="secondary" id="clearAcceptedBtn">🗑️ Clear</button>
+            </div>
+            <div class="records-panel-table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th class="select-col"><input type="checkbox" id="selectAllAccepted"></th>
+                    <th>Plate</th><th>Driver</th><th>Shop</th><th>Date &amp; Time</th>
+                    <th>Species &amp; Count</th><th>HC / Source</th><th>Notes</th><th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="acceptedTableBody">
+                  <tr><td colspan="9" class="empty-msg">No accepted shipments yet</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <div class="records-panel rejected">
+            <div class="records-panel-header">
+              <div class="records-panel-title">❌ Rejected Shipments</div>
+              <span class="records-panel-count" id="rejectedCount">0</span>
+            </div>
+            <div class="records-panel-total">
+              <div class="total-header-row">
+                <span class="total-label-text">🐏 Total Rejected Animals</span>
+                <span class="total-grand-value" id="rejectedTotalAnimals">0</span>
+              </div>
+              <div class="species-breakdown" id="rejectedSpeciesBreakdown"></div>
+            </div>
+            <div class="records-panel-filters">
+              <select id="rejectedFilterSpecies">
+                <option value="">All Species</option>
+                <option value="Sheep">Sheep</option>
+                <option value="Goat">Goat</option>
+                <option value="Cattle">Cattle</option>
+                <option value="Camel">Camel</option>
+                <option value="Gazelle">Gazelle</option>
+              </select>
+              <select id="rejectedFilterGroup">
+                <option value="">All Groups</option>
+                <option value="Automated livestock shops">Automated</option>
+                <option value="Shahama livestock shops">Shahama</option>
+                <option value="Wathba livestock shops">Wathba</option>
+                <option value="Baniyas livestock shops">Baniyas</option>
+              </select>
+              <input type="text" id="rejectedFilterShop" placeholder="Shop...">
+            </div>
+            <div class="records-panel-actions">
+              <button type="button" class="export-selected" id="exportRejectedSelectedCsvBtn" disabled>📎 CSV Selected (0)</button>
+              <button type="button" class="pdf-btn" id="exportRejectedSelectedPdfBtn" disabled>📄 PDF Selected (0)</button>
+              <button type="button" class="secondary" id="exportRejectedCsvBtn">📎 CSV All</button>
+              <button type="button" class="pdf-btn" id="exportRejectedPdfBtn">📄 PDF All</button>
+              <button type="button" class="secondary" id="clearRejectedBtn">🗑️ Clear</button>
+            </div>
+            <div class="records-panel-table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th class="select-col"><input type="checkbox" id="selectAllRejected"></th>
+                    <th>Plate</th><th>Driver</th><th>Shop</th><th>Date &amp; Time</th>
+                    <th>Species &amp; Count</th><th>Reason</th><th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="rejectedTableBody">
+                  <tr><td colspan="8" class="empty-msg">No rejected shipments yet</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- TAB 2: VEHICLE SPRAY/WASH QUEUE -->
+    <div class="tab-pane" id="washTab">
+      <div class="section-label">🚿 Vehicle Spraying & Wash Tracking</div>
+      <p style="font-size:0.75rem; color:#6b8f7c; margin:0 0 14px 0;">
+        Track vehicles through the process: Pending -> Sprayed -> Washed. Select records and click the buttons to move them between stages.
+      </p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px;">
+        
+        <!-- 1. PENDING SPRAY/WASH -->
+        <div class="records-panel accepted">
+          <div class="records-panel-header">
+            <div class="records-panel-title">🕐 Pending Spray/Wash</div>
+            <span class="records-panel-count" id="pendingWashCount">0</span>
+          </div>
+          <div class="records-panel-actions">
+            <button type="button" class="wash-btn" id="moveToSprayingBtn" disabled style="background:#ca8a04;">➡️ To Spraying (0)</button>
+            <button type="button" class="wash-btn" id="moveToWashedDirectBtn" disabled style="background:#1f4e79;">➡️ To Washed (0)</button>
+          </div>
+          <div class="records-panel-actions" style="border-top:none; padding-top:0;">
+            <button type="button" class="secondary" id="exportPendingCsvBtn">📎 CSV Selected</button>
+            <button type="button" class="pdf-btn" id="exportPendingPdfBtn">📄 PDF Selected</button>
+          </div>
+          <div class="records-panel-table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th class="select-col"><input type="checkbox" id="selectAllPending"></th>
+                  <th>Plate</th><th>Shop</th><th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="pendingTableBody">
+                <tr><td colspan="4" class="empty-msg">No pending records</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 2. ANIMAL SPRAYING -->
+        <div class="records-panel" style="border-color:#eab308;">
+          <div class="records-panel-header" style="background:#ca8a04;">
+            <div class="records-panel-title">💦 Animal Spraying</div>
+            <span class="records-panel-count" id="sprayedCount">0</span>
+          </div>
+          <div class="records-panel-actions">
+            <button type="button" class="wash-btn" id="moveToWashedBtn" disabled style="background:#1f4e79;">➡️ To Washed (0)</button>
+          </div>
+          <div class="records-panel-actions" style="border-top:none; padding-top:0;">
+            <button type="button" class="secondary" id="exportSprayedCsvBtn">📎 CSV Selected</button>
+            <button type="button" class="pdf-btn" id="exportSprayedPdfBtn">📄 PDF Selected</button>
+          </div>
+          <div class="records-panel-table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th class="select-col"><input type="checkbox" id="selectAllSprayed"></th>
+                  <th>Plate</th><th>Shop</th><th>Sprayed At</th>
+                </tr>
+              </thead>
+              <tbody id="sprayedTableBody">
+                <tr><td colspan="4" class="empty-msg">No sprayed records</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        <!-- 3. WASHED VEHICLES -->
+        <div class="records-panel washed">
+          <div class="records-panel-header">
+            <div class="records-panel-title">✅ Washed Vehicles</div>
+            <span class="records-panel-count" id="washedCount">0</span>
+          </div>
+          <div class="records-panel-actions">
+            <button type="button" class="secondary" id="exportWashedCsvBtn">📎 CSV All</button>
+            <button type="button" class="pdf-btn" id="exportWashedPdfBtn">📄 PDF All</button>
+            <button type="button" class="secondary" id="clearWashedBtn">🗑️ Clear</button>
+          </div>
+          <div class="records-panel-actions" style="border-top:none; padding-top:0;">
+            <button type="button" class="secondary" id="exportWashedSelectedCsvBtn" disabled>📎 CSV Selected (0)</button>
+            <button type="button" class="pdf-btn" id="exportWashedSelectedPdfBtn" disabled>📄 PDF Selected (0)</button>
+          </div>
+          <div class="records-panel-table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th class="select-col"><input type="checkbox" id="selectAllWashed"></th>
+                  <th>Plate</th><th>Shop</th><th>Washed At</th>
+                </tr>
+              </thead>
+              <tbody id="washedTableBody">
+                <tr><td colspan="4" class="empty-msg">No washed records yet</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 3: LIVE INVENTORY -->
+    <div class="tab-pane" id="liveInventoryTab">
+      <div class="section-label">🏪 Live Inventory Dashboard</div>
+      <p style="font-size:0.8rem; color:#6b8f7c; margin-bottom:16px;">
+        Overview of all livestock currently held in each shop. Click on any shop card to deduct animals (slaughter, death, sale) or transfer them to another shop.
+      </p>
+      <div id="liveInventoryContainer" style="display: flex; flex-direction: column; gap: 24px;"></div>
+    </div>
+
+    <!-- TAB 4: SEARCH & ARCHIVE -->
+    <div class="tab-pane" id="archiveTab">
+      <div class="archive-search-box">
+        <h3>🔍 Advanced Search &amp; Archive</h3>
+        <p>Search by Animal ID, Health Certificate No., or use filters to track any animal's full history (Accepted or Rejected).</p>
+        
+        <div class="archive-search-input-group" style="margin-bottom:10px;">
+          <input type="text" id="searchAnimalIdInput" placeholder="🔎 Animal ID (e.g., A-1001 or 1050)">
+          <input type="text" id="searchHealthCertInput" placeholder="🩺 Health Certificate No. (e.g., HC-2024-00123)">
+          <button type="button" class="archive-search-btn" id="performSearchBtn">🔍 Search</button>
+        </div>
+        
+        <div class="archive-search-input-group">
+          <select id="searchSpeciesSelect">
+            <option value="">All Species</option>
+            <option value="Sheep">Sheep</option>
+            <option value="Goat">Goat</option>
+            <option value="Cattle">Cattle</option>
+            <option value="Camel">Camel</option>
+            <option value="Gazelle">Gazelle</option>
+          </select>
+          <select id="searchSubBreedSelect">
+            <option value="">All Breeds</option>
+          </select>
+          <input type="text" id="searchShopInput" placeholder="🏪 Shop name...">
+          <input type="date" id="searchDateInput" title="Search by date">
+        </div>
+      </div>
+      
+      <div id="searchResultBox" style="display:none;"></div>
+      
+      <div class="archive-tables-wrapper">
+        <div>
+          <div class="archive-section-header">
+            <span class="archive-section-title">📦 All Shipments (Filtered)</span>
+            <span class="archive-section-count" id="archiveAllShipmentsCount">0</span>
+          </div>
+          <div class="archive-section-body">
+            <div class="archive-table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Status</th><th>Date</th><th>Plate</th><th>Shop</th><th>Species</th><th>HC No.</th><th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="archiveAllShipmentsBody">
+                  <tr><td colspan="7" class="empty-msg">Use search or filters above</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <div class="archive-section-header blue">
+            <span class="archive-section-title">🐏 Animal IDs (Filtered)</span>
+            <span class="archive-section-count" id="archiveAllAnimalsCount">0</span>
+          </div>
+          <div class="archive-section-body">
+            <div class="archive-table-wrapper blue">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Animal ID</th><th>Status</th><th>Species</th><th>Breed</th><th>Plate</th><th>Date</th>
+                  </tr>
+                </thead>
+                <tbody id="archiveAllAnimalsBody">
+                  <tr><td colspan="6" class="empty-msg">Use search or filters above</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="providersModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>🚛 Approved Providers</h2>
+      <button type="button" class="close-modal-btn" id="closeProvidersBtn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap;">
+        <button type="button" class="secondary" id="exportProvidersJsonBtn">📤 Export Providers (JSON)</button>
+        <button type="button" class="secondary" id="importProvidersJsonBtn">📥 Import Providers (JSON)</button>
+      </div>
+      <div class="add-vehicle-section">
+        <h3>➕ Add New Vehicle &amp; Driver</h3>
+        <div class="add-vehicle-form">
+          <div class="field-item"><label>Vehicle Plate No. *</label><input type="text" id="newVehiclePlate" placeholder="54321"></div>
+          <div class="field-item"><label>Emirate *</label>
+            <select id="newVehicleEmirate">
+              <option value="" disabled selected>— select —</option>
+              <option value="Abu Dhabi">Abu Dhabi</option>
+              <option value="Dubai">Dubai</option>
+              <option value="Sharjah">Sharjah</option>
+              <option value="Ajman">Ajman</option>
+              <option value="Umm Al Quwain">Umm Al Quwain</option>
+              <option value="Ras Al Khaimah">Ras Al Khaimah</option>
+              <option value="Fujairah">Fujairah</option>
+            </select>
+          </div>
+          <div class="field-item"><label>Driver Name *</label><input type="text" id="newDriverName"></div>
+          <div class="field-item"><label>Driver ID *</label><input type="text" id="newDriverId" placeholder="784-XXXX-XXXXXXX-X"></div>
+          <div class="field-item full-width"><label>Driver Contact *</label><input type="tel" id="newDriverContact" placeholder="+971 50 XXX XXXX"></div>
+          <button type="button" class="add-vehicle-btn" id="addVehicleBtn">Add to Approved List</button>
+        </div>
+      </div>
+      <h3 style="color:#2d6a4f; font-size:1rem; margin-bottom:12px;">📋 Saved Providers (Sorted A-Z)</h3>
+      <div class="providers-list" id="providersList"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="viewIdsModal">
+  <div class="modal-content wide">
+    <div class="modal-header rejected-header">
+      <h2 id="viewIdsTitle">🐏 Shipment Animal IDs</h2>
+      <button type="button" class="close-modal-btn" id="closeViewIdsBtn">&times;</button>
+    </div>
+    <div class="modal-body" id="viewIdsBody"></div>
+  </div>
+</div>
+
+<!-- SHOP DETAILS & ACTIONS MODAL -->
+<div class="modal-overlay" id="shopDetailsModal">
+  <div class="modal-content wide">
+    <div class="modal-header" style="background:#2d6a4f;">
+      <h2 id="shopDetailsTitle">Shop Details</h2>
+      <button type="button" class="close-modal-btn" id="closeShopDetailsBtn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div id="shopDetailsSummary" style="margin-bottom:20px; background:#f4faf6; padding:15px; border-radius:12px; border:1px solid #c8e0d0;"></div>
+      
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+        <!-- Deduct -->
+        <div style="background:#fefaf9; border:1px solid #f0c0bb; border-radius:12px; padding:15px;">
+          <h3 style="margin:0 0 10px 0; color:#a53125; font-size:1rem;">📤 Deduct Animals</h3>
+          <p style="font-size:0.75rem; color:#666; margin-bottom:10px;">Deduct by total count or specific ID.</p>
+          <div class="field-item" style="margin-bottom:10px;">
+            <label style="font-size:0.75rem; font-weight:700; color:#a53125;">Action Type *</label>
+            <select id="deductActionType" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc;">
+              <option value="Slaughter (ذبح)">Slaughter (ذبح)</option>
+              <option value="Death (نفوق)">Death (نفوق)</option>
+              <option value="Sale/Exit (بيع)">Sale/Exit (بيع)</option>
+            </select>
+          </div>
+          <div class="field-item" style="margin-bottom:10px;">
+            <label style="font-size:0.75rem; font-weight:700; color:#a53125;">Method</label>
+            <select id="deductMethod" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc;">
+              <option value="count">By Count (Total)</option>
+              <option value="id">By Animal ID</option>
+            </select>
+          </div>
+          <div id="deductByCountBox" style="display:block;">
+            <div class="field-item" style="margin-bottom:10px;">
+              <label style="font-size:0.75rem; font-weight:700; color:#a53125;">Species *</label>
+              <select id="deductSpecies" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc;"></select>
+            </div>
+            <div class="field-item" style="margin-bottom:10px;">
+              <label style="font-size:0.75rem; font-weight:700; color:#a53125;">Count *</label>
+              <input type="number" id="deductCount" min="1" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc;">
+            </div>
+          </div>
+          <div id="deductByIdBox" style="display:none;">
+            <div class="field-item" style="margin-bottom:10px;">
+              <label style="font-size:0.75rem; font-weight:700; color:#a53125;">Animal ID *</label>
+              <input type="text" id="deductAnimalId" placeholder="e.g., A-1001" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc;">
+            </div>
+          </div>
+          <button type="button" class="submit-btn reject" id="confirmDeductBtn" style="width:100%; padding:10px; font-size:0.85rem; margin-top:10px;">Confirm Deduction</button>
+        </div>
+        
+        <!-- Transfer -->
+        <div style="background:#e8f0f8; border:1px solid #b8cbe0; border-radius:12px; padding:15px;">
+          <h3 style="margin:0 0 10px 0; color:#1f4e79; font-size:1rem;">🔄 Transfer to Another Shop</h3>
+          <p style="font-size:0.75rem; color:#666; margin-bottom:10px;">Move animals from this shop to another.</p>
+          <div class="field-item" style="margin-bottom:10px;">
+            <label style="font-size:0.75rem; font-weight:700; color:#1f4e79;">Destination Shop *</label>
+            <select id="transferDestShop" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc;"></select>
+          </div>
+          <div class="field-item" style="margin-bottom:10px;">
+            <label style="font-size:0.75rem; font-weight:700; color:#1f4e79;">Species *</label>
+            <select id="transferSpecies" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc;"></select>
+          </div>
+          <div class="field-item" style="margin-bottom:10px;">
+            <label style="font-size:0.75rem; font-weight:700; color:#1f4e79;">Count *</label>
+            <input type="number" id="transferCount" min="1" style="width:100%; padding:8px; border-radius:8px; border:1px solid #ccc;">
+          </div>
+          <button type="button" class="submit-btn save" id="confirmTransferBtn" style="width:100%; padding:10px; font-size:0.85rem; margin-top:10px; background:#1f4e79;">Confirm Transfer</button>
+        </div>
+      </div>
+      
+      <div style="margin-top:20px;">
+        <h4 style="font-size:0.85rem; color:#2d6a4f; margin-bottom:8px;">📋 Recent Movements in this Shop</h4>
+        <div class="archive-table-wrapper" style="max-height:200px; border:1px solid #ddd; border-radius:8px;">
+          <table>
+            <thead>
+              <tr><th>Date</th><th>Action</th><th>Species</th><th>Count</th><th>ID</th></tr>
+            </thead>
+            <tbody id="shopMovementsBody">
+              <tr><td colspan="5" class="empty-msg">No movements yet</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="passwordModal">
+  <div class="modal-content narrow">
+    <div class="modal-header warning-header">
+      <h2>🔐 Admin Password Required</h2>
+      <button type="button" class="close-modal-btn" id="closePasswordBtn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.85rem; color:#555; margin-top:0;">This action requires admin authorization.</p>
+      <input type="password" class="password-input" id="passwordInput" placeholder="••••••••" autocomplete="off">
+      <div class="password-error" id="passwordError">❌ Incorrect password. Try again.</div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="cancel" id="cancelPasswordBtn">Cancel</button>
+      <button type="button" class="primary" id="confirmPasswordBtn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="helpModal">
+  <div class="modal-content wide">
+    <div class="modal-header">
+      <h2>📖 User Guide</h2>
+      <button type="button" class="close-modal-btn" id="closeHelpBtn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="help-section">
+        <h3>🚀 Getting Started</h3>
+        <p>This system tracks livestock shipments entering animal shops in Abu Dhabi. It manages <strong>Accepted</strong>, <strong>Rejected</strong>, <strong>Sprayed</strong>, <strong>Washed</strong> shipments, and now includes a <strong>Live Inventory</strong> to track the actual animals inside each shop.</p>
+      </div>
+      <div class="help-section">
+        <h3>📝 Data Entry Tab</h3>
+        <ul>
+          <li><strong>Quick Select Vehicle:</strong> Auto-fills saved provider details.</li>
+          <li><strong>Health Certificate:</strong> Required only for non-Local breeds.</li>
+          <li><strong>Animal IDs:</strong> Optional registration for accepted or rejected animals.</li>
+        </ul>
+      </div>
+      <div class="help-section">
+        <h3>🚿 Vehicle Spray/Wash Tab</h3>
+        <ul>
+          <li><strong>Pending:</strong> Newly accepted shipments waiting for spraying or washing.</li>
+          <li><strong>Animal Spraying:</strong> Shipments that have been sprayed.</li>
+          <li><strong>Washed:</strong> Fully washed vehicles.</li>
+          <li>You can move records step-by-step or skip directly to washed. Select records to export them individually.</li>
+        </ul>
+      </div>
+      <div class="help-section">
+        <h3>🏪 Live Inventory Tab</h3>
+        <ul>
+          <li>Shows a visual grid of all shops grouped by location.</li>
+          <li>Click any shop card to see details, deduct animals (Slaughter/Death/Sale), or transfer them to another shop.</li>
+          <li>Deductions and Transfers are recorded in a movement log.</li>
+        </ul>
+      </div>
+      <div class="help-section">
+        <h3>🔍 Search &amp; Archive Tab</h3>
+        <ul>
+          <li>Search by Animal ID, Health Certificate, or use filters (Species, Breed, Shop, Date).</li>
+          <li>View animal histories and shipment details.</li>
+        </ul>
+      </div>
+      <div class="help-section">
+        <h3>✏️ Editing &amp; Admin</h3>
+        <ul>
+          <li>Click <strong>✏️ Edit</strong> next to a record to modify it (requires Admin Password: <code>2102258</code>).</li>
+          <li>Deletions also require the password.</li>
+        </ul>
+      </div>
+      <div class="help-section">
+        <h3>💾 Backup</h3>
+        <p>Use <strong>📤 Export All</strong> to save a full JSON backup (including inventory movements). Use <strong>📥 Import All</strong> to restore or merge data.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="importModeModal">
+  <div class="modal-content narrow">
+    <div class="modal-header">
+      <h2>📥 Import Data</h2>
+      <button type="button" class="close-modal-btn" id="closeImportModeBtn">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.85rem; color:#555; margin-top:0;">Choose how to merge the imported data with your current data.</p>
+      <div id="importFileSummary" style="background:#f4faf6; border:1px solid #c8e0d0; border-radius:12px; padding:12px; margin-bottom:14px; font-size:0.8rem; color:#2d6a4f; line-height:1.6;"></div>
+      <label class="import-option">
+        <input type="radio" name="importMode" value="merge" checked>
+        <div>
+          <strong style="font-size:0.85rem;">Merge (recommended)</strong>
+          <div style="font-size:0.72rem; color:#666; margin-top:3px;">Add new records only · Skip existing ones (by ID)</div>
+        </div>
+      </label>
+      <label class="import-option">
+        <input type="radio" name="importMode" value="replace">
+        <div>
+          <strong style="font-size:0.85rem; color:#c0392b;">Replace All</strong>
+          <div style="font-size:0.72rem; color:#c0392b; margin-top:3px;">⚠️ Delete all current data, then import · Use for fresh install</div>
+        </div>
+      </label>
+      <label class="import-option" style="margin-bottom:0;">
+        <input type="radio" name="importMode" value="overwrite">
+        <div>
+          <strong style="font-size:0.85rem;">Merge &amp; Overwrite</strong>
+          <div style="font-size:0.72rem; color:#666; margin-top:3px;">Add new records + replace existing ones with imported versions</div>
+        </div>
+      </label>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="cancel" id="cancelImportBtn">Cancel</button>
+      <button type="button" class="primary" id="confirmImportBtn">Import Now</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ======================== GLOBAL STATE ========================
+let acceptedRecords = [];
+let rejectedRecords = [];
+let washedRecords = [];
+let sprayedRecords = []; // NEW: Tracks sprayed records
+let inventoryMovements = []; // Log of deductions and transfers
+
+let selectedAccepted = new Set();
+let selectedRejected = new Set();
+let pendingSelected = new Set();
+let selectedSprayed = new Set(); // NEW
+let selectedWashed = new Set(); // NEW
+let animalIdIndex = {};
+let currentAcceptedIds = [];
+let currentRejectedIds = [];
+let editingRecord = null;
+
+const ADMIN_PASSWORD = '2102258';
+const STORAGE_KEYS = {
+  accepted: 'livestockAccepted',
+  rejected: 'livestockRejected',
+  washed: 'livestockWashed',
+  sprayed: 'livestockSprayed', // NEW
+  movements: 'livestockMovements',
+  formDraft: 'livestockFormDraft'
+};
+
+// ======================== DATA DICTIONARIES ========================
+const subBreedsList = ["Local","Australian","Somali","Holland","Pakistan","Iran","Oman","Ethiopia","India"];
+const speciesList = [
+  { value: "Sheep", label: "Sheep 🐑", emoji: "🐑" },
+  { value: "Goat", label: "Goat 🐐", emoji: "🐐" },
+  { value: "Cattle", label: "Cattle 🐄", emoji: "🐄" },
+  { value: "Camel", label: "Camel 🐪", emoji: "🐪" },
+  { value: "Gazelle", label: "Gazelle 🦌", emoji: "🦌" }
+];
+
+const shopDatabase = {
+  "Automated livestock shops": [
+    "1- CN-1030387 AL KHALID & ALHUSSIN TRADING EST", "2- CN-2317105 ZUHOOR ALJIBAL GOAT TRADING", "3- CN-1030920 AL MOHANNA COMPANY", "4- CN-1030920 AL MOHANNA COMPANY", "5- CN-1025756 AL MINHAJ LIVESTOCK", "6- CN-2100502 AL SAHEL AL GANOOBI LIVESTOCK", "7- CN-1167578 OASIS LIVESTOCK EST", "8- CN-1136885 BEERHAA LIVESTOCK", "9- CN-3826724 SEADRAGON LIVESTOCK - L.L.C", "10- CN-1144473 RAS GHORAB LIVESTOCK FOODER TRADING", "11- CN-3826724 AL BARAKA LIVESTOCK EST", "12- CN-3826724 SEADRAGON LIVESTOCK - L.L.C", "13- store", "14- CN-1029476 FLORIDA TRADING EST", "15- CN-1025756 AL MINHAJ LIVESTOCK", "16- CN-1145161 EL TAWEELA LIVESTOCK TRADING - SOLE PROPRIETORSHIP L.L.C.", "17- CN-1031046 MOHAMMED SALEM MOHAMMED LIVESTOCK", "18- CN-1030387 AL KHALID & ALHUSSIN TRADING EST", "19- CN-1025341 SHUJAA IMPORTING & TRADING EST", "20- CN-1048540 AL RAHMA LIVESTOCK", "21- CN-1025341 SHUJAA IMPORTING & TRADING EST", "22- SHOP", "23- CN-1029476 FLORIDA TRADING EST", "24- CN-1222236 SPEAR LIVESTOCK TRADING", "25- CN-1037586 AL RUWEIDAT TRADING COMPANY", "26- CN-1032485 ALGHAITH LIVESTOCK", "27- CN-1050878 DIAMOND SANDS LIVESTOCK EST", "28- CN-1052524 FLYING SAUCER LIVESTOCK", "29- CN-1167578 OASIS LIVESTOCK EST", "30- CN-1052178 AL SUQIR LIVESTOCK", "31- CN-2100502 AL SAHEL AL GANOOBI LIVESTOCK", "32- CN-1033822 AL NUBRAS LIVESTOCK & SHEEP", "33- CN-1021720 BOU ATABA LIVESTOCK ESTABLISHMENT", "34- CN-1222236 SPEAR LIVESTOCK TRADING", "35- CN-1728031 THE LIVE LIVESTOCK"
+  ],
+  "Shahama livestock shops": [
+    "1- CN-1189039 NOOR ALHUDA CATTLE AND SHEEP TRADING - L.L.C - S.P.C", "2- CN-1189039 NOOR ALHUDA CATTLE AND SHEEP TRADING - L.L.C - S.P.C", "3- CN-1193301 HAMA LIVESTOCK & SHEEP TRADING - L.L.C - O.P.C", "4- CN-1193301 HAMA LIVESTOCK & SHEEP TRADING - L.L.C - O.P.C", "5- CN-1164823 GREEN ISLAND LIVESTOCK & SHEEP TRADING L.L.C.", "6- CN-5564599 QASR ALLUHUM FOR SHEEP TRADE", "7- CN-6580716 WAHAT AL DHABI LIVESTOCK TRADING - BRANCH", "8- CN-4708296 ZAHRAT AL WADI SHEEPS TRADING", "9- CN-1940012 WADI MASAFI LIVESTOCKS", "10- CN-1940012 WADI MASAFI LIVESTOCKS", "11- CN-1145872 NASER ALI SALEM LIVESTOCK TRADING", "12- CN-2569736 ALQARYA LIVESTOCK", "13- CN-1145161-3 EL TAWEELA LIVESTOCK TRADING - SOLE PROPRIETORSHIP L.L.C. - BRANCH", "14- CN-4856849 AL RAHMA LIVESTOCK - L.L.C. - S.P.C - BRANCH", "15- CN-1167578-2 OASIS LIVESTOCK- LLC - BRANCH 1", "16- CN-1167578-2 OASIS LIVESTOCK- LLC - BRANCH 1", "17- CN-1100164 ARROW LIVESTOCK & SHEEP TRADING - L.L.C - S.P.C", "18- CN-1100164 ARROW LIVESTOCK & SHEEP TRADING - L.L.C - S.P.C", "19- CN-1145872 NASER ALI SALEM LIVESTOCK TRADING", "20- CN-1033822-1 AL NUBRAS LIVESTOCK & SHEEP - BRANCH 1", "21- CN-6580716 WAHAT AL DHABI LIVESTOCK TRADING - BRANCH", "22- CN-1940012 WADI MASAFI LIVESTOCKS", "23- CN-1190886 THEMAR LIVESTOCK AND SHEEP TRADING - SOLE PROPRIETORSHIP L.L.C.", "24- CN-1190886 THEMAR LIVESTOCK AND SHEEP TRADING - SOLE PROPRIETORSHIP L.L.C."
+  ],
+  "Wathba livestock shops": [
+    "1- CN-1164823 GREEN ISLAND LIVESTOCK & SHEEP TRADING L.L.C.", "2- CN-1144375 AL NUBA LIVESTOCK TRADING", "3- CN-2919781 ALWAHA INTERNATIONAL LEATHER TRADING L.L.C.", "5- CN-4299870 SILVER STAR MEAT TRADING L.L.C. - BRANCH", "21- CN-4260086 SILVER STAR MEAT TRADING L.L.C.", "22- CN-4260086 SILVER STAR MEAT TRADING L.L.C.", "24- CN-1191003 NOOR AL UYOON LIVESTOCK - L.L.C - S.P.C", "26- CN-1033450 DHAFAR LIVESTOCK TRADING ESTABLISHMENT - L.L.C - O.P.C", "45- CN-5568915 ALSAQR ALHUR LIVESTOCK TRADING - L.L.C - S.P.C", "46- CN-5568915 ALSAQR ALHUR LIVESTOCK TRADING - L.L.C - S.P.C", "48- CN-1164823 GREEN ISLAND LIVESTOCK & SHEEP TRADING L.L.C."
+  ],
+  "Baniyas livestock shops": [
+    "1A- CN- 1098553 AL SAHAB LIVESTOCK TRADING & SALES", "2A- CN- 1099768 SAWAT LIVESTOCK & SHEEP TRADING", "3A- CN- 1029547 KHADIM AL MANSOURY LIVESTOCK & FODDER SHOP", "4A- CN- 1096120 AL MANASHI LIVESTOCK TRADING - L.L.C - S.P.C", "5A- CN- 1096118 AL RAWABI LIVESTOCK TRADING - L.L.C - S.P.C", "6A- CN- 1191003 NOOR AL UYOON LIVESTOCK - L.L.C - S.P.C", "7A- CN- 1164823- 1 GREEN ISLAND LIVESTOCK & SHEEP TRADING L.L.C. - BRANCH", "8A- CN- 1193301- 1 HAMA LIVESTOCK & SHEEP TRADING - L.L.C - O.P.C - BRANCH", "9A- CN- 1010199 AL reef Al Akhdar Livestock", "10A- CN- 1012341 AL MEAJAZ LIVESTOCK TRADING", "11A- CN- 1077187 AL UYOUN LIVESTOCK ESTABLISHMENT", "12A- CN- 4809098 JABAL AL NOOBA FOR THE SALE OF SHEEP - SOLE PROPRIETORSHIP", "13A- CN- 1007907AL MUAZIZ LIVESTOCK & SHEEP TRADING ESTABLISHMENT", "14A- CN- 1021720- 1BOU ATABA LIVESTOCK ESTABLISHMENT - BRANCH 1", "15A- CN- 1098782SAEED ALHAMERI CATTLES TRADING", "16A- CN- 1144375AL NUBA LIVESTOCK TRADING", "17A- CN- 5796050ROYAL FALCON LIVESTOCK TRADING", "18A- CN- 1145129 SAMA BANIYAS LIVESTOCK TRADNIG", "19A- CN- 1084381 WADI SWAT LIVESTOCK & SHEEP TRADING", "20A- CN- 1009235 AL THANIYYA CATTLE AND SHEEP TRADING", "1B SAMA LIWA LIVESTOCK - SOLE PROPRIETORSHIP L.L.C.", "2B- CN- 1136885- 1 BEERHAA LIVESTOCK - BRANCH 2", "3B- CN- 2252669 NASEEM AL SABAH LIVESTOCK", "4B- CN- 2124290 AL RAMZ LIVESTOCK TRADING", "5B- CN- 2280087 AL SALSABEEL LIVESTOCK TRADING", "6B- CN- 2234948 AL QALAA AL KHADHRAA LIVESTOCK TRADING", "7B- CN- 1837100 AL HAZM LIVESTOCK - L.L.C - S.P.C", "8B- CN- 4551498 SILVER STAR MEAT TRADING L.L.C. - RESALE OUTLET- BRANCH", "9B- CN- 2249364 JABAL AL HALA LIVESTOCK TRADING", "10B- CN- 1167578- 3 OASIS LIVESTOCK- RESALE OUTLET- BRANCH 2", "11B- CN- 11451612 EL TAWEELA LIVESTOCK TRADING - SOLE PROPRIETORSHIP", "12B- CN- 2097605 AL QOMAR SHEEP SALE", "13B- CN- 2280386 DAHNAN LIVESTOCK TRADING - SOLE PROPRIETORSHIP L.L.C.", "14B- CN- 2103240 ALMASEELA LIVESTOCK TRADING EST", "15B- CN- 2145495 AL ANSAF LIVESTOCKS EST", "16B- CN- 2104780 ABR AL MADAR LIVESTOCK TRADING", "17B- CN- 2111391 NAJEM SUHAIL LIVESTOCK", "18B- CN- 1878207 SHAEALIH WA NAR LIVESTOCK"
+  ]
+};
+
+// ======================== DOM ELEMENTS ========================
+const tabButtons = document.querySelectorAll('.tab-btn');
+const tabPanes = document.querySelectorAll('.tab-pane');
+
+const plateInput = document.getElementById('vehiclePlateNumber');
+const emirateInput = document.getElementById('vehicleEmirate');
+const driverNameInput = document.getElementById('driverName');
+const driverIdInput = document.getElementById('driverId');
+const driverContactInput = document.getElementById('driverContact');
+const dateTimeInput = document.getElementById('recordDateTime');
+const groupSelect = document.getElementById('shopGroup');
+const shopSelect = document.getElementById('shopName');
+const healthCertInput = document.getElementById('healthCertNo');
+const totalInCertificateInput = document.getElementById('totalInCertificate');
+const sourceCertificateSelect = document.getElementById('sourceCertificate');
+const sourceCertificateOther = document.getElementById('sourceCertificateOther');
+const notesInput = document.getElementById('notes');
+const rejectionReasonSelect = document.getElementById('rejectionReason');
+const rejectionReasonOther = document.getElementById('rejectionReasonOther');
+
+const rejectionReasonBox = document.getElementById('rejectionReasonBox');
+const acceptedIdsSection = document.getElementById('acceptedIdsSection');
+const rejectedIdsSection = document.getElementById('rejectedIdsSection');
+const speciesTableBody = document.getElementById('speciesTableBody');
+const totalAnimalCountInput = document.getElementById('totalAnimalCount');
+
+const quickSelectVehicle = document.getElementById('quickSelectVehicle');
+const certAlert = document.getElementById('certAlert');
+const healthCertLabel = document.getElementById('healthCertLabel');
+const healthCertHint = document.getElementById('healthCertHint');
+const autosaveStatus = document.getElementById('autosaveStatus');
+
+const acceptBtn = document.getElementById('acceptBtn');
+const rejectBtn = document.getElementById('rejectBtn');
+const saveEditBtn = document.getElementById('saveEditBtn');
+const cancelEditBtn = document.getElementById('cancelEditBtn');
+
+const acceptedTableBody = document.getElementById('acceptedTableBody');
+const rejectedTableBody = document.getElementById('rejectedTableBody');
+const pendingTableBody = document.getElementById('pendingTableBody');
+const sprayedTableBody = document.getElementById('sprayedTableBody');
+const washedTableBody = document.getElementById('washedTableBody');
+
+// ======================== UTILS ========================
+function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>"']/g, m => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[m])); }
+function formatDateTimeDisplay(dtValue) {
+  if (!dtValue) return '';
+  const d = new Date(dtValue);
+  if (isNaN(d.getTime())) return dtValue;
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${String(d.getDate()).padStart(2,'0')} ${months[d.getMonth()]} ${d.getFullYear()}, ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+function getCurrentDateTimeLocal() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}T${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+}
+function setDateTimeToNow() { dateTimeInput.value = getCurrentDateTimeLocal(); }
+document.getElementById('nowBtn').addEventListener('click', () => {
+  setDateTimeToNow();
+  document.getElementById('nowBtn').textContent = '✓';
+  setTimeout(() => { document.getElementById('nowBtn').textContent = '🔄 Now'; }, 800);
+});
+
+// Prefix 784 for Driver ID
+driverIdInput.addEventListener('focus', () => {
+  if (driverIdInput.value === '') { driverIdInput.value = '784-'; }
+});
+
+tabButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    tabButtons.forEach(b => b.classList.remove('active'));
+    tabPanes.forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+    if (btn.dataset.tab === 'archiveTab') performSearch();
+    if (btn.dataset.tab === 'liveInventoryTab') renderLiveInventory();
+  });
+});
+
+// ======================== DATA STORAGE ========================
+function saveData() {
+  try {
+    localStorage.setItem(STORAGE_KEYS.accepted, JSON.stringify(acceptedRecords));
+    localStorage.setItem(STORAGE_KEYS.rejected, JSON.stringify(rejectedRecords));
+    localStorage.setItem(STORAGE_KEYS.washed, JSON.stringify(washedRecords));
+    localStorage.setItem(STORAGE_KEYS.sprayed, JSON.stringify(sprayedRecords));
+    localStorage.setItem(STORAGE_KEYS.movements, JSON.stringify(inventoryMovements));
+  } catch (e) { console.error('Save error', e); }
+}
+function loadData() {
+  try {
+    acceptedRecords = JSON.parse(localStorage.getItem(STORAGE_KEYS.accepted)) || [];
+    rejectedRecords = JSON.parse(localStorage.getItem(STORAGE_KEYS.rejected)) || [];
+    washedRecords = JSON.parse(localStorage.getItem(STORAGE_KEYS.washed)) || [];
+    sprayedRecords = JSON.parse(localStorage.getItem(STORAGE_KEYS.sprayed)) || [];
+    inventoryMovements = JSON.parse(localStorage.getItem(STORAGE_KEYS.movements)) || [];
+    rebuildAnimalIdIndex();
+  } catch (e) { console.error('Load error', e); }
+}
+
+// ======================== PROVIDERS & QUICK SELECT ========================
+let providers = JSON.parse(localStorage.getItem('approvedProviders')) || [];
+function saveProviders() { 
+  providers.sort((a, b) => a.plate.localeCompare(b.plate, undefined, { numeric: true, sensitivity: 'base' }));
+  localStorage.setItem('approvedProviders', JSON.stringify(providers)); 
+  renderProvidersList(); 
+  renderQuickSelect(); 
+}
+
+function renderQuickSelect() {
+  quickSelectVehicle.innerHTML = '<option value="">-- Choose to auto-fill vehicle & driver details --</option>';
+  providers.forEach((p, idx) => {
+    p.drivers.forEach((d, didx) => {
+      const opt = document.createElement('option');
+      opt.value = `${idx}|${didx}`;
+      opt.textContent = `🚗 ${p.plate} - ${p.emirate} | 🧑‍✈️ ${d.name}`;
+      quickSelectVehicle.appendChild(opt);
+    });
+  });
+}
+quickSelectVehicle.addEventListener('change', (e) => {
+  if (!e.target.value) return;
+  const [pIdx, dIdx] = e.target.value.split('|');
+  const provider = providers[pIdx];
+  const driver = provider.drivers[dIdx];
+  plateInput.value = provider.plate;
+  emirateInput.value = provider.emirate;
+  driverNameInput.value = driver.name;
+  driverIdInput.value = driver.id;
+  driverContactInput.value = driver.contact;
+  document.getElementById('lookupHint').textContent = '✅ Auto-filled from saved provider';
+  document.getElementById('lookupHint').style.color = '#2d6a4f';
+  scheduleAutosave();
+});
+
+function renderProvidersList() {
+  const list = document.getElementById('providersList');
+  if (providers.length === 0) {
+    list.innerHTML = '<p style="text-align:center; color:#888; font-size:0.85rem;">No approved providers yet. Add one above.</p>';
+    return;
+  }
+  let html = '';
+  providers.forEach((provider, index) => {
+    const driversHtml = provider.drivers.map((driver, dIdx) => `
+      <div class="provider-driver-row">
+        <div class="driver-info">
+          <strong>${escapeHtml(driver.name)}</strong>
+          <span>ID: ${escapeHtml(driver.id)}</span>
+          <span>📞 ${escapeHtml(driver.contact)}</span>
+        </div>
+        <button type="button" class="delete-driver-btn" onclick="deleteDriver(${index}, ${dIdx})" title="Remove driver">✖</button>
+      </div>
+    `).join('');
+    html += `
+      <div class="provider-card">
+        <div class="provider-vehicle-header">
+          <span class="provider-vehicle-title">🚗 ${escapeHtml(provider.plate)} - ${escapeHtml(provider.emirate)}</span>
+          <button type="button" class="delete-vehicle-btn" onclick="deleteVehicle(${index})">Delete Vehicle</button>
+        </div>
+        <div class="provider-drivers-list">
+          ${driversHtml}
+          <div class="add-driver-inline-form">
+            <input type="text" id="addDriverName-${index}" placeholder="Driver Name">
+            <input type="text" id="addDriverId-${index}" placeholder="Driver ID">
+            <input type="text" id="addDriverContact-${index}" placeholder="Contact No.">
+            <button type="button" class="add-driver-inline-btn" onclick="addDriverInline(${index})">➕ Add</button>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+  list.innerHTML = html;
+}
+
+window.deleteVehicle = function(index) {
+  requirePassword(() => {
+    if (confirm(`Delete vehicle ${providers[index].plate} and all its drivers?`)) { providers.splice(index, 1); saveProviders(); }
+  });
+};
+window.deleteDriver = function(vehicleIndex, driverIndex) {
+  requirePassword(() => {
+    if (confirm(`Delete driver ${providers[vehicleIndex].drivers[driverIndex].name}?`)) { providers[vehicleIndex].drivers.splice(driverIndex, 1); saveProviders(); }
+  });
+};
+window.addDriverInline = function(vehicleIndex) {
+  const name = document.getElementById(`addDriverName-${vehicleIndex}`).value.trim();
+  const id = document.getElementById(`addDriverId-${vehicleIndex}`).value.trim();
+  const contact = document.getElementById(`addDriverContact-${vehicleIndex}`).value.trim();
+  if (!name || !id || !contact) { alert("Please fill all driver fields."); return; }
+  providers[vehicleIndex].drivers.push({ name, id, contact }); saveProviders();
+};
+document.getElementById('addVehicleBtn').addEventListener('click', () => {
+  const plate = document.getElementById('newVehiclePlate').value.trim().toUpperCase();
+  const emirate = document.getElementById('newVehicleEmirate').value;
+  const name = document.getElementById('newDriverName').value.trim();
+  const id = document.getElementById('newDriverId').value.trim();
+  const contact = document.getElementById('newDriverContact').value.trim();
+  if (!plate || !emirate || !name || !id || !contact) { alert("Please fill all fields."); return; }
+  let existingVehicle = providers.find(p => p.plate === plate && p.emirate === emirate);
+  if (existingVehicle) existingVehicle.drivers.push({ name, id, contact });
+  else providers.push({ plate, emirate, drivers: [{ name, id, contact }] });
+  ['newVehiclePlate','newVehicleEmirate','newDriverName','newDriverId','newDriverContact'].forEach(id => document.getElementById(id).value = '');
+  saveProviders();
+});
+
+const providersModal = document.getElementById('providersModal');
+document.getElementById('openProvidersBtn').addEventListener('click', () => providersModal.classList.add('active'));
+document.getElementById('closeProvidersBtn').addEventListener('click', () => providersModal.classList.remove('active'));
+providersModal.addEventListener('click', (e) => { if (e.target === providersModal) providersModal.classList.remove('active'); });
+
+document.getElementById('exportProvidersJsonBtn').addEventListener('click', () => {
+  const backup = { _meta: { app: 'Livestock Population Monitor - Providers', version: '1.0', exportedAt: new Date().toISOString() }, providers };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `providers_backup_${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(link); link.click(); document.body.removeChild(link);
+});
+document.getElementById('importProvidersJsonBtn').addEventListener('click', () => document.getElementById('importProvidersFileInput').click());
+document.getElementById('importProvidersFileInput').addEventListener('change', (e) => {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    try {
+      const data = JSON.parse(evt.target.result);
+      if (!data.providers || !Array.isArray(data.providers)) { alert('Invalid providers file.'); return; }
+      const merge = confirm('Click OK to MERGE with existing providers, or Cancel to REPLACE all.');
+      if (merge) {
+        data.providers.forEach(p => {
+          const exist = providers.find(x => x.plate === p.plate && x.emirate === p.emirate);
+          if (!exist) providers.push(p);
+        });
+      } else { providers = data.providers; }
+      saveProviders(); alert('✅ Providers imported successfully!');
+    } catch (err) { alert('Parse error.'); }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+});
+
+// ======================== SHOP DROPDOWN ========================
+function populateShopDropdown() {
+  const selectedGroup = groupSelect.value;
+  const currentShop = shopSelect.value;
+  shopSelect.innerHTML = '<option value="" disabled selected>— select shop —</option>';
+  if (!selectedGroup || !shopDatabase[selectedGroup]) return;
+  shopDatabase[selectedGroup].forEach(shop => {
+    const option = document.createElement('option');
+    option.value = shop; option.textContent = shop;
+    shopSelect.appendChild(option);
+  });
+  if (currentShop && shopDatabase[selectedGroup].includes(currentShop)) shopSelect.value = currentShop;
+}
+groupSelect.addEventListener('change', () => { populateShopDropdown(); scheduleAutosave(); });
+
+// ======================== MANUAL INPUTS ========================
+sourceCertificateSelect.addEventListener('change', () => {
+  if (sourceCertificateSelect.value === 'OTHER') { sourceCertificateOther.classList.add('show'); sourceCertificateOther.focus(); }
+  else { sourceCertificateOther.classList.remove('show'); sourceCertificateOther.value = ''; }
+  scheduleAutosave();
+});
+rejectionReasonSelect.addEventListener('change', () => {
+  if (rejectionReasonSelect.value === 'OTHER') { rejectionReasonOther.classList.add('show'); rejectionReasonOther.focus(); }
+  else { rejectionReasonOther.classList.remove('show'); rejectionReasonOther.value = ''; }
+  scheduleAutosave();
+});
+
+// ======================== SPECIES TABLE ========================
+let speciesRowCounter = 0;
+function createSpeciesRow(data = null) {
+  speciesRowCounter++;
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td>
+      <select class="species-select" required>
+        <option value="" disabled ${!data ? 'selected' : ''}></option>
+        ${speciesList.map(s => `<option value="${s.value}" ${data && data.species === s.value ? 'selected' : ''}>${s.label}</option>`).join('')}
+      </select><span class="required-star">*</span>
+    </td>
+    <td>
+      <select class="subbreed-select" required>
+        <option value="" disabled ${!data ? 'selected' : ''}></option>
+        ${subBreedsList.map(b => `<option value="${b}" ${data && data.subBreed === b ? 'selected' : ''}>${b}</option>`).join('')}
+      </select><span class="required-star">*</span>
+    </td>
+    <td>
+      <div style="display:flex; align-items:center; gap:6px;">
+        <input type="number" class="animals-count-input" min="0" step="1" value="${data ? data.animalCount : ''}" required style="flex:1;">
+        <span class="required-star">*</span>
+        <button type="button" class="add-row-btn" title="Add another row">➕</button>
+      </div>
+    </td>
+    <td class="add-row-cell">
+      <button type="button" class="remove-row-btn" title="Remove this row" style="display:none;">✖</button>
+    </td>
+  `;
+  speciesTableBody.appendChild(tr);
+  
+  tr.querySelector('.add-row-btn').addEventListener('click', () => { createSpeciesRow(); scheduleAutosave(); });
+  tr.querySelector('.remove-row-btn').addEventListener('click', () => {
+    if (speciesTableBody.querySelectorAll('tr').length > 1) {
+      tr.remove(); updateRemoveRowButtons(); updateTotalCount(); updateHealthCertHint(); scheduleAutosave();
+    }
+  });
+  tr.querySelector('.animals-count-input').addEventListener('input', () => { updateTotalCount(); scheduleAutosave(); });
+  tr.querySelector('.subbreed-select').addEventListener('change', () => { updateHealthCertHint(); scheduleAutosave(); });
+  tr.querySelector('.species-select').addEventListener('change', scheduleAutosave);
+  
+  updateRemoveRowButtons(); updateTotalCount(); updateHealthCertHint();
+  return tr;
+}
+function updateRemoveRowButtons() {
+  const rows = speciesTableBody.querySelectorAll('tr');
+  rows.forEach(row => {
+    const btn = row.querySelector('.remove-row-btn');
+    if (btn) btn.style.display = rows.length > 1 ? 'inline-flex' : 'none';
+  });
+}
+function updateTotalCount() {
+  let total = 0;
+  speciesTableBody.querySelectorAll('.animals-count-input').forEach(inp => { total += parseInt(inp.value) || 0; });
+  totalAnimalCountInput.value = total;
+}
+function updateHealthCertHint() {
+  const subBreeds = Array.from(speciesTableBody.querySelectorAll('.subbreed-select')).map(s => s.value).filter(v => v);
+  const hasNonLocal = subBreeds.some(b => b !== 'Local');
+  if (subBreeds.length === 0) {
+    healthCertLabel.textContent = '🩺 Health Certificate No.'; healthCertLabel.style.color = '#2d6a4f'; healthCertInput.style.borderColor = '#c8e0d0';
+    healthCertHint.textContent = 'Optional for Local breed · Required for imported breeds'; healthCertHint.style.color = '#6b8f7c';
+  } else if (hasNonLocal) {
+    healthCertLabel.innerHTML = '🩺 Health Certificate No. <span style="color:#c0392b;">*</span>'; healthCertLabel.style.color = '#c0392b'; healthCertInput.style.borderColor = '#c0392b';
+    healthCertHint.textContent = '⚠️ Required — shipment contains non-Local breed(s)'; healthCertHint.style.color = '#c0392b';
+  } else {
+    healthCertLabel.textContent = '🩺 Health Certificate No.'; healthCertLabel.style.color = '#2d6a4f'; healthCertInput.style.borderColor = '#c8e0d0';
+    healthCertHint.textContent = '✅ Optional — all breeds are Local'; healthCertHint.style.color = '#2d6a4f';
+  }
+}
+
+// ======================== CERTIFICATE BALANCE CHECK ========================
+function checkCertificateUsage() {
+  const certNo = healthCertInput.value.trim();
+  if (!certNo) { certAlert.classList.remove('show'); return; }
+  const usage = [];
+  acceptedRecords.forEach(r => {
+    if (r.healthCertNo === certNo && (!editingRecord || r.id !== editingRecord.id)) {
+      usage.push({ record: r, count: r.speciesLines.reduce((s, l) => s + l.animalCount, 0), status: 'Accepted' });
+    }
+  });
+  rejectedRecords.forEach(r => {
+    if (r.healthCertNo === certNo && (!editingRecord || r.id !== editingRecord.id)) {
+      usage.push({ record: r, count: r.speciesLines.reduce((s, l) => s + l.animalCount, 0), status: 'Rejected' });
+    }
+  });
+  if (usage.length === 0) { certAlert.classList.remove('show'); return; }
+  const totalUsed = usage.reduce((s, u) => s + u.count, 0);
+  const totalInCert = parseInt(totalInCertificateInput.value) || 0;
+  let alertClass = 'info'; let alertHtml = '';
+  if (totalInCert > 0) {
+    const remaining = totalInCert - totalUsed;
+    if (remaining <= 0) {
+      alertClass = 'danger'; alertHtml = `⚠️ <strong>Certificate balance exhausted!</strong><br>Total: <strong>${totalInCert}</strong> · Used: <strong>${totalUsed}</strong> · Remaining: <strong style="color:#c0392b;">${remaining}</strong>`;
+    } else {
+      alertClass = 'info'; alertHtml = `✅ <strong>Certificate used before (${usage.length} shipment(s))</strong><br>Total: <strong>${totalInCert}</strong> · Used: <strong>${totalUsed}</strong> · <strong style="color:#2d6a4f;">Remaining: ${remaining}</strong>`;
+    }
+  } else {
+    alertClass = 'warning'; alertHtml = `ℹ️ <strong>Certificate used before (${usage.length} shipment(s))</strong><br>Total used so far: <strong>${totalUsed}</strong> animals<br><span style="font-size:0.7rem;">Tip: enter "Total in Certificate" to track remaining balance.</span>`;
+  }
+  const details = usage.map(u => `• ${u.record.vehiclePlate} (${u.status}) — ${u.count} animals — ${formatDateTimeDisplay(u.record.dateTime)}`).join('<br>');
+  alertHtml += `<div style="margin-top:6px; font-size:0.7rem; line-height:1.5;">${details}</div>`;
+  certAlert.className = 'cert-alert show ' + alertClass; certAlert.innerHTML = alertHtml;
+}
+healthCertInput.addEventListener('blur', checkCertificateUsage);
+totalInCertificateInput.addEventListener('input', checkCertificateUsage);
+totalInCertificateInput.addEventListener('blur', checkCertificateUsage);
+
+// ======================== ANIMAL IDS LOGIC ========================
+const idInputModes = { accepted: 'individual', rejected: 'individual' };
+document.querySelectorAll('.input-mode-tab').forEach(tab => {
+  tab.addEventListener('click', (e) => {
+    const target = e.target.dataset.target; const mode = e.target.dataset.mode;
+    if (!target) return;
+    document.querySelectorAll(`.input-mode-tab[data-target="${target}"]`).forEach(t => t.classList.remove('active'));
+    e.target.classList.add('active');
+    document.querySelectorAll(`#${target}IdsSection .input-mode-pane`).forEach(p => p.classList.remove('active'));
+    document.getElementById(`${target}-pane-${mode}`).classList.add('active');
+    idInputModes[target] = mode;
+  });
+});
+['accepted', 'rejected'].forEach(target => {
+  const sp = document.getElementById(`${target}RangeSpecies`); const sb = document.getElementById(`${target}RangeSubBreed`);
+  speciesList.forEach(s => { const opt = document.createElement('option'); opt.value = s.value; opt.textContent = s.label; sp.appendChild(opt); });
+  subBreedsList.forEach(b => { const opt = document.createElement('option'); opt.value = b; opt.textContent = b; sb.appendChild(opt); });
+});
+function createIdRow(target) {
+  const list = document.getElementById(`${target}IndividualIdsList`);
+  const row = document.createElement('div');
+  row.className = 'individual-id-row';
+  row.innerHTML = `
+    <input type="text" class="ind-id-input" placeholder="Animal ID (e.g., A-1001)">
+    <select class="ind-species-select"><option value="">Species</option>${speciesList.map(s => `<option value="${s.value}">${s.label}</option>`).join('')}</select>
+    <select class="ind-subbreed-select"><option value="">Sub-breed</option>${subBreedsList.map(b => `<option value="${b}">${b}</option>`).join('')}</select>
+    <button type="button" class="remove-id-btn" title="Remove">✖</button>
+  `;
+  list.appendChild(row);
+  row.querySelector('.remove-id-btn').addEventListener('click', () => row.remove());
+}
+createIdRow('accepted'); createIdRow('rejected');
+document.getElementById('acceptedAddIndividualIdBtn').addEventListener('click', () => addIndividualIds('accepted'));
+document.getElementById('rejectedAddIndividualIdBtn').addEventListener('click', () => addIndividualIds('rejected'));
+function addIndividualIds(target) {
+  const list = document.getElementById(`${target}IndividualIdsList`); const rows = list.querySelectorAll('.individual-id-row');
+  let added = 0;
+  rows.forEach(row => {
+    const id = row.querySelector('.ind-id-input').value.trim(); const sp = row.querySelector('.ind-species-select').value; const sb = row.querySelector('.ind-subbreed-select').value;
+    if (!id) return; if (!sp || !sb) { alert('Please select Species and Sub-breed for ID: ' + id); return; }
+    if (tryAddAnimalId(target, id, sp, sb)) added++;
+  });
+  if (added > 0) { list.innerHTML = ''; createIdRow(target); renderRegisteredIds(target); scheduleAutosave(); }
+}
+['accepted', 'rejected'].forEach(target => {
+  document.getElementById(`${target}PreviewRangeBtn`).addEventListener('click', () => {
+    const ids = buildRangeIds(target); if (!ids) return;
+    const preview = document.getElementById(`${target}RangePreview`); preview.style.display = 'block';
+    preview.textContent = `Will generate ${ids.length} IDs: ${ids.slice(0, 20).join(', ')}${ids.length > 20 ? ' ...' : ''}`;
+  });
+  document.getElementById(`${target}AddRangeBtn`).addEventListener('click', () => {
+    const ids = buildRangeIds(target); if (!ids) return;
+    const sp = document.getElementById(`${target}RangeSpecies`).value; const sb = document.getElementById(`${target}RangeSubBreed`).value;
+    let added = 0, skipped = 0;
+    ids.forEach(id => { if (tryAddAnimalId(target, id, sp, sb, true)) added++; else skipped++; });
+    document.getElementById(`${target}RangePreview`).style.display = 'none'; renderRegisteredIds(target); scheduleAutosave();
+    if (skipped > 0) alert(`⚠️ ${skipped} duplicate IDs were skipped.`);
+  });
+});
+function buildRangeIds(target) {
+  const prefix = document.getElementById(`${target}RangePrefix`).value; const suffix = document.getElementById(`${target}RangeSuffix`).value;
+  const from = parseInt(document.getElementById(`${target}RangeFrom`).value); const to = parseInt(document.getElementById(`${target}RangeTo`).value);
+  const padding = parseInt(document.getElementById(`${target}RangePadding`).value);
+  const sp = document.getElementById(`${target}RangeSpecies`).value; const sb = document.getElementById(`${target}RangeSubBreed`).value;
+  if (isNaN(from) || isNaN(to) || from > to) { alert('Invalid range numbers.'); return null; }
+  if (to - from + 1 > 10000) { alert('Range too large (max 10,000).'); return null; }
+  if (!sp || !sb) { alert('Select Species and Sub-breed.'); return null; }
+  const ids = []; for (let n = from; n <= to; n++) ids.push(prefix + String(n).padStart(padding, '0') + suffix);
+  return ids;
+}
+['accepted', 'rejected'].forEach(target => {
+  document.getElementById(`${target}ParsePasteBtn`).addEventListener('click', () => {
+    const text = document.getElementById(`${target}PasteTextarea`).value; if (!text.trim()) return;
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l);
+    const parsed = lines.map(line => { const parts = line.split(',').map(p => p.trim()); return { idNumber: parts[0], species: parts[1] || '', subBreed: parts[2] || '' }; });
+    window[`_parsedPaste_${target}`] = parsed;
+    const preview = document.getElementById(`${target}PastePreview`); preview.style.display = 'block';
+    preview.textContent = `Parsed ${parsed.length} IDs: ${parsed.slice(0, 15).map(p => p.idNumber).join(', ')}...`;
+    const old = document.getElementById(`${target}ConfirmPasteBtn`); if (old) old.remove();
+    const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'range-btn'; btn.id = `${target}ConfirmPasteBtn`; btn.textContent = '✅ Confirm & Add'; btn.style.marginTop = '8px';
+    btn.addEventListener('click', () => {
+      const items = window[`_parsedPaste_${target}`] || [];
+      const defaultSp = speciesTableBody.querySelector('.species-select')?.value || ''; const defaultSb = speciesTableBody.querySelector('.subbreed-select')?.value || '';
+      let added = 0, skipped = 0;
+      items.forEach(p => { const sp = p.species || defaultSp; const sb = p.subBreed || defaultSb; if (sp && sb && tryAddAnimalId(target, p.idNumber, sp, sb, true)) added++; else skipped++; });
+      document.getElementById(`${target}PasteTextarea`).value = ''; preview.style.display = 'none'; btn.remove(); renderRegisteredIds(target); scheduleAutosave();
+      if (skipped > 0) alert(`⚠️ ${skipped} duplicates or invalid entries skipped.`);
+    });
+    preview.parentNode.insertBefore(btn, preview.nextSibling);
+  });
+});
+function tryAddAnimalId(target, id, sp, sb, silentMode = false) {
+  id = id.trim(); if (!id) return false;
+  const arr = target === 'accepted' ? currentAcceptedIds : currentRejectedIds;
+  if (arr.find(x => x.idNumber === id)) { if (!silentMode) alert(`❌ ID "${id}" is already added to this shipment.`); return false; }
+  if (arr.length >= 10000) { alert('Max 10,000 IDs reached.'); return false; }
+  const prior = animalIdIndex[id];
+  if (prior && prior.length > 0 && !silentMode) {
+    const p = prior[0];
+    if (!confirm(`⚠️ ID "${id}" was previously recorded:\n\nStatus: ${p.status}\nVehicle: ${p.vehiclePlate}\nDate: ${formatDateTimeDisplay(p.dateTime)}\n\nAdd anyway?`)) return false;
+  }
+  arr.push({ idNumber: id, species: sp, subBreed: sb });
+  document.getElementById(`${target}IdsCountBadge`).textContent = arr.length + ' registered';
+  return true;
+}
+function renderRegisteredIds(target) {
+  const arr = target === 'accepted' ? currentAcceptedIds : currentRejectedIds;
+  const summary = document.getElementById(`${target}IdsSummary`); const list = document.getElementById(`${target}IdsList`); const countSpan = document.getElementById(`${target}IdsCount`);
+  document.getElementById(`${target}IdsCountBadge`).textContent = arr.length + ' registered';
+  if (arr.length === 0) { summary.style.display = 'none'; return; }
+  summary.style.display = 'block'; countSpan.textContent = arr.length;
+  list.innerHTML = arr.map(x => `<span class="id-chip" title="${escapeHtml(x.species)} / ${escapeHtml(x.subBreed)}">${escapeHtml(x.idNumber)} <span class="id-chip-close" onclick="removeAnimalId('${target}', '${escapeHtml(x.idNumber).replace(/'/g, "\\'")}')">✖</span></span>`).join('');
+}
+window.removeAnimalId = function(target, idNumber) {
+  if (target === 'accepted') currentAcceptedIds = currentAcceptedIds.filter(x => x.idNumber !== idNumber);
+  else currentRejectedIds = currentRejectedIds.filter(x => x.idNumber !== idNumber);
+  renderRegisteredIds(target); scheduleAutosave();
+};
+
+// ======================== FORM AUTOSAVE ========================
+function collectFormDraft() {
+  const speciesRows = [];
+  speciesTableBody.querySelectorAll('tr').forEach(row => { speciesRows.push({ species: row.querySelector('.species-select').value, subBreed: row.querySelector('.subbreed-select').value, count: row.querySelector('.animals-count-input').value }); });
+  return {
+    plateNumber: plateInput.value, emirate: emirateInput.value, driverName: driverNameInput.value, driverId: driverIdInput.value, driverContact: driverContactInput.value,
+    dateTime: dateTimeInput.value, group: groupSelect.value, shop: shopSelect.value, healthCertNo: healthCertInput.value, totalInCertificate: totalInCertificateInput.value,
+    sourceCertificate: sourceCertificateSelect.value, sourceCertificateOther: sourceCertificateOther.value, notes: notesInput.value, speciesRows: speciesRows,
+    rejectionReason: rejectionReasonSelect.value, rejectionReasonOther: rejectionReasonOther.value, acceptedIds: currentAcceptedIds, rejectedIds: currentRejectedIds
+  };
+}
+function saveFormDraft() {
+  try {
+    localStorage.setItem(STORAGE_KEYS.formDraft, JSON.stringify(collectFormDraft()));
+    if (autosaveStatus) { autosaveStatus.textContent = '💾 Draft auto-saved · ' + new Date().toLocaleTimeString(); autosaveStatus.style.color = '#6b8f7c'; }
+  } catch (e) { console.error('Draft save error', e); }
+}
+let autosaveTimer = null;
+function scheduleAutosave() { clearTimeout(autosaveTimer); autosaveTimer = setTimeout(saveFormDraft, 1000); }
+document.getElementById('populationForm').addEventListener('input', scheduleAutosave);
+document.getElementById('populationForm').addEventListener('change', scheduleAutosave);
+
+function restoreFormDraft() {
+  try {
+    const draft = JSON.parse(localStorage.getItem(STORAGE_KEYS.formDraft)); if (!draft) return false;
+    plateInput.value = draft.plateNumber || ''; emirateInput.value = draft.emirate || '';
+    driverNameInput.value = draft.driverName || ''; driverIdInput.value = draft.driverId || ''; driverContactInput.value = draft.driverContact || '';
+    dateTimeInput.value = draft.dateTime || getCurrentDateTimeLocal();
+    groupSelect.value = draft.group || ''; populateShopDropdown(); shopSelect.value = draft.shop || '';
+    healthCertInput.value = draft.healthCertNo || ''; totalInCertificateInput.value = draft.totalInCertificate || '';
+    sourceCertificateSelect.value = draft.sourceCertificate || '';
+    if (draft.sourceCertificate === 'OTHER') { sourceCertificateOther.value = draft.sourceCertificateOther || ''; sourceCertificateOther.classList.add('show'); }
+    notesInput.value = draft.notes || '';
+    if (draft.speciesRows && draft.speciesRows.length > 0) { speciesTableBody.innerHTML = ''; draft.speciesRows.forEach(sr => createSpeciesRow({ species: sr.species, subBreed: sr.subBreed, animalCount: sr.count })); }
+    rejectionReasonSelect.value = draft.rejectionReason || '';
+    if (draft.rejectionReason === 'OTHER') { rejectionReasonOther.value = draft.rejectionReasonOther || ''; rejectionReasonOther.classList.add('show'); }
+    currentAcceptedIds = draft.acceptedIds || []; renderRegisteredIds('accepted');
+    currentRejectedIds = draft.rejectedIds || []; renderRegisteredIds('rejected');
+    autosaveStatus.textContent = '📂 Draft restored from previous session'; autosaveStatus.style.color = '#2d6a4f';
+    return true;
+  } catch (e) { return false; }
+}
+
+function resetForm(clearDraft = true) {
+  editingRecord = null;
+  plateInput.value = ""; emirateInput.value = ""; driverNameInput.value = ""; driverIdInput.value = ""; driverContactInput.value = "";
+  quickSelectVehicle.value = ""; notesInput.value = ""; healthCertInput.value = ""; totalInCertificateInput.value = "";
+  certAlert.classList.remove('show');
+  sourceCertificateSelect.value = ""; sourceCertificateOther.value = ""; sourceCertificateOther.classList.remove('show');
+  rejectionReasonSelect.value = ""; rejectionReasonOther.value = ""; rejectionReasonOther.classList.remove('show');
+  rejectionReasonBox.style.display = 'none'; acceptedIdsSection.style.display = 'block'; rejectedIdsSection.style.display = 'none';
+  currentAcceptedIds = []; currentRejectedIds = []; renderRegisteredIds('accepted'); renderRegisteredIds('rejected');
+  speciesTableBody.innerHTML = ''; speciesRowCounter = 0; createSpeciesRow();
+  setDateTimeToNow(); if (clearDraft) localStorage.removeItem(STORAGE_KEYS.formDraft); updateHealthCertHint();
+  acceptBtn.style.display = 'block'; rejectBtn.style.display = 'block'; saveEditBtn.style.display = 'none'; cancelEditBtn.style.display = 'none';
+  autosaveStatus.textContent = '';
+}
+
+// ======================== BUILD & SUBMIT ========================
+function buildRecordFromForm(isRejection) {
+  const plate = plateInput.value.trim(); if (!plate) { alert("❌ Enter Vehicle Plate Number"); return null; }
+  const emirate = emirateInput.value; if (!emirate) { alert("❌ Select Vehicle Emirate"); return null; }
+  const driverName = driverNameInput.value.trim(); if (!driverName) { alert("❌ Enter Driver Name"); return null; }
+  const driverId = driverIdInput.value.trim(); if (!driverId || driverId === '784-') { alert("❌ Enter Driver ID No."); return null; }
+  const driverContact = driverContactInput.value.trim(); if (!driverContact) { alert("❌ Enter Driver Contact No."); return null; }
+  const dt = dateTimeInput.value; if (!dt) { alert("❌ Select Date & Time"); return null; }
+  const group = groupSelect.value; if (!group) { alert("❌ Select shop group"); return null; }
+  const shop = shopSelect.value; if (!shop) { alert("❌ Select individual shop"); return null; }
+  let srcCert = sourceCertificateSelect.value; if (!srcCert) { alert("❌ Select Source"); return null; }
+  if (srcCert === 'OTHER') { srcCert = sourceCertificateOther.value.trim(); if (!srcCert) { alert("❌ Enter custom source"); return null; } }
+  let rejReason = "";
+  if (isRejection) {
+    rejReason = rejectionReasonSelect.value; if (!rejReason) { alert("❌ Select rejection reason"); return null; }
+    if (rejReason === 'OTHER') { rejReason = rejectionReasonOther.value.trim(); if (!rejReason) { alert("❌ Enter custom rejection reason"); return null; } }
+  }
+  const rows = speciesTableBody.querySelectorAll('tr'); const speciesLines = []; let hasError = false;
+  rows.forEach((row, idx) => {
+    const sp = row.querySelector('.species-select').value; const sb = row.querySelector('.subbreed-select').value; const cnt = parseInt(row.querySelector('.animals-count-input').value) || 0;
+    if (!sp) { alert(`❌ Row #${idx+1}: select Animal`); hasError = true; return; }
+    if (!sb) { alert(`❌ Row #${idx+1}: select Breed`); hasError = true; return; }
+    speciesLines.push({ species: sp, subBreed: sb, animalCount: cnt });
+  });
+  if (hasError || speciesLines.length === 0) return null;
+  const hc = healthCertInput.value.trim(); const needsHC = speciesLines.some(l => l.subBreed !== 'Local');
+  if (needsHC && !hc) { alert("❌ Health Certificate No. is required for non-Local breeds."); return null; }
+  return {
+    id: editingRecord ? editingRecord.id : (Date.now() + Math.random()),
+    vehiclePlateNumber: plate, vehicleEmirate: emirate, vehiclePlate: `${plate} - ${emirate}`, driverName, driverId, driverContact,
+    dateTime: dt, group, individualShop: shop, healthCertNo: hc, totalInCertificate: parseInt(totalInCertificateInput.value) || 0, sourceCertificate: srcCert,
+    rejectionReason: rejReason, notes: notesInput.value.trim(), speciesLines, acceptedAnimals: isRejection ? [] : [...currentAcceptedIds], rejectedAnimals: isRejection ? [...currentRejectedIds] : []
+  };
+}
+
+acceptBtn.addEventListener('click', () => {
+  rejectionReasonBox.style.display = 'none'; rejectedIdsSection.style.display = 'none'; acceptedIdsSection.style.display = 'block';
+  const record = buildRecordFromForm(false); if (!record) return;
+  acceptedRecords.push(record); rebuildAnimalIdIndex(); saveData(); renderAll(); renderLiveInventory(); resetForm();
+});
+rejectBtn.addEventListener('click', () => {
+  rejectionReasonBox.style.display = 'block'; acceptedIdsSection.style.display = 'none'; rejectedIdsSection.style.display = 'block';
+  const record = buildRecordFromForm(true); if (!record) return;
+  if (record.rejectedAnimals.length === 0) { if (!confirm('⚠️ No animal IDs registered for this rejection. Continue anyway?')) return; }
+  rejectedRecords.push(record); rebuildAnimalIdIndex(); saveData(); renderAll(); resetForm();
+});
+saveEditBtn.addEventListener('click', () => {
+  if (!editingRecord) return; const isRejection = editingRecord.status === 'rejected'; const record = buildRecordFromForm(isRejection); if (!record) return;
+  if (isRejection) { const idx = rejectedRecords.findIndex(r => r.id === record.id); if (idx >= 0) rejectedRecords[idx] = record; }
+  else { const idx = acceptedRecords.findIndex(r => r.id === record.id); if (idx >= 0) acceptedRecords[idx] = record; }
+  rebuildAnimalIdIndex(); saveData(); renderAll(); resetForm(); alert('✅ Changes saved successfully!');
+});
+cancelEditBtn.addEventListener('click', () => resetForm());
+
+window.startEdit = function(type, id) {
+  requirePassword(() => {
+    const record = type === 'accepted' ? acceptedRecords.find(r => String(r.id) === String(id)) : rejectedRecords.find(r => String(r.id) === String(id));
+    if (!record) return; editingRecord = { id: record.id, status: type };
+    plateInput.value = record.vehiclePlateNumber; emirateInput.value = record.vehicleEmirate; driverNameInput.value = record.driverName;
+    driverIdInput.value = record.driverId; driverContactInput.value = record.driverContact; dateTimeInput.value = record.dateTime;
+    groupSelect.value = record.group; populateShopDropdown(); shopSelect.value = record.individualShop;
+    healthCertInput.value = record.healthCertNo || ''; totalInCertificateInput.value = record.totalInCertificate || '';
+    sourceCertificateSelect.value = record.sourceCertificate;
+    if (record.sourceCertificate === 'OTHER') { const std = ['ADM','AAM','DRM','DXB','SHJ','AJM','UAQ','RAK','FUJ']; if (!std.includes(record.sourceCertificate)) { sourceCertificateSelect.value = 'OTHER'; sourceCertificateOther.value = record.sourceCertificate; sourceCertificateOther.classList.add('show'); } }
+    notesInput.value = record.notes || ''; speciesTableBody.innerHTML = ''; record.speciesLines.forEach(l => createSpeciesRow(l));
+    if (type === 'rejected') {
+      rejectionReasonBox.style.display = 'block'; rejectionReasonSelect.value = record.rejectionReason;
+      if (record.rejectionReason === 'OTHER') { rejectionReasonSelect.value = 'OTHER'; rejectionReasonOther.value = record.rejectionReason; rejectionReasonOther.classList.add('show'); }
+      rejectedIdsSection.style.display = 'block'; acceptedIdsSection.style.display = 'none';
+      currentRejectedIds = [...(record.rejectedAnimals || [])]; currentAcceptedIds = [];
+    } else {
+      rejectionReasonBox.style.display = 'none'; rejectedIdsSection.style.display = 'none'; acceptedIdsSection.style.display = 'block';
+      currentAcceptedIds = [...(record.acceptedAnimals || [])]; currentRejectedIds = [];
+    }
+    renderRegisteredIds('accepted'); renderRegisteredIds('rejected');
+    acceptBtn.style.display = 'none'; rejectBtn.style.display = 'none'; saveEditBtn.style.display = 'block'; cancelEditBtn.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+};
+
+// ======================== LIVE INVENTORY ENGINE ========================
+function calculateInventory() {
+  const inventory = {}; // Key: group||shop||species, Value: count
+  const getKey = (g, s, sp) => `${g}||${s}||${sp}`;
+  
+  acceptedRecords.forEach(r => {
+    r.speciesLines.forEach(l => {
+      const k = getKey(r.group, r.individualShop, l.species);
+      inventory[k] = (inventory[k] || 0) + l.animalCount;
+    });
+  });
+
+  inventoryMovements.forEach(m => {
+    if (m.type === 'deduct') {
+      const k = getKey(m.fromGroup, m.fromShop, m.species);
+      inventory[k] = (inventory[k] || 0) - m.count;
+    } else if (m.type === 'transfer') {
+      const kOut = getKey(m.fromGroup, m.fromShop, m.species);
+      inventory[kOut] = (inventory[kOut] || 0) - m.count;
+      const kIn = getKey(m.toGroup, m.toShop, m.species);
+      inventory[kIn] = (inventory[kIn] || 0) + m.count;
+    }
+  });
+  return inventory;
+}
+
+function renderLiveInventory() {
+  const container = document.getElementById('liveInventoryContainer');
+  const inv = calculateInventory();
+  
+  let html = '';
+  Object.keys(shopDatabase).forEach(group => {
+    let groupTotal = 0;
+    let shopsHtml = '';
+    
+    shopDatabase[group].forEach(shopName => {
+      let shopTotal = 0;
+      let speciesHtml = '';
+      
+      speciesList.forEach(sp => {
+        const count = inv[`${group}||${shopName}||${sp.value}`] || 0;
+        if (count > 0) {
+          shopTotal += count;
+          speciesHtml += `<div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#555; margin-top:2px;"><span>${sp.emoji} ${sp.value}</span> <strong>${count}</strong></div>`;
+        }
+      });
+      
+      groupTotal += shopTotal;
+      let cardBg = '#ffffff'; let borderColor = '#c8e0d0'; let opacity = '1';
+      if (shopTotal === 0) { cardBg = '#f9f9f9'; opacity = '0.7'; borderColor = '#ddd'; }
+      else if (shopTotal > 100) { borderColor = '#2d6a4f'; borderWidth = '2px'; }
+      
+      shopsHtml += `
+        <div style="background:${cardBg}; border:1px solid ${borderColor}; border-radius:10px; padding:12px; cursor:pointer; opacity:${opacity}; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition:transform 0.15s;" 
+             onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'"
+             onclick="openShopDetails('${escapeHtml(group)}', '${escapeHtml(shopName)}')">
+          <div style="font-weight:700; color:#222; font-size:0.8rem; margin-bottom:6px; height:32px; overflow:hidden; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">${escapeHtml(shopName)}</div>
+          <div style="font-size:1.4rem; font-weight:800; color:${shopTotal > 0 ? '#2d6a4f' : '#aaa'}; margin-bottom:8px;">${shopTotal} <span style="font-size:0.8rem; font-weight:normal;">animals</span></div>
+          <div style="border-top:1px dashed #ddd; padding-top:6px;">
+            ${speciesHtml || '<div style="font-size:0.7rem; color:#aaa; text-align:center;">Empty</div>'}
+          </div>
+        </div>
+      `;
+    });
+    
+    html += `
+      <div style="background:#f4faf6; border:1px solid #c8e0d0; border-radius:16px; padding:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:2px solid #2d6a4f; padding-bottom:8px;">
+          <h3 style="margin:0; color:#2d6a4f; font-size:1.1rem;">🏪 ${escapeHtml(group)}</h3>
+          <span style="background:#2d6a4f; color:white; padding:4px 12px; border-radius:20px; font-weight:700; font-size:0.85rem;">Total: ${groupTotal} animals</span>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:12px;">
+          ${shopsHtml}
+        </div>
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
+
+let currentShopData = null;
+window.openShopDetails = function(group, shop) {
+  currentShopData = { group, shop };
+  document.getElementById('shopDetailsTitle').textContent = `🏪 ${shop}`;
+  const inv = calculateInventory();
+  let summaryHtml = `<strong style="font-size:1rem; color:#2d6a4f;">Current Balance in ${group}</strong><div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:8px;">`;
+  let total = 0;
+  speciesList.forEach(sp => {
+    const count = inv[`${group}||${shop}||${sp.value}`] || 0;
+    if (count > 0) { total += count; summaryHtml += `<div style="background:white; border:1px solid #c8e0d0; padding:4px 10px; border-radius:20px; font-size:0.85rem;">${sp.emoji} ${sp.value}: <strong>${count}</strong></div>`; }
+  });
+  if (total === 0) summaryHtml += `<span style="color:#888; font-size:0.85rem;">No animals currently in this shop.</span>`;
+  summaryHtml += `</div>`;
+  document.getElementById('shopDetailsSummary').innerHTML = summaryHtml;
+
+  const destSelect = document.getElementById('transferDestShop');
+  destSelect.innerHTML = '<option value="">-- Select Destination --</option>';
+  Object.keys(shopDatabase).forEach(g => {
+    shopDatabase[g].forEach(s => {
+      if (g === group && s === shop) return;
+      destSelect.innerHTML += `<option value="${escapeHtml(g)}||${escapeHtml(s)}">${escapeHtml(g)} - ${escapeHtml(s)}</option>`;
+    });
+  });
+  
+  const spSelectDeduct = document.getElementById('deductSpecies');
+  const spSelectTransfer = document.getElementById('transferSpecies');
+  spSelectDeduct.innerHTML = ''; spSelectTransfer.innerHTML = '';
+  speciesList.forEach(sp => {
+    spSelectDeduct.innerHTML += `<option value="${sp.value}">${sp.emoji} ${sp.value}</option>`;
+    spSelectTransfer.innerHTML += `<option value="${sp.value}">${sp.emoji} ${sp.value}</option>`;
+  });
+
+  const moves = inventoryMovements.filter(m => (m.fromGroup === group && m.fromShop === shop) || (m.toGroup === group && m.toShop === shop)).reverse();
+  const movesBody = document.getElementById('shopMovementsBody');
+  if (moves.length === 0) movesBody.innerHTML = '<tr><td colspan="5" class="empty-msg">No movements yet</td></tr>';
+  else {
+    movesBody.innerHTML = moves.map(m => `
+      <tr>
+        <td style="font-size:0.65rem;">${escapeHtml(formatDateTimeDisplay(m.dateTime))}</td>
+        <td><span style="color:${m.type === 'deduct' ? '#c0392b' : '#1f4e79'}; font-weight:700;">${m.type === 'deduct' ? m.action : 'Transfer'}</span></td>
+        <td>${escapeHtml(m.species)}</td>
+        <td><strong>${m.count}</strong></td>
+        <td>${m.animalId ? escapeHtml(m.animalId) : '—'}</td>
+      </tr>
+    `).join('');
+  }
+  document.getElementById('shopDetailsModal').classList.add('active');
+};
+document.getElementById('closeShopDetailsBtn').addEventListener('click', () => document.getElementById('shopDetailsModal').classList.remove('active'));
+
+document.getElementById('deductMethod').addEventListener('change', (e) => {
+  if (e.target.value === 'count') { document.getElementById('deductByCountBox').style.display = 'block'; document.getElementById('deductByIdBox').style.display = 'none'; }
+  else { document.getElementById('deductByCountBox').style.display = 'none'; document.getElementById('deductByIdBox').style.display = 'block'; }
+});
+
+document.getElementById('confirmDeductBtn').addEventListener('click', () => {
+  if (!currentShopData) return;
+  const action = document.getElementById('deductActionType').value;
+  const method = document.getElementById('deductMethod').value;
+  const sp = document.getElementById('deductSpecies').value;
+  const dt = getCurrentDateTimeLocal();
+  
+  if (method === 'count') {
+    const count = parseInt(document.getElementById('deductCount').value) || 0;
+    if (count <= 0) { alert('Enter a valid count.'); return; }
+    const inv = calculateInventory();
+    const available = inv[`${currentShopData.group}||${currentShopData.shop}||${sp}`] || 0;
+    if (count > available) { alert(`❌ Cannot deduct ${count}. Only ${available} ${sp} available in this shop.`); return; }
+    inventoryMovements.push({ type: 'deduct', action, fromGroup: currentShopData.group, fromShop: currentShopData.shop, species: sp, count, animalId: null, dateTime: dt });
+    saveData(); renderLiveInventory(); openShopDetails(currentShopData.group, currentShopData.shop);
+    document.getElementById('deductCount').value = '';
+    alert(`✅ Deducted ${count} ${sp} (${action}).`);
+  } else {
+    const animalId = document.getElementById('deductAnimalId').value.trim();
+    if (!animalId) { alert('Enter Animal ID.'); return; }
+    let found = false;
+    acceptedRecords.forEach(r => {
+      if (r.group === currentShopData.group && r.individualShop === currentShopData.shop) {
+        if ((r.acceptedAnimals || []).find(a => a.idNumber === animalId)) found = true;
+      }
+    });
+    if (!found) { alert('⚠️ This ID was not found in the accepted records for this shop. Proceeding anyway.'); }
+    inventoryMovements.push({ type: 'deduct', action, fromGroup: currentShopData.group, fromShop: currentShopData.shop, species: sp, count: 1, animalId, dateTime: dt });
+    saveData(); renderLiveInventory(); openShopDetails(currentShopData.group, currentShopData.shop);
+    document.getElementById('deductAnimalId').value = '';
+    alert(`✅ Deducted Animal ID ${animalId} (${action}).`);
+  }
+});
+
+document.getElementById('confirmTransferBtn').addEventListener('click', () => {
+  if (!currentShopData) return;
+  const destValue = document.getElementById('transferDestShop').value;
+  if (!destValue) { alert('Select destination shop.'); return; }
+  const [destGroup, destShop] = destValue.split('||');
+  const sp = document.getElementById('transferSpecies').value;
+  const count = parseInt(document.getElementById('transferCount').value) || 0;
+  if (count <= 0) { alert('Enter a valid count.'); return; }
+  
+  const inv = calculateInventory();
+  const available = inv[`${currentShopData.group}||${currentShopData.shop}||${sp}`] || 0;
+  if (count > available) { alert(`❌ Cannot transfer ${count}. Only ${available} ${sp} available.`); return; }
+  
+  inventoryMovements.push({ type: 'transfer', fromGroup: currentShopData.group, fromShop: currentShopData.shop, toGroup: destGroup, toShop: destShop, species: sp, count, dateTime: getCurrentDateTimeLocal() });
+  saveData(); renderLiveInventory(); openShopDetails(currentShopData.group, currentShopData.shop);
+  document.getElementById('transferCount').value = '';
+  alert(`✅ Transferred ${count} ${sp} to ${destShop}.`);
+});
+
+// ======================== PASSWORD MODAL ========================
+const passwordModal = document.getElementById('passwordModal');
+const passwordInput = document.getElementById('passwordInput');
+const passwordError = document.getElementById('passwordError');
+let passwordCallback = null;
+function requirePassword(callback) {
+  passwordCallback = callback; passwordInput.value = ''; passwordError.classList.remove('show');
+  passwordModal.classList.add('active'); setTimeout(() => passwordInput.focus(), 100);
+}
+function closePasswordModal() { passwordModal.classList.remove('active'); passwordCallback = null; }
+document.getElementById('closePasswordBtn').addEventListener('click', closePasswordModal);
+document.getElementById('cancelPasswordBtn').addEventListener('click', closePasswordModal);
+document.getElementById('confirmPasswordBtn').addEventListener('click', () => {
+  if (passwordInput.value === ADMIN_PASSWORD) { const cb = passwordCallback; closePasswordModal(); if (cb) cb(); }
+  else { passwordError.classList.add('show'); passwordInput.value = ''; passwordInput.focus(); }
+});
+
+// ======================== RENDERING TABLES & CHECKBOXES ========================
+function renderAll() { renderTable('accepted'); renderTable('rejected'); renderWashQueue(); }
+
+function renderTable(type) {
+  const records = type === 'accepted' ? acceptedRecords : rejectedRecords;
+  const tbody = document.getElementById(`${type}TableBody`);
+  const filterSpecies = document.getElementById(`${type}FilterSpecies`).value;
+  const filterGroup = document.getElementById(`${type}FilterGroup`).value;
+  const filterShop = document.getElementById(`${type}FilterShop`).value.toLowerCase();
+  
+  let filtered = records.filter(r => {
+    if (filterGroup && r.group !== filterGroup) return false;
+    if (filterShop && !r.individualShop.toLowerCase().includes(filterShop)) return false;
+    if (filterSpecies && !r.speciesLines.some(l => l.species === filterSpecies)) return false;
+    return true;
+  });
+  filtered.sort((a, b) => new Date(b.dateTime) - new Date(a.dateTime));
+  
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="${type === 'accepted' ? 9 : 8}" class="empty-msg">No ${type} shipments found</td></tr>`;
+  } else {
+    let html = '';
+    filtered.forEach(r => {
+      const total = r.speciesLines.reduce((s, l) => s + l.animalCount, 0);
+      const speciesSummary = r.speciesLines.map(l => `${l.species} (${l.animalCount})`).join('<br>');
+      const isChecked = (type === 'accepted' ? selectedAccepted : selectedRejected).has(String(r.id));
+      
+      if (type === 'accepted') {
+        html += `<tr class="${isChecked ? 'row-selected' : ''}">
+          <td class="select-col"><input type="checkbox" class="accepted-checkbox" data-id="${r.id}" ${isChecked ? 'checked' : ''}></td>
+          <td><strong>${escapeHtml(r.vehiclePlate)}</strong></td>
+          <td>${escapeHtml(r.driverName)}<br><span style="color:#888; font-size:0.65rem;">${escapeHtml(r.driverContact)}</span></td>
+          <td>${escapeHtml(r.individualShop)}</td>
+          <td>${escapeHtml(formatDateTimeDisplay(r.dateTime))}</td>
+          <td><span style="font-weight:700; color:#2d6a4f;">${total}</span><br><span style="color:#666; font-size:0.65rem;">${speciesSummary}</span></td>
+          <td><span style="font-size:0.65rem; color:#555;">🩺 ${escapeHtml(r.healthCertNo || '—')}</span></td>
+          <td style="max-width:100px; overflow:hidden; text-overflow:ellipsis;" title="${escapeHtml(r.notes)}">${escapeHtml(r.notes.substring(0, 20))}</td>
+          <td><button class="action-btn-edit" onclick="startEdit('accepted', '${r.id}')">✏️ Edit</button></td>
+        </tr>`;
+      } else {
+        html += `<tr class="${isChecked ? 'row-selected' : ''}">
+          <td class="select-col"><input type="checkbox" class="rejected-checkbox" data-id="${r.id}" ${isChecked ? 'checked' : ''}></td>
+          <td><strong>${escapeHtml(r.vehiclePlate)}</strong></td>
+          <td>${escapeHtml(r.driverName)}<br><span style="color:#888; font-size:0.65rem;">${escapeHtml(r.driverContact)}</span></td>
+          <td>${escapeHtml(r.individualShop)}</td>
+          <td>${escapeHtml(formatDateTimeDisplay(r.dateTime))}</td>
+          <td><span style="font-weight:700; color:#c0392b;">${total}</span><br><span style="color:#666; font-size:0.65rem;">${speciesSummary}</span></td>
+          <td><span style="color:#c0392b; font-weight:700; font-size:0.7rem;">${escapeHtml(r.rejectionReason)}</span></td>
+          <td><button class="action-btn-edit" onclick="startEdit('rejected', '${r.id}')">✏️ Edit</button></td>
+        </tr>`;
+      }
+    });
+    tbody.innerHTML = html;
+  }
+  
+  const { totals, grandTotal } = computeBreakdown(filtered);
+  document.getElementById(`${type}TotalAnimals`).textContent = grandTotal.toLocaleString();
+  let breakdownHtml = '';
+  speciesList.forEach(s => { if (totals[s.value] > 0) breakdownHtml += `<div class="species-chip"><span class="chip-name">${s.emoji} ${s.value}</span><span class="chip-count">${totals[s.value]}</span></div>`; });
+  document.getElementById(`${type}SpeciesBreakdown`).innerHTML = breakdownHtml || '<div class="species-breakdown-empty">No animals</div>';
+  document.getElementById(`${type}Count`).innerText = `${filtered.length} shipments`;
+  updateSelectionUI(type);
+}
+
+function computeBreakdown(records) {
+  const totals = {}; speciesList.forEach(s => { totals[s.value] = 0; }); let grandTotal = 0;
+  records.forEach(r => { r.speciesLines.forEach(l => { if (totals[l.species] === undefined) totals[l.species] = 0; totals[l.species] += l.animalCount; grandTotal += l.animalCount; }); });
+  return { totals, grandTotal };
+}
+
+['accepted', 'rejected'].forEach(type => {
+  document.getElementById(`${type}FilterSpecies`).addEventListener('change', () => renderTable(type));
+  document.getElementById(`${type}FilterGroup`).addEventListener('change', () => renderTable(type));
+  document.getElementById(`${type}FilterShop`).addEventListener('input', () => renderTable(type));
+});
+
+acceptedTableBody.addEventListener('change', (e) => {
+  if (e.target.classList.contains('accepted-checkbox')) {
+    const id = e.target.dataset.id;
+    if (e.target.checked) selectedAccepted.add(id); else selectedAccepted.delete(id);
+    e.target.closest('tr').classList.toggle('row-selected', e.target.checked);
+    updateSelectionUI('accepted');
+  }
+});
+rejectedTableBody.addEventListener('change', (e) => {
+  if (e.target.classList.contains('rejected-checkbox')) {
+    const id = e.target.dataset.id;
+    if (e.target.checked) selectedRejected.add(id); else selectedRejected.delete(id);
+    e.target.closest('tr').classList.toggle('row-selected', e.target.checked);
+    updateSelectionUI('rejected');
+  }
+});
+
+function updateSelectionUI(type) {
+  const count = type === 'accepted' ? selectedAccepted.size : selectedRejected.size;
+  document.getElementById(`export${type.charAt(0).toUpperCase() + type.slice(1)}SelectedCsvBtn`).textContent = `📎 CSV Selected (${count})`;
+  document.getElementById(`export${type.charAt(0).toUpperCase() + type.slice(1)}SelectedPdfBtn`).textContent = `📄 PDF Selected (${count})`;
+  document.getElementById(`export${type.charAt(0).toUpperCase() + type.slice(1)}SelectedCsvBtn`).disabled = count === 0;
+  document.getElementById(`export${type.charAt(0).toUpperCase() + type.slice(1)}SelectedPdfBtn`).disabled = count === 0;
+}
+
+// ======================== WASH QUEUE ========================
+function renderWashQueue() {
+  const processedIds = new Set([...sprayedRecords.map(w => String(w.recordId)), ...washedRecords.map(w => String(w.recordId))]);
+  const pending = acceptedRecords.filter(r => !processedIds.has(String(r.id)));
+  
+  if (pending.length === 0) { pendingTableBody.innerHTML = '<tr><td colspan="4" class="empty-msg">✅ No pending records</td></tr>'; }
+  else {
+    pendingTableBody.innerHTML = pending.map(r => {
+      const isChecked = pendingSelected.has(String(r.id));
+      return `<tr class="${isChecked ? 'row-selected' : ''}">
+        <td class="select-col"><input type="checkbox" class="pending-checkbox" data-id="${r.id}" ${isChecked ? 'checked' : ''}></td>
+        <td><strong>${escapeHtml(r.vehiclePlate)}</strong></td>
+        <td>${escapeHtml(r.individualShop)}</td>
+        <td>${escapeHtml(formatDateTimeDisplay(r.dateTime))}</td>
+      </tr>`;
+    }).join('');
+  }
+  
+  const washedIds = new Set(washedRecords.map(w => String(w.recordId)));
+  const sprayed = sprayedRecords.filter(w => !washedIds.has(String(w.recordId)));
+  
+  if (sprayed.length === 0) { sprayedTableBody.innerHTML = '<tr><td colspan="4" class="empty-msg">No sprayed records</td></tr>'; }
+  else {
+    sprayedTableBody.innerHTML = sprayed.map(w => {
+      const r = acceptedRecords.find(rec => String(rec.id) === String(w.recordId)); if (!r) return '';
+      const isChecked = selectedSprayed.has(String(r.id));
+      return `<tr class="${isChecked ? 'row-selected' : ''}">
+        <td class="select-col"><input type="checkbox" class="sprayed-checkbox" data-id="${r.id}" ${isChecked ? 'checked' : ''}></td>
+        <td><strong>${escapeHtml(r.vehiclePlate)}</strong></td>
+        <td>${escapeHtml(r.individualShop)}</td>
+        <td><span style="color:#ca8a04; font-weight:700;">${escapeHtml(formatDateTimeDisplay(w.sprayedAt))}</span></td>
+      </tr>`;
+    }).join('');
+  }
+
+  if (washedRecords.length === 0) { washedTableBody.innerHTML = '<tr><td colspan="4" class="empty-msg">No washed records yet</td></tr>'; }
+  else {
+    washedTableBody.innerHTML = washedRecords.map(w => {
+      const r = acceptedRecords.find(rec => String(rec.id) === String(w.recordId)); if (!r) return '';
+      const isChecked = selectedWashed.has(String(r.id));
+      return `<tr class="${isChecked ? 'row-selected' : ''}">
+        <td class="select-col"><input type="checkbox" class="washed-checkbox" data-id="${r.id}" ${isChecked ? 'checked' : ''}></td>
+        <td><strong>${escapeHtml(r.vehiclePlate)}</strong></td>
+        <td>${escapeHtml(r.individualShop)}</td>
+        <td><span style="color:#1f4e79; font-weight:700;">${escapeHtml(formatDateTimeDisplay(w.washedAt))}</span></td>
+      </tr>`;
+    }).join('');
+  }
+  
+  document.getElementById('pendingWashCount').innerText = `${pending.length}`;
+  document.getElementById('sprayedCount').innerText = `${sprayed.length}`;
+  document.getElementById('washedCount').innerText = `${washedRecords.length}`;
+  
+  updatePendingBtn(); updateSprayedBtn(); updateWashedBtn();
+}
+
+pendingTableBody.addEventListener('change', (e) => {
+  if (e.target.classList.contains('pending-checkbox')) {
+    const id = e.target.dataset.id;
+    if (e.target.checked) pendingSelected.add(id); else pendingSelected.delete(id);
+    e.target.closest('tr').classList.toggle('row-selected', e.target.checked);
+    updatePendingBtn();
+  }
+});
+sprayedTableBody.addEventListener('change', (e) => {
+  if (e.target.classList.contains('sprayed-checkbox')) {
+    const id = e.target.dataset.id;
+    if (e.target.checked) selectedSprayed.add(id); else selectedSprayed.delete(id);
+    e.target.closest('tr').classList.toggle('row-selected', e.target.checked);
+    updateSprayedBtn();
+  }
+});
+washedTableBody.addEventListener('change', (e) => {
+  if (e.target.classList.contains('washed-checkbox')) {
+    const id = e.target.dataset.id;
+    if (e.target.checked) selectedWashed.add(id); else selectedWashed.delete(id);
+    e.target.closest('tr').classList.toggle('row-selected', e.target.checked);
+    updateWashedBtn();
+  }
+});
+
+function updatePendingBtn() {
+  const count = pendingSelected.size;
+  document.getElementById('moveToSprayingBtn').textContent = `➡️ To Spraying (${count})`;
+  document.getElementById('moveToSprayingBtn').disabled = count === 0;
+  document.getElementById('moveToWashedDirectBtn').textContent = `➡️ To Washed (${count})`;
+  document.getElementById('moveToWashedDirectBtn').disabled = count === 0;
+}
+function updateSprayedBtn() {
+  const count = selectedSprayed.size;
+  document.getElementById('moveToWashedBtn').textContent = `➡️ To Washed (${count})`;
+  document.getElementById('moveToWashedBtn').disabled = count === 0;
+}
+function updateWashedBtn() {
+  const count = selectedWashed.size;
+  document.getElementById('exportWashedSelectedCsvBtn').textContent = `📎 CSV Selected (${count})`;
+  document.getElementById('exportWashedSelectedPdfBtn').textContent = `📄 PDF Selected (${count})`;
+  document.getElementById('exportWashedSelectedCsvBtn').disabled = count === 0;
+  document.getElementById('exportWashedSelectedPdfBtn').disabled = count === 0;
+}
+
+document.getElementById('moveToSprayingBtn').addEventListener('click', () => {
+  const now = getCurrentDateTimeLocal();
+  pendingSelected.forEach(id => {
+    const rec = acceptedRecords.find(r => String(r.id) === String(id));
+    if (rec) sprayedRecords.push({ recordId: rec.id, sprayedAt: now });
+  });
+  pendingSelected.clear(); saveData(); renderWashQueue();
+});
+document.getElementById('moveToWashedDirectBtn').addEventListener('click', () => {
+  const now = getCurrentDateTimeLocal();
+  pendingSelected.forEach(id => {
+    const rec = acceptedRecords.find(r => String(r.id) === String(id));
+    if (rec) washedRecords.push({ recordId: rec.id, washedAt: now });
+  });
+  pendingSelected.clear(); saveData(); renderWashQueue();
+});
+document.getElementById('moveToWashedBtn').addEventListener('click', () => {
+  const now = getCurrentDateTimeLocal();
+  selectedSprayed.forEach(id => {
+    const rec = acceptedRecords.find(r => String(r.id) === String(id));
+    if (rec) washedRecords.push({ recordId: rec.id, washedAt: now });
+  });
+  selectedSprayed.clear(); saveData(); renderWashQueue();
+});
+
+// ======================== EXPORT WASH QUEUE ========================
+document.getElementById('exportPendingCsvBtn').addEventListener('click', () => {
+  if (pendingSelected.size === 0) { alert('Select records first.'); return; }
+  const headers = ["Date","Plate","Driver","Shop"];
+  const rows = acceptedRecords.filter(r => pendingSelected.has(String(r.id))).map(r => [formatDateTimeDisplay(r.dateTime), r.vehiclePlate, r.driverName, r.individualShop]);
+  downloadCSV(headers, rows, 'pending_selected');
+});
+document.getElementById('exportPendingPdfBtn').addEventListener('click', () => {
+  if (pendingSelected.size === 0) { alert('Select records first.'); return; }
+  const headers = ["Date","Plate","Driver","Shop"];
+  const rows = acceptedRecords.filter(r => pendingSelected.has(String(r.id))).map(r => [formatDateTimeDisplay(r.dateTime), r.vehiclePlate, r.driverName, r.individualShop]);
+  exportPdf('Pending Spray/Wash', headers, rows, 'pending_selected', [45,106,79]);
+});
+document.getElementById('exportSprayedCsvBtn').addEventListener('click', () => {
+  if (selectedSprayed.size === 0) { alert('Select records first.'); return; }
+  const headers = ["Sprayed At","Plate","Driver","Shop"];
+  const rows = sprayedRecords.filter(w => selectedSprayed.has(String(w.recordId))).map(w => { const r = acceptedRecords.find(rec => String(rec.id) === String(w.recordId)); if(!r) return null; return [formatDateTimeDisplay(w.sprayedAt), r.vehiclePlate, r.driverName, r.individualShop]; }).filter(x => x);
+  downloadCSV(headers, rows, 'sprayed_selected');
+});
+document.getElementById('exportSprayedPdfBtn').addEventListener('click', () => {
+  if (selectedSprayed.size === 0) { alert('Select records first.'); return; }
+  const headers = ["Sprayed At","Plate","Driver","Shop"];
+  const rows = sprayedRecords.filter(w => selectedSprayed.has(String(w.recordId))).map(w => { const r = acceptedRecords.find(rec => String(rec.id) === String(w.recordId)); if(!r) return null; return [formatDateTimeDisplay(w.sprayedAt), r.vehiclePlate, r.driverName, r.individualShop]; }).filter(x => x);
+  exportPdf('Sprayed Vehicles', headers, rows, 'sprayed_selected', [202,138,4]);
+});
+document.getElementById('exportWashedSelectedCsvBtn').addEventListener('click', () => {
+  if (selectedWashed.size === 0) return;
+  const headers = ["Washed At","Plate","Driver","Shop"];
+  const rows = washedRecords.filter(w => selectedWashed.has(String(w.recordId))).map(w => { const r = acceptedRecords.find(rec => String(rec.id) === String(w.recordId)); if(!r) return null; return [formatDateTimeDisplay(w.washedAt), r.vehiclePlate, r.driverName, r.individualShop]; }).filter(x => x);
+  downloadCSV(headers, rows, 'washed_selected');
+});
+document.getElementById('exportWashedSelectedPdfBtn').addEventListener('click', () => {
+  if (selectedWashed.size === 0) return;
+  const headers = ["Washed At","Plate","Driver","Shop"];
+  const rows = washedRecords.filter(w => selectedWashed.has(String(w.recordId))).map(w => { const r = acceptedRecords.find(rec => String(rec.id) === String(w.recordId)); if(!r) return null; return [formatDateTimeDisplay(w.washedAt), r.vehiclePlate, r.driverName, r.individualShop]; }).filter(x => x);
+  exportPdf('Washed Vehicles', headers, rows, 'washed_selected', [31,78,121]);
+});
+
+// ======================== SEARCH & ARCHIVE ========================
+function rebuildAnimalIdIndex() {
+  animalIdIndex = {};
+  const addToIndex = (record, animal, status) => {
+    const id = animal.idNumber;
+    if (!animalIdIndex[id]) animalIdIndex[id] = [];
+    animalIdIndex[id].push({ status, recordId: record.id, vehiclePlate: record.vehiclePlate, driverName: record.driverName, individualShop: record.individualShop, dateTime: record.dateTime, rejectionReason: record.rejectionReason, healthCertNo: record.healthCertNo, species: animal.species, subBreed: animal.subBreed });
+  };
+  rejectedRecords.forEach(r => (r.rejectedAnimals || []).forEach(a => addToIndex(r, a, 'Rejected')));
+  acceptedRecords.forEach(r => (r.acceptedAnimals || []).forEach(a => addToIndex(r, a, 'Accepted')));
+}
+
+function performSearch() {
+  const idQuery = document.getElementById('searchAnimalIdInput').value.trim().toLowerCase();
+  const certQuery = document.getElementById('searchHealthCertInput').value.trim().toLowerCase();
+  const spFilter = document.getElementById('searchSpeciesSelect').value;
+  const sbFilter = document.getElementById('searchSubBreedSelect').value;
+  const shopFilter = document.getElementById('searchShopInput').value.trim().toLowerCase();
+  const dateFilter = document.getElementById('searchDateInput').value;
+
+  if (idQuery) {
+    const matches = [];
+    Object.keys(animalIdIndex).forEach(key => { if (key.toLowerCase().includes(idQuery)) animalIdIndex[key].forEach(entry => matches.push({ id: key, entry })); });
+    const resBox = document.getElementById('searchResultBox'); resBox.style.display = 'block';
+    if (matches.length === 0) {
+      resBox.className = 'search-result-box no-result'; resBox.innerHTML = `<div class="search-result-title">🔍 No record found for "${escapeHtml(idQuery)}"</div>`;
+    } else {
+      let timelineHtml = matches.map(m => `
+        <div class="search-timeline-item ${m.entry.status.toLowerCase()}">
+          <span class="search-timeline-icon">${m.entry.status === 'Rejected' ? '❌' : '✅'}</span>
+          <div class="search-timeline-content">
+            <strong>${escapeHtml(m.id)}</strong> — ${m.entry.status} at ${escapeHtml(m.entry.vehiclePlate)}
+            <div class="search-timeline-meta">🏪 ${escapeHtml(m.entry.individualShop)} · 🩺 ${escapeHtml(m.entry.healthCertNo || '—')}<br>🐏 ${escapeHtml(m.entry.species)} / ${escapeHtml(m.entry.subBreed)} · 📅 ${escapeHtml(formatDateTimeDisplay(m.entry.dateTime))}</div>
+          </div>
+        </div>`).join('');
+      resBox.className = 'search-result-box has-result';
+      resBox.innerHTML = `<div class="search-result-title">🔍 Found ${matches.length} record(s) matching "${escapeHtml(idQuery)}"</div><div class="search-timeline">${timelineHtml}</div>`;
+    }
+  } else { document.getElementById('searchResultBox').style.display = 'none'; }
+
+  const allShipments = [];
+  const filterRecord = (r, status) => {
+    if (certQuery && !(r.healthCertNo || '').toLowerCase().includes(certQuery)) return false;
+    if (shopFilter && !r.individualShop.toLowerCase().includes(shopFilter)) return false;
+    if (dateFilter && !r.dateTime.startsWith(dateFilter)) return false;
+    if (spFilter && !r.speciesLines.some(l => l.species === spFilter)) return false;
+    if (sbFilter && !r.speciesLines.some(l => l.subBreed === sbFilter)) return false;
+    return true;
+  };
+  const addToTable = (r, status) => {
+    allShipments.push({ type: 'shipment', status, record: r, spSummary: r.speciesLines.map(l => `${l.species} (${l.animalCount})`).join(', ') });
+    const animals = status === 'Accepted' ? (r.acceptedAnimals || []) : (r.rejectedAnimals || []);
+    animals.forEach(a => { if (spFilter && a.species !== spFilter) return; if (sbFilter && a.subBreed !== sbFilter) return; allShipments.push({ type: 'animal', status, record: r, animal: a }); });
+  };
+  acceptedRecords.filter(r => filterRecord(r, 'Accepted')).forEach(r => addToTable(r, 'Accepted'));
+  rejectedRecords.filter(r => filterRecord(r, 'Rejected')).forEach(r => addToTable(r, 'Rejected'));
+
+  const shipments = allShipments.filter(x => x.type === 'shipment');
+  shipments.sort((a, b) => new Date(b.record.dateTime) - new Date(a.record.dateTime));
+  if (shipments.length === 0) { document.getElementById('archiveAllShipmentsBody').innerHTML = '<tr><td colspan="7" class="empty-msg">No shipments match</td></tr>'; }
+  else {
+    document.getElementById('archiveAllShipmentsBody').innerHTML = shipments.map(s => `
+      <tr>
+        <td><span style="color:${s.status === 'Accepted' ? '#2d6a4f' : '#c0392b'}; font-weight:700;">${s.status}</span></td>
+        <td>${escapeHtml(formatDateTimeDisplay(s.record.dateTime))}</td><td><strong>${escapeHtml(s.record.vehiclePlate)}</strong></td>
+        <td>${escapeHtml(s.record.individualShop)}</td><td>${escapeHtml(s.spSummary)}</td><td>${escapeHtml(s.record.healthCertNo || '—')}</td>
+        <td><button class="archive-view-ids-btn" onclick="openViewIdsModal('${s.record.id}', '${s.status.toLowerCase()}')">👁️ View IDs</button></td>
+      </tr>`).join('');
+  }
+  document.getElementById('archiveAllShipmentsCount').textContent = shipments.length;
+
+  const animals = allShipments.filter(x => x.type === 'animal');
+  if (animals.length === 0) { document.getElementById('archiveAllAnimalsBody').innerHTML = '<tr><td colspan="6" class="empty-msg">No animal IDs match</td></tr>'; }
+  else {
+    document.getElementById('archiveAllAnimalsBody').innerHTML = animals.map(a => `
+      <tr>
+        <td><strong style="font-family:monospace;">${escapeHtml(a.animal.idNumber)}</strong></td>
+        <td><span style="color:${a.status === 'Accepted' ? '#2d6a4f' : '#c0392b'}; font-weight:700;">${a.status}</span></td>
+        <td>${escapeHtml(a.animal.species)}</td><td>${escapeHtml(a.animal.subBreed)}</td>
+        <td>${escapeHtml(a.record.vehiclePlate)}</td><td>${escapeHtml(formatDateTimeDisplay(a.record.dateTime))}</td>
+      </tr>`).join('');
+  }
+  document.getElementById('archiveAllAnimalsCount').textContent = animals.length;
+}
+
+document.getElementById('performSearchBtn').addEventListener('click', performSearch);
+['searchAnimalIdInput', 'searchHealthCertInput', 'searchShopInput', 'searchDateInput'].forEach(id => { document.getElementById(id).addEventListener('keydown', (e) => { if (e.key === 'Enter') performSearch(); }); });
+['searchSpeciesSelect', 'searchSubBreedSelect'].forEach(id => { document.getElementById(id).addEventListener('change', performSearch); });
+const sbs = document.getElementById('searchSubBreedSelect'); subBreedsList.forEach(b => { const opt = document.createElement('option'); opt.value = b; opt.textContent = b; sbs.appendChild(opt); });
+
+window.openViewIdsModal = function(recordId, status) {
+  const records = status === 'accepted' ? acceptedRecords : rejectedRecords;
+  const record = records.find(r => String(r.id) === String(recordId)); if (!record) return;
+  const animals = status === 'accepted' ? (record.acceptedAnimals || []) : (record.rejectedAnimals || []);
+  document.getElementById('viewIdsTitle').textContent = `🐏 ${status === 'accepted' ? 'Accepted' : 'Rejected'} IDs — ${record.vehiclePlate}`;
+  const body = document.getElementById('viewIdsBody');
+  let html = `<div style="margin-bottom:12px; font-size:0.8rem; color:#666;"><strong>Driver:</strong> ${escapeHtml(record.driverName)}<br><strong>Shop:</strong> ${escapeHtml(record.individualShop)}<br><strong>Date:</strong> ${escapeHtml(formatDateTimeDisplay(record.dateTime))}</div>`;
+  if (animals.length === 0) { html += '<p style="text-align:center; color:#888; padding:20px;">No individual animal IDs registered.</p>'; }
+  else {
+    const groups = {}; animals.forEach(a => { const key = a.species + '||' + a.subBreed; if (!groups[key]) groups[key] = []; groups[key].push(a.idNumber); });
+    html += '<div style="display:flex; flex-direction:column; gap:12px;">';
+    Object.keys(groups).forEach(key => {
+      const [sp, sb] = key.split('||');
+      html += `<div style="border:1px solid ${status === 'accepted' ? '#b8dcc5' : '#f0c0bb'}; border-radius:12px; overflow:hidden;">
+        <div style="background:${status === 'accepted' ? '#eaf6ee' : '#fdecea'}; padding:8px 12px; font-weight:700; color:${status === 'accepted' ? '#2d6a4f' : '#a53125'}; font-size:0.8rem;">🐏 ${escapeHtml(sp)} / ${escapeHtml(sb)} — ${groups[key].length} IDs</div>
+        <div style="padding:10px 12px; display:flex; flex-wrap:wrap; gap:4px; max-height:300px; overflow-y:auto; background:white;">${groups[key].map(id => `<span style="background:${status === 'accepted' ? '#eaf6ee' : '#fdecea'}; color:${status === 'accepted' ? '#1f543d' : '#842318'}; padding:2px 9px; border-radius:20px; font-size:0.72rem; font-weight:600; border:1px solid ${status === 'accepted' ? '#b8dcc5' : '#f0c0bb'}; font-family:monospace;">${escapeHtml(id)}</span>`).join('')}</div>
+      </div>`;
+    });
+    html += '</div>';
+  }
+  body.innerHTML = html; document.getElementById('viewIdsModal').classList.add('active');
+};
+document.getElementById('closeViewIdsBtn').addEventListener('click', () => document.getElementById('viewIdsModal').classList.remove('active'));
+
+// ======================== EXPORT CSV / PDF (Main Tables) ========================
+function downloadCSV(headers, rows, filename) {
+  if (rows.length === 0) { alert("⚠️ Nothing to export."); return; }
+  const csvContent = [headers, ...rows].map(row => row.map(cell => { let s = String(cell); if (s.includes(',') || s.includes('"') || s.includes('\n')) s = `"${s.replace(/"/g, '""')}"`; return s; }).join(',')).join('\n');
+  const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+  const link = document.createElement("a"); link.href = URL.createObjectURL(blob);
+  link.download = `livestock_${filename}_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(link); link.click(); document.body.removeChild(link);
+}
+
+document.getElementById('exportAcceptedSelectedCsvBtn').addEventListener('click', () => {
+  if (selectedAccepted.size === 0) return;
+  const headers = ["Date","Plate","Driver","Shop","HC","Species","Count"];
+  const rows = acceptedRecords.filter(r => selectedAccepted.has(String(r.id))).map(r => [formatDateTimeDisplay(r.dateTime), r.vehiclePlate, r.driverName, r.individualShop, r.healthCertNo, r.speciesLines.map(l=>l.species).join(','), r.speciesLines.reduce((s,l)=>s+l.animalCount,0)]);
+  downloadCSV(headers, rows, 'accepted_selected');
+});
+document.getElementById('exportRejectedSelectedCsvBtn').addEventListener('click', () => {
+  if (selectedRejected.size === 0) return;
+  const headers = ["Date","Plate","Driver","Shop","Reason","Species","Count"];
+  const rows = rejectedRecords.filter(r => selectedRejected.has(String(r.id))).map(r => [formatDateTimeDisplay(r.dateTime), r.vehiclePlate, r.driverName, r.individualShop, r.rejectionReason, r.speciesLines.map(l=>l.species).join(','), r.speciesLines.reduce((s,l)=>s+l.animalCount,0)]);
+  downloadCSV(headers, rows, 'rejected_selected');
+});
+document.getElementById('exportAcceptedCsvBtn').addEventListener('click', () => {
+  const headers = ["Date","Plate","Driver","Shop","HC","Species","Count"];
+  const rows = acceptedRecords.map(r => [formatDateTimeDisplay(r.dateTime), r.vehiclePlate, r.driverName, r.individualShop, r.healthCertNo, r.speciesLines.map(l=>l.species).join(','), r.speciesLines.reduce((s,l)=>s+l.animalCount,0)]);
+  downloadCSV(headers, rows, 'accepted_all');
+});
+document.getElementById('exportRejectedCsvBtn').addEventListener('click', () => {
+  const headers = ["Date","Plate","Driver","Shop","Reason","Species","Count"];
+  const rows = rejectedRecords.map(r => [formatDateTimeDisplay(r.dateTime), r.vehiclePlate, r.driverName, r.individualShop, r.rejectionReason, r.speciesLines.map(l=>l.species).join(','), r.speciesLines.reduce((s,l)=>s+l.animalCount,0)]);
+  downloadCSV(headers, rows, 'rejected_all');
+});
+document.getElementById('exportAllCsvBtn').addEventListener('click', () => {
+  const headers = ["Status","Date","Plate","Driver","Shop","Species","Count"];
+  const rows = [
+    ...acceptedRecords.map(r => ['Accepted', formatDateTimeDisplay(r.dateTime), r.vehiclePlate, r.driverName, r.individualShop, r.speciesLines.map(l=>l.species).join(','), r.speciesLines.reduce((s,l)=>s+l.animalCount,0)]),
+    ...rejectedRecords.map(r => ['Rejected', formatDateTimeDisplay(r.dateTime), r.vehiclePlate, r.driverName, r.individualShop, r.speciesLines.map(l=>l.species).join(','), r.speciesLines.reduce((s,l)=>s+l.animalCount,0)])
+  ];
+  downloadCSV(headers, rows, 'all');
+});
+document.getElementById('exportPendingCsvBtn').addEventListener('click', () => {
+  const pending = acceptedRecords.filter(r => !new Set([...sprayedRecords.map(w => String(w.recordId)), ...washedRecords.map(w => String(w.recordId))]).has(String(r.id)));
+  const headers = ["Date","Plate","Driver","Shop","Species","Count"];
+  const rows = pending.map(r => [formatDateTimeDisplay(r.dateTime), r.vehiclePlate, r.driverName, r.individualShop, r.speciesLines.map(l=>l.species).join(','), r.speciesLines.reduce((s,l)=>s+l.animalCount,0)]);
+  downloadCSV(headers, rows, 'pending_wash');
+});
+document.getElementById('exportSprayedCsvBtn').addEventListener('click', () => {
+  const washedIds = new Set(washedRecords.map(w => String(w.recordId)));
+  const sprayed = sprayedRecords.filter(w => !washedIds.has(String(w.recordId)));
+  const headers = ["Sprayed At","Plate","Driver","Shop","Species","Count"];
+  const rows = sprayed.map(w => { const r = acceptedRecords.find(rec => String(rec.id) === String(w.recordId)); if(!r) return null; return [formatDateTimeDisplay(w.sprayedAt), r.vehiclePlate, r.driverName, r.individualShop, r.speciesLines.map(l=>l.species).join(','), r.speciesLines.reduce((s,l)=>s+l.animalCount,0)]; }).filter(x => x);
+  downloadCSV(headers, rows, 'sprayed_list');
+});
+document.getElementById('exportWashedCsvBtn').addEventListener('click', () => {
+  const headers = ["Accepted Date","Washed At","Plate","Driver","Shop","Species","Count"];
+  const rows = washedRecords.map(w => { const r = acceptedRecords.find(rec => String(rec.id) === String(w.recordId)); if(!r) return null; return [formatDateTimeDisplay(r.dateTime), formatDateTimeDisplay(w.washedAt), r.vehiclePlate, r.driverName, r.individualShop, r.speciesLines.map(l=>l.species).join(','), r.speciesLines.reduce((s,l)=>s+l.animalCount,0)]; }).filter(x => x);
+  downloadCSV(headers, rows, 'washed');
+});
+
+function exportPdf(title, headers, rows, filename, color) {
+  if (rows.length === 0) return;
+  const { jsPDF } = window.jspdf; const doc = new jsPDF({ orientation: 'landscape' });
+  doc.setFontSize(16); doc.setTextColor(...color); doc.text(title, 14, 20); doc.setFontSize(9); doc.setTextColor(100); doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 28);
+  doc.autoTable({ head: [headers], body: rows, startY: 35, styles: { fontSize: 7, cellPadding: 2 }, headStyles: { fillColor: color, textColor: 255 } });
+  doc.save(`livestock_${filename}_${new Date().toISOString().slice(0,10)}.pdf`);
+}
+document.getElementById('exportAcceptedSelectedPdfBtn').addEventListener('click', () => {
+  if (selectedAccepted.size === 0) return;
+  const headers = ["Date","Plate","Driver","Shop","HC","Species","Count"];
+  const rows = acceptedRecords.filter(r => selectedAccepted.has(String(r.id))).map(r => [formatDateTimeDisplay(r.dateTime), r.vehiclePlate, r.driverName, r.individualShop, r.healthCertNo, r.speciesLines.map(l=>l.species).join(','), r.speciesLines.reduce((s,l)=>s+l.animalCount,0)]);
+  exportPdf('Accepted Shipments — Selected', headers, rows, 'accepted_selected', [45,106,79]);
+});
+document.getElementById('exportRejectedSelectedPdfBtn').addEventListener('click', () => {
+  if (selectedRejected.size === 0) return;
+  const headers = ["Date","Plate","Driver","Shop","Reason","Species","Count"];
+  const rows = rejectedRecords.filter(r => selectedRejected.has(String(r.id))).map(r => [formatDateTimeDisplay(r.dateTime), r.vehiclePlate, r.driverName, r.individualShop, r.rejectionReason, r.speciesLines.map(l=>l.species).join(','), r.speciesLines.reduce((s,l)=>s+l.animalCount,0)]);
+  exportPdf('Rejected Shipments — Selected', headers, rows, 'rejected_selected', [192,57,43]);
+});
+document.getElementById('exportAcceptedPdfBtn').addEventListener('click', () => {
+  const headers = ["Date","Plate","Driver","Shop","HC","Species","Count"];
+  const rows = acceptedRecords.map(r => [formatDateTimeDisplay(r.dateTime), r.vehiclePlate, r.driverName, r.individualShop, r.healthCertNo, r.speciesLines.map(l=>l.species).join(','), r.speciesLines.reduce((s,l)=>s+l.animalCount,0)]);
+  exportPdf('Accepted Shipments', headers, rows, 'accepted', [45,106,79]);
+});
+document.getElementById('exportRejectedPdfBtn').addEventListener('click', () => {
+  const headers = ["Date","Plate","Driver","Shop","Reason","Species","Count"];
+  const rows = rejectedRecords.map(r => [formatDateTimeDisplay(r.dateTime), r.vehiclePlate, r.driverName, r.individualShop, r.rejectionReason, r.speciesLines.map(l=>l.species).join(','), r.speciesLines.reduce((s,l)=>s+l.animalCount,0)]);
+  exportPdf('Rejected Shipments', headers, rows, 'rejected', [192,57,43]);
+});
+document.getElementById('exportAllPdfBtn').addEventListener('click', () => {
+  const headers = ["Status","Date","Plate","Driver","Shop","Species","Count"];
+  const rows = [
+    ...acceptedRecords.map(r => ['Accepted', formatDateTimeDisplay(r.dateTime), r.vehiclePlate, r.driverName, r.individualShop, r.speciesLines.map(l=>l.species).join(','), r.speciesLines.reduce((s,l)=>s+l.animalCount,0)]),
+    ...rejectedRecords.map(r => ['Rejected', formatDateTimeDisplay(r.dateTime), r.vehiclePlate, r.driverName, r.individualShop, r.speciesLines.map(l=>l.species).join(','), r.speciesLines.reduce((s,l)=>s+l.animalCount,0)])
+  ];
+  exportPdf('All Shipments', headers, rows, 'all', [45,106,79]);
+});
+document.getElementById('exportPendingPdfBtn').addEventListener('click', () => {
+  const pending = acceptedRecords.filter(r => !new Set([...sprayedRecords.map(w => String(w.recordId)), ...washedRecords.map(w => String(w.recordId))]).has(String(r.id)));
+  const headers = ["Date","Plate","Driver","Shop","Species","Count"];
+  const rows = pending.map(r => [formatDateTimeDisplay(r.dateTime), r.vehiclePlate, r.driverName, r.individualShop, r.speciesLines.map(l=>l.species).join(','), r.speciesLines.reduce((s,l)=>s+l.animalCount,0)]);
+  exportPdf('Pending Wash', headers, rows, 'pending', [45,106,79]);
+});
+document.getElementById('exportSprayedPdfBtn').addEventListener('click', () => {
+  const washedIds = new Set(washedRecords.map(w => String(w.recordId)));
+  const sprayed = sprayedRecords.filter(w => !washedIds.has(String(w.recordId)));
+  const headers = ["Sprayed At","Plate","Driver","Shop","Species","Count"];
+  const rows = sprayed.map(w => { const r = acceptedRecords.find(rec => String(rec.id) === String(w.recordId)); if(!r) return null; return [formatDateTimeDisplay(w.sprayedAt), r.vehiclePlate, r.driverName, r.individualShop, r.speciesLines.map(l=>l.species).join(','), r.speciesLines.reduce((s,l)=>s+l.animalCount,0)]; }).filter(x => x);
+  exportPdf('Sprayed Vehicles', headers, rows, 'sprayed', [202,138,4]);
+});
+document.getElementById('exportWashedPdfBtn').addEventListener('click', () => {
+  const headers = ["Accepted Date","Washed At","Plate","Driver","Shop","Species","Count"];
+  const rows = washedRecords.map(w => { const r = acceptedRecords.find(rec => String(rec.id) === String(w.recordId)); if(!r) return null; return [formatDateTimeDisplay(r.dateTime), formatDateTimeDisplay(w.washedAt), r.vehiclePlate, r.driverName, r.individualShop, r.speciesLines.map(l=>l.species).join(','), r.speciesLines.reduce((s,l)=>s+l.animalCount,0)]; }).filter(x => x);
+  exportPdf('Washed Vehicles', headers, rows, 'washed', [31,78,121]);
+});
+
+// ======================== CLEAR ACTIONS & IMPORT/EXPORT ========================
+document.getElementById('clearAcceptedBtn').addEventListener('click', () => { requirePassword(() => { if (confirm("⚠️ Delete ALL accepted records?")) { acceptedRecords = []; sprayedRecords = []; washedRecords = []; saveData(); renderAll(); renderLiveInventory(); } }); });
+document.getElementById('clearRejectedBtn').addEventListener('click', () => { requirePassword(() => { if (confirm("⚠️ Delete ALL rejected records?")) { rejectedRecords = []; saveData(); renderAll(); } }); });
+document.getElementById('clearWashedBtn').addEventListener('click', () => { requirePassword(() => { if (confirm("⚠️ Delete ALL washed records?")) { washedRecords = []; saveData(); renderWashQueue(); } }); });
+document.getElementById('clearAllBtn').addEventListener('click', () => { requirePassword(() => { if (confirm("⚠️ Delete ALL data?")) { acceptedRecords = []; rejectedRecords = []; sprayedRecords = []; washedRecords = []; inventoryMovements = []; saveData(); renderAll(); renderLiveInventory(); resetForm(); } }); });
+document.getElementById('clearFormBtn').addEventListener('click', () => { if (confirm('Clear current form?')) resetForm(); });
+
+document.getElementById('exportJsonBtn').addEventListener('click', () => {
+  const backup = { _meta: { app: 'Livestock Population Monitor', version: '3.1', exportedAt: new Date().toISOString() }, providers, acceptedRecords, rejectedRecords, sprayedRecords, washedRecords, inventoryMovements };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+  const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `livestock_backup_${new Date().toISOString().slice(0,10)}.json`; document.body.appendChild(link); link.click(); document.body.removeChild(link);
+});
+document.getElementById('importJsonBtn').addEventListener('click', () => document.getElementById('importFileInput').click());
+document.getElementById('importFileInput').addEventListener('change', (e) => {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    try {
+      const data = JSON.parse(evt.target.result);
+      if (!data._meta || data._meta.app !== 'Livestock Population Monitor') { alert('Invalid file.'); return; }
+      window._importData = data;
+      document.getElementById('importFileSummary').innerHTML = `Found: ${data.acceptedRecords?.length || 0} Accepted, ${data.rejectedRecords?.length || 0} Rejected, ${data.sprayedRecords?.length || 0} Sprayed, ${data.inventoryMovements?.length || 0} Movements.`;
+      document.getElementById('importModeModal').classList.add('active');
+    } catch (err) { alert('Parse error.'); }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+});
+document.getElementById('closeImportModeBtn').addEventListener('click', () => document.getElementById('importModeModal').classList.remove('active'));
+document.getElementById('cancelImportBtn').addEventListener('click', () => document.getElementById('importModeModal').classList.remove('active'));
+document.getElementById('confirmImportBtn').addEventListener('click', () => {
+  const data = window._importData; if (!data) return;
+  const mode = document.querySelector('input[name="importMode"]:checked').value;
+  if (mode === 'replace') {
+    acceptedRecords = data.acceptedRecords || []; rejectedRecords = data.rejectedRecords || []; sprayedRecords = data.sprayedRecords || []; washedRecords = data.washedRecords || []; inventoryMovements = data.inventoryMovements || []; providers = data.providers || [];
+  } else {
+    const mergeArr = (current, imported) => { imported.forEach(item => { const idx = current.findIndex(x => x.id === item.id); if (idx >= 0 && mode === 'overwrite') current[idx] = item; else if (idx < 0) current.push(item); }); };
+    mergeArr(acceptedRecords, data.acceptedRecords || []); mergeArr(rejectedRecords, data.rejectedRecords || []);
+    (data.sprayedRecords || []).forEach(w => { if (!sprayedRecords.find(x => String(x.recordId) === String(w.recordId))) sprayedRecords.push(w); });
+    (data.washedRecords || []).forEach(w => { if (!washedRecords.find(x => String(x.recordId) === String(w.recordId))) washedRecords.push(w); });
+    (data.inventoryMovements || []).forEach(m => { if (!inventoryMovements.find(x => x.dateTime === m.dateTime && x.count === m.count)) inventoryMovements.push(m); });
+    (data.providers || []).forEach(p => { const exist = providers.find(x => x.plate === p.plate && x.emirate === p.emirate); if (!exist) providers.push(p); });
+  }
+  saveProviders(); saveData(); rebuildAnimalIdIndex(); renderAll(); renderLiveInventory(); resetForm();
+  document.getElementById('importModeModal').classList.remove('active'); alert('✅ Import successful!');
+});
+document.getElementById('openHelpBtn').addEventListener('click', () => document.getElementById('helpModal').classList.add('active'));
+document.getElementById('closeHelpBtn').addEventListener('click', () => document.getElementById('helpModal').classList.remove('active'));
+
+// ======================== BOOTSTRAP ========================
+loadData();
+saveProviders();
+setDateTimeToNow();
+populateShopDropdown();
+createSpeciesRow();
+renderAll();
+renderLiveInventory();
+
+setTimeout(() => {
+  if (!restoreFormDraft() && acceptedRecords.length === 0 && rejectedRecords.length === 0) {
+    const now = new Date(); const d1 = new Date(now.getTime() - 25 * 60 * 1000).toISOString().slice(0,16);
+    acceptedRecords.push({
+      id: 'demo1', vehiclePlateNumber: '12345', vehicleEmirate: 'Abu Dhabi', vehiclePlate: '12345 - Abu Dhabi',
+      driverName: 'Ahmed Al Mansoori', driverId: '784-1990', driverContact: '+971 50 123 4567',
+      dateTime: d1, group: 'Baniyas livestock shops', individualShop: '1B SAMA LIWA LIVESTOCK - SOLE PROPRIETORSHIP L.L.C.',
+      healthCertNo: 'HC-2024-001', totalInCertificate: 100, sourceCertificate: 'ADM', notes: 'Demo data',
+      speciesLines: [{ species: 'Sheep', subBreed: 'Local', animalCount: 50 }, { species: 'Goat', subBreed: 'Pakistan', animalCount: 4 }],
+      acceptedAnimals: [{ idNumber: 'A-1001', species: 'Sheep', subBreed: 'Local' }]
+    });
+    saveData(); rebuildAnimalIdIndex(); renderAll(); renderLiveInventory();
+  }
+}, 500);
+
+</script>
+</body>
+</html>
